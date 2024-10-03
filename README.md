@@ -11,11 +11,11 @@ file structure
 │
 ├── /server              # Backend (Node.js with Express)
 │   ├── /src
-│   │   ├── /config
-│   │   ├── /controllers
-│   │   ├── /models
-│   │   ├── /routes
-│   │   └── /services
+│   │   ├── /config      #Configuration setting(e.g., db.js)
+│   │   ├── /controllers	#handles application logic and routes
+│   │   ├── /models				#database schema
+│   │   ├── /routes 			#API routes (e.g., user routes)
+│   │   └── /services			#business logic
 │   └── index.js
 │
 ├── package.json         # Root package.json for managing scripts
