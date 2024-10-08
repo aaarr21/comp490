@@ -21,3 +21,9 @@ file structure
 ├── package.json         # Root package.json for managing scripts
 ├── README.md            # Documentation
 └── .env                 # Environment variables
+
+
+
+NOTE: 
+  
+   Please message me for the specifics of the .env file because you cannot push it to the remote without violating branch protection
