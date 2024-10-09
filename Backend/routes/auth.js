@@ -40,6 +40,7 @@ router.get("/login/failed" , (req, res) =>{
  
 // success handler for google oAuth
 router.get("/WorkFlowBoard",isLoggedIN, (req,res) => {
+  console.log("this worked?");
   if(req.user){
     res.status(200).json({
         success:true,

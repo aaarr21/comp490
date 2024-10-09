@@ -34,9 +34,11 @@ const LoginPage = () => {
                         </section>
                     </div>
                     <button className="submitButton">Login</button>
-                    <div className="signUP">
-                        <p>No Account, Sign up!</p>
-                    </div>
+                    
+                    <Link to="/register">
+                    <button className="registerButton"> Sign up!</button>
+                    </Link>
+                    
                 </div>
             </div>
         </div>

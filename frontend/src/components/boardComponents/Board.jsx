@@ -1,18 +1,32 @@
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import Column from './Column';
 
+
 const Board = () => {
-   const [cards , setCards] = useState(DEFAULT_CARDS);
+   const [cards , setCards] = useState([]); 
+   const [hasChecked, sethasChecked] = useState(false);
+
+    useEffect( () => {
+        hasChecked && localStorage.setItem("cards", JSON.stringify(cards));
+    }, [cards]);
+
+    useEffect( () => {
+      const cardData = localStorage.getItem("cards");
+      setCards( cardData ? JSON.parse(cardData) : DEFAULT_CARDS);
+
+      sethasChecked(true);
+    }, []);
+
    return (<div className ="flex h-full w-full gap-3 overflow-scroll p-12">
      
-     <Column 
-     title="Backlog"
-     column="backlog"
+     <Column         
+     title="Backlog"                  //Backlog column, for all tasks to be done in some random time
+     column="backlog"                 //designator on what column type it is
      headingColor="text-neutral-500"
-     cards={cards}
+     cards={cards}                    // card objects within said column
      setCards={setCards}
      />
-     <Column 
+     <Column                        // Todo column, current tasks that aren't being worked on.
      title="TBD"
      column="TBD"
      headingColor="text-yellow-200"
@@ -20,7 +34,7 @@ const Board = () => {
      setCards={setCards}
      />
      <Column 
-     title="In Progress"
+     title="In Progress"                // Active column, tasks that are currently being done.
      column="active"
      headingColor="text-blue-200"
      cards={cards}
