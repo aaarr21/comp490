@@ -72,11 +72,7 @@ const Register = () =>{ //Component
               return;
            }
              try{
-             const response = await axios.post('/auth/register', {
-                username: subtestuser,
-                password: subtestPass
-                
-             })
+             const response = await axios.post('/register', { username,password  });
             console.log(response);
             setSuccess(true);
              } catch(err){
@@ -85,7 +81,7 @@ const Register = () =>{ //Component
                 }
              }
              errorRef.current.focus();
-       }
+       };
 
 
   return( <div className="h-screen w-full bg-neutral-900 text neutral-50">

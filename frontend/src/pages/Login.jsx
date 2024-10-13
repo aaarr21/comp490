@@ -1,11 +1,29 @@
+import { useState } from 'react';
 import google from '../components/images/googlethumbnail.webp';
 import { Link } from 'react-router-dom';
-
+import axios from 'axios';
 const LoginPage = () => {
     // Define the function to handle the Google login
     const googleLogin = () => {
         window.open("http://localhost:5000/auth/google", "_self");
     };
+
+    const [usernameLog,setuserNameLog] = useState('');
+
+    const [passwordLog, setpasswordLog] = useState('');
+
+    const handleLocalLogin = async (e) => {
+        e.preventDefault();
+        console.log(usernameLog); 
+          try {
+            const response = await axios.post('/login', {usernameLog, passwordLog});
+            console.log(response);
+          } catch (error) {
+            
+          }
+    }
+     
+
 
     return (
         <div className="loginBox">
@@ -22,8 +40,12 @@ const LoginPage = () => {
                     <div className="or">OR</div>
                 </div>
                 <div className="rightSide">
-                    <input type="text" className="inputField" placeholder="Username" required />
-                    <input type="password" className="inputField" placeholder="Password" required />
+                    <input type="text" className="inputField" 
+                      onChange={ (e) => setuserNameLog(e.target.value)}
+                    placeholder="Username" required />
+                    <input type="password" className="inputField"
+                      onChange={ (e) => setpasswordLog(e.target.value)}
+                    placeholder="Password" required />
                     <div className="forgot">
                         <section>
                             <input type="checkbox" id="check" />
@@ -33,7 +55,7 @@ const LoginPage = () => {
                             <a href="#">Forgot Password</a>
                         </section>
                     </div>
-                    <button className="submitButton">Login</button>
+                    <button className="submitButton" onClick={handleLocalLogin}>Login</button>
                     
                     <Link to="/register">
                     <button className="registerButton"> Sign up!</button>

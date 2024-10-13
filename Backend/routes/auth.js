@@ -29,6 +29,14 @@ router.get('/google/callback', passport.authenticate("google", {
 })); 
 
 
+router.post('auth/register' , (req,res) =>{
+     const username = req.body.username;
+     const password = req.body.password;
+     
+     console.log(username + "YAYYYYYYYYYYYYY");
+});
+
+
 
 // failure handler for google oAuth
 router.get("/login/failed" , (req, res) =>{
@@ -39,7 +47,7 @@ router.get("/login/failed" , (req, res) =>{
 });
  
 // success handler for google oAuth
-router.get("/WorkFlowBoard",isLoggedIN, (req,res) => {
+router.get("/WorkBoard",isLoggedIN, (req,res) => {
   console.log("this worked?");
   if(req.user){
     res.status(200).json({

@@ -18,13 +18,18 @@ const sessionSecret = process.env.SESSION_SECRET;
 
 
 
+
+
+
 app.use(express.json()); //parses incoming JSON requests
+app.use(express.urlencoded());
 app.use(cors({
-  origin: "http://localhost:3000",
+  origin: "localhost:3000",
   methods: "GET, POST, PUT, DELETE",
   credentials: true //  allow sending session cookies with request
 }));
 
+app.options('*',cors());
 
 
 app.use(session({
@@ -40,6 +45,49 @@ app.use(session({
 
 
 app.use("/auth", auth_routes);
+
+function isLoggedIN(req, res,next) {
+  //checks if logged in, sends 401 status if not
+  req.user ? next() : res.sendStatus(401);
+}
+
+app.get("/WorkBoard",isLoggedIN, (req,res) => {
+  console.log("this worked?");
+  if(req.user){
+    res.status(200).json({
+        success:true,
+        message: "Login successful",
+        user: req.user,
+        
+      });
+  } else {
+    res.status(401).json({
+      success: false,
+      message: "unauthorized user",
+    });
+    res.redirect("/");
+  }
+
+});
+
+
+app.post('/register' , (req,res) =>{
+  const username = req.body.username;
+  const password = req.body.password;
+   res.sendStatus(201);
+  console.log(username + " " + password); //check if this route actually acquired the username and password
+                                          // This should redone to include storing within the db.
+});
+
+app.post('/login', (req,res) =>{
+   const username = req.body.username;
+   const password = req.body.password;
+   res.sendStatus(201);
+   console.log(username + " " + password);
+ 
+});
+
+
 
 //MySql database connection
 /* const db = mysql.createPool({
