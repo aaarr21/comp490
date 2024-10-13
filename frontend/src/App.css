@@ -223,7 +223,35 @@ section a{
   color: #555;
 }
 
+.valid {
+  color: limegreen;
+  margin-left: 0.25rem;
+}
 
 
+.invalid {
+  color: blue;
+  margin-left: 0.25rem;
+}
+
+.errmsg{
+  color: blue;
+  margin-left: 0.25rem;
+}
+
+.erase{
+  position: absolute;
+  left:-9999px;
+}
+
+.userInstruct{
+  font-size:0.75rem;
+  border-radius: 0.5rem;
+  background: #000;
+  color: #fff;
+  padding: 0.25rem;
+  position: relative;
+  bottom: -10px;
+}
 
 
