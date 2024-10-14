@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from "react";
-import axios, { Axios } from 'axios';
+import axios from 'axios';
+
+import { Navigate, useNavigate } from "react-router-dom";
 
 
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/; // Password must be between 8-24 chracters, 
@@ -31,6 +33,8 @@ const Register = () =>{ //Component
        const userRef = useRef();
 
        const errorRef= useRef(); 
+       
+       const navigate = useNavigate();
 
       
          useEffect(()=> {
@@ -72,9 +76,13 @@ const Register = () =>{ //Component
               return;
            }
              try{
-             const response = await axios.post('/register', { username,password  });
+             const response = await axios.post('/register', { username,  password  });
             console.log(response);
             setSuccess(true);
+            setTimeout(()=>{
+               navigate('/');
+            },2000
+             )
              } catch(err){
                 if(!err?.reponse){
                   setErrmsg('No Server reponse');
@@ -93,10 +101,8 @@ const Register = () =>{ //Component
   
      
       {success ? (<section className = "bg-red-800 shadow-md rounded px-8 pt-6 pb-8 mb-4">
-           <h1> SUCCESS!</h1>
-           <p>
-               <a href="#">  Sign in</a>
-           </p>
+           <h1 className = "sectiontext"> SUCCESS!</h1>
+           
       </section>
       ) : (
 
