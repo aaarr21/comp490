@@ -15,9 +15,6 @@ function isLoggedIN(req, res,next) {
 //get route for Google Auth
 // scope of request from google; email and profile
 
-router.get("/", (req,res) =>{
-   
-})
 
 router.get("/google", passport.authenticate("google", {scope: ['email', 'profile'] })
 );
@@ -28,12 +25,19 @@ router.get('/google/callback', passport.authenticate("google", {
   successRedirect: FRONTEND_URL // redirect to flowban route
 })); 
 
+/* 
+    This should have a call to the database to search if the username already exists.
+   If not, then insert the userdata into a new record within the table.
+   Need our made userSchema and all database connections.
+    I cannot do this currently because I need my wsl distro password in order to install a mysql database. Of which
+    I have no clue on what it is.
+*/
 
-router.post('auth/register' , (req,res) =>{
-     const username = req.body.username;
-     const password = req.body.password;
-     
-     console.log(username + "YAYYYYYYYYYYYYY");
+router.post('/register' , (req,res) =>{          //NOTE: Currently this route never gets reached by front-end
+     const username = req.body.username;         // Attempt to axios.post with /auth/register does a 404 status,
+     const password = req.body.password;        // Which means the proxy doesn't play nice with /auth
+      res.sendStatus(201);
+   
 });
 
 

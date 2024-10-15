@@ -51,24 +51,12 @@ function isLoggedIN(req, res,next) {
   req.user ? next() : res.sendStatus(401);
 }
 
-app.get("/WorkBoard",isLoggedIN, (req,res) => {
+app.get("/WorkBoard",(req,res) => {
   console.log("this worked?");
-  if(req.user){
-    res.status(200).json({
-        success:true,
-        message: "Login successful",
-        user: req.user,
-        
-      });
-  } else {
-    res.status(401).json({
-      success: false,
-      message: "unauthorized user",
-    });
-    res.redirect("/");
+ 
   }
 
-});
+);
 
 
 app.post('/register' , (req,res) =>{

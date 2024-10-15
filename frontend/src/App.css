@@ -260,3 +260,18 @@ section a{
   
 }
 
+.hide{
+  display:none;
+
+}
+
+.invalid{
+  color:blue;
+  margin-left: 0.25rem;
+}
+
+.valid{
+  color:green;
+  margin-left:0.25rem;
+}
+

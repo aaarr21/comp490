@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import axios from 'axios';
-
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faCheck, faTimes, faInfoCircle} from "@fortawesome/free-solid-svg-icons";
 import { Navigate, useNavigate } from "react-router-dom";
 
 
@@ -68,7 +69,7 @@ const Register = () =>{ //Component
 
        const handleRegistration = async (e) =>{
           e.preventDefault();
-           const subtestuser = USER_REGEX.test(username);
+           const subtestuser = USER_REGEX.test(username); //final test, so someone can't just enable the submit button
            const subtestPass = PWD_REGEX.test(password);
 
            if(!subtestuser || !subtestPass){
@@ -76,8 +77,8 @@ const Register = () =>{ //Component
               return;
            }
              try{
-             const response = await axios.post('/register', { username,  password  });
-            console.log(response);
+             const response = await axios.post('/register', { username,  password  }); // DOesn't work with /auth/register
+            console.log(response);                                                     // Need to figure out why
             setSuccess(true);
             setTimeout(()=>{
                navigate('/');
@@ -101,7 +102,7 @@ const Register = () =>{ //Component
   
      
       {success ? (<section className = "bg-red-800 shadow-md rounded px-8 pt-6 pb-8 mb-4">
-           <h1 className = "sectiontext"> SUCCESS!</h1>
+           <h1 className = "sectiontext"> SUCCESS!Returning to Login Page.</h1>
            
       </section>
       ) : (
@@ -111,7 +112,9 @@ const Register = () =>{ //Component
       <h1 className ="mb-4 text-4xl font-extrabold  "> Register Here!</h1>
       <div className="mb-4">
         <label htmlFor="username" className="block text-white-700 text-sm font-bold mb-2">
-          Username
+          Username:
+           <FontAwesomeIcon icon={faCheck} className = {validName ? "valid" : "hide"}/>
+           <FontAwesomeIcon icon = {faTimes} className = {validName ? "hide" : "invalid"}/>
         </label>
         <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"  
            type="text"
@@ -134,7 +137,9 @@ const Register = () =>{ //Component
       </div>
       <div class="mb-6">
         <label htmlFor="password" class="block text-white-700 text-sm font-bold mb-2" >
-          Password
+          Password:
+          <FontAwesomeIcon icon={faCheck} className = {validPass ? "valid" : "hide"}/>
+          <FontAwesomeIcon icon = {faTimes} className = {validPass || !password ? "hide" : "invalid"}/>
         </label>
         <input className="shadow appearance-none border  rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" 
            onChange = {(e)=> setPassword(e.target.value)} 
@@ -158,7 +163,10 @@ const Register = () =>{ //Component
 
       <div class="mb-6">
         <label htmlFor="passMatch" class="block text-white-700 text-sm font-bold mb-2" >
-         Confirm Password
+         Confirm Password:
+
+         <FontAwesomeIcon icon={faCheck} className = {validMatch && passwordMatch ? "valid" : "hide"}/>
+         <FontAwesomeIcon icon = {faTimes} className = {validMatch || !passwordMatch ? "hide" : "invalid"}/>
         </label>
         <input className="shadow appearance-none border  rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" 
            onChange = {(e)=> setpasswordMatch(e.target.value)}
