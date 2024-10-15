@@ -17,8 +17,10 @@ dotenv.config();
 const app = express();
 const sessionSecret = process.env.SESSION_SECRET;
 
-// Middleware to parse incoming JSON requests
-app.use(express.json());
+
+app.use(express.json()); //  parse incoming JSON requests
+app.use(express.urlencoded({ extended: true }));
+
 
 // CORS setup to allow requests from frontend
 app.use(cors({
@@ -27,11 +29,13 @@ app.use(cors({
   credentials: true // allow sending session cookies with request
 }));
 
+app.options('*',cors());
+
 // Session management
 app.use(session({
   secret: sessionSecret, // Used to sign the session ID cookie
   resave: false, // Prevents saving the session back to the store if not modified
-  saveUninitialized: false, // Prevents saving uninitialized sessions
+  saveUninitialized: true, // Prevents saving uninitialized sessions
   cookie: {
     httpOnly: true, // Protects the cookie from being accessed by client-side scripts
     secure: process.env.NODE_ENV === 'production', // Set `secure` to true only in production for HTTPS

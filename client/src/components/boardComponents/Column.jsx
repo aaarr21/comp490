@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Card from './Card';
 import DropIndicator from "./DropIndicator";
 
@@ -154,28 +154,46 @@ const Column = ({ title, headingColor, column, cards, setCards, activeCardMenu, 
 const AddCard = ({ column, setCards }) => {
   const [text, setText] = useState("");
   const [adding, setAdding] = useState(false);
+  const formRef = useRef(null);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    if (!text.trim().length) return;
+  const handleSubmit = () => {
+    const trimmedText = text.trim();
+    if (!trimmedText.length) return;
 
     const newCard = {
       column,
-      title: text.trim(),
+      title: trimmedText,
       id: Math.random().toString(),
     };
 
     setCards((prev) => [...prev, newCard]);
-
-    setAdding(false);
+    setText(""); // Clear input field
+    setAdding(false); // Close the form after adding
   };
+
+  const handleClickOutside = (e) => {
+    if (formRef.current && !formRef.current.contains(e.target)) {
+      setAdding(false); // Just close the form without saving
+    }
+  };
+
+  useEffect(() => {
+    if (adding) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [adding]);
 
   return (
     <>
       {adding ? (
-        <form onSubmit={handleSubmit}>
+        <form ref={formRef} onSubmit={(e) => e.preventDefault()}>
           <textarea
+            value={text}
             onChange={(e) => setText(e.target.value)}
             autoFocus
             placeholder="Add new Form..."
@@ -183,13 +201,9 @@ const AddCard = ({ column, setCards }) => {
           />
           <div className="mt-1.5 flex items-center justify-end gap-1.5">
             <button
-              onClick={() => setAdding(false)}
-              className="px-3 py-1.5 text-sm text-neutral-400 transition-colors hover:text-neutral-50"
-            >
-              Close
-            </button>
-            <button
-              type="submit"
+              onClick={() => {
+                handleSubmit();
+              }}
               className="flex items-center gap-1.5 rounded bg-neutral-50 px-3 py-1.5 text-xs text-neutral-950 transition-colors hover:bg-neutral-300"
             >
               <span>Add</span>
@@ -207,5 +221,7 @@ const AddCard = ({ column, setCards }) => {
     </>
   );
 };
+
+
 
 export default Column;

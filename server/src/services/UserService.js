@@ -40,9 +40,9 @@ class UserService {
         return user;
     }
 
-    // Find user by Google ID or create a new one
-    async findOrCreateByGoogleId(googleId, email, name) {
-        return await this.userRepository.findOrCreateByGoogleId(googleId, email, name);
+    // Find user by Google ID or create a new one with tokens
+    async findOrCreateByGoogleId(googleId, email, name, accessToken, refreshToken) {
+        return await this.userRepository.findOrCreateByGoogleId(googleId, email, name, accessToken, refreshToken);
     }
 
     // Find a user by their ID
@@ -51,9 +51,9 @@ class UserService {
     }
 
     // Retrieve all users from the database
-async getAllUsers() {
-    return await this.userRepository.getAllUsers();
-}
+    async getAllUsers() {
+        return await this.userRepository.getAllUsers();
+    }
 }
 
 module.exports = UserService;

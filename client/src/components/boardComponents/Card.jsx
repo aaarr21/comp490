@@ -1,51 +1,31 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
-const Card = ({ title, id, column, handleDragStart, onEdit, onDelete, setActiveCardMenu, activeCardMenu }) => {
+const Card = ({ title, id, column, handleDragStart, onEdit, onDelete }) => {
   const [menuVisible, setMenuVisible] = useState(false);
-  const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(title);
+  const menuRef = useRef(null);
 
-  // Handle right-click event
-  const handleContextMenu = (e) => {
-    e.preventDefault();
-    setMenuPosition({ x: e.pageX, y: e.pageY });
-    setMenuVisible(true);
-    setActiveCardMenu(id);
-  };
-
-  // Handle click outside to close the menu
   const handleClickOutside = useCallback(
     (e) => {
-      if (menuVisible && !e.target.closest(".context-menu")) {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
         setMenuVisible(false);
-        setActiveCardMenu(null);
       }
     },
-    [menuVisible, setActiveCardMenu]
+    []
   );
 
   useEffect(() => {
-    document.addEventListener("click", handleClickOutside);
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
-    };
-  }, [handleClickOutside]);
-
-  // Close menu if another card's context menu is opened
-  useEffect(() => {
-    if (activeCardMenu !== id) {
-      setMenuVisible(false);
+    if (menuVisible) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
     }
-  }, [activeCardMenu, id]);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [menuVisible, handleClickOutside]);
 
-  // Handle edit action
-  const handleEdit = () => {
-    setIsEditing(true);
-    setMenuVisible(false);
-  };
-
-  // Handle save action
   const handleSaveEdit = () => {
     if (editTitle.trim() !== "") {
       onEdit(id, editTitle);
@@ -54,54 +34,50 @@ const Card = ({ title, id, column, handleDragStart, onEdit, onDelete, setActiveC
   };
 
   return (
-    <>
-      <div
-        draggable="true"
-        onDragStart={(e) => handleDragStart(e, { title, id, column })}
-        onContextMenu={handleContextMenu}
-        className="cursor-grab rounded border border-neutral-700 bg-neutral-800 p-3 active:cursor-grabbing"
+    <div
+      draggable="true"
+      onDragStart={(e) => handleDragStart(e, { title, id, column })}
+      className="relative cursor-grab rounded border border-neutral-700 bg-neutral-800 p-3 active:cursor-grabbing"
+    >
+      {/* Horizontal three-dot menu button, adjusted for extra spacing */}
+      <button
+        onClick={() => setMenuVisible((prev) => !prev)}
+        className="absolute top-2 right-2 text-neutral-400 hover:text-neutral-50"
+        style={{ padding: "0", margin: "4px", transform: "translate(50%, -50%)" }}
       >
-        {isEditing ? (
-          <textarea
-            value={editTitle}
-            onChange={(e) => setEditTitle(e.target.value)}
-            onBlur={handleSaveEdit}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault(); // Prevent new line on enter
-                handleSaveEdit();
-              }
-            }}
-            autoFocus
-            className="w-full bg-neutral-800 text-neutral-100 p-1 rounded focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none"
-          />
-        ) : (
-          <p
-            className="text-sm text-neutral-100 break-words"
-            style={{
-              maxWidth: "100%",
-              wordWrap: "break-word",
-            }}
-          >
-            {title}
-          </p>
-        )}
-      </div>
+        &#x2026; {/* Horizontal ellipsis */}
+      </button>
 
-      {/* Custom Context Menu */}
+      {isEditing ? (
+        <textarea
+          value={editTitle}
+          onChange={(e) => setEditTitle(e.target.value)}
+          onBlur={handleSaveEdit}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              handleSaveEdit();
+            }
+          }}
+          autoFocus
+          className="w-full bg-neutral-800 text-neutral-100 p-1 rounded focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none"
+        />
+      ) : (
+        <p className="text-sm text-neutral-100 break-words">{title}</p>
+      )}
+
+      {/* Dropdown menu for Edit and Delete */}
       {menuVisible && (
         <div
-          className="context-menu rounded-md bg-white shadow-md p-1.5"
-          style={{
-            top: menuPosition.y,
-            left: menuPosition.x,
-            position: "absolute",
-            zIndex: 1000,
-          }}
+          ref={menuRef}
+          className="absolute top-6 right-2 z-10 rounded-md bg-white shadow-md p-1.5"
         >
           <ul className="list-none m-0 p-0 text-sm">
             <li
-              onClick={handleEdit}
+              onClick={() => {
+                setIsEditing(true);
+                setMenuVisible(false);
+              }}
               className="cursor-pointer px-3 py-1 rounded hover:bg-violet-100 transition-colors"
             >
               ✏️ Edit
@@ -110,7 +86,6 @@ const Card = ({ title, id, column, handleDragStart, onEdit, onDelete, setActiveC
               onClick={() => {
                 onDelete(id);
                 setMenuVisible(false);
-                setActiveCardMenu(null);
               }}
               className="cursor-pointer px-3 py-1 rounded hover:bg-red-100 transition-colors"
             >
@@ -119,7 +94,7 @@ const Card = ({ title, id, column, handleDragStart, onEdit, onDelete, setActiveC
           </ul>
         </div>
       )}
-    </>
+    </div>
   );
 };
 

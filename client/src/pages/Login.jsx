@@ -4,10 +4,40 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const LoginPage = () => {
+
+ // Simulate checking if user is logged in, e.g., via a token or session check
+ const checkLoginStatus = async () => {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/status`, {
+        credentials: 'include',
+    });
+    const data = await response.json();
+    if (data.loggedIn) {
+        navigate('/workBoard');
+    }
+};
+
+useEffect(() => {
+    // Check login status on component mount
+    checkLoginStatus();
+}, []);
+
+
     // Define the function to handle the Google login
     const googleLogin = () => {
-        window.open("http://localhost:5000/auth/google", "_self");
+        const width = 500;
+        const height = 600;
+        
+        // Calculate the position to center the window on the screen
+        const left = (window.screen.width / 2) - (width / 2);
+        const top = (window.screen.height / 2) - (height / 2);
+    
+        window.open(
+            `${process.env.REACT_APP_API_URL}/auth/google`, 
+            'Google Login', 
+            `width=${width},height=${height},top=${top},left=${left}`
+        );
     };
+    
 
     const userRef = useRef();
     const [usernameLog, setUsernameLog] = useState('');
