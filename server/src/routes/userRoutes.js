@@ -68,7 +68,8 @@ router.post('/logout', (req, res, next) => {
   });
 });
 
-// Dynamic Route to get user profile by ID
+// moved here because routes are matched to avoid unintenetional matches which was causing the bug where clicking sign in with google would redirect you to blank page
+//Dynamic Route to get user profile by ID 
 router.get('/:id', userController.getUserProfile);  // Route to get user profile by ID (move this last)
 
 module.exports = router;

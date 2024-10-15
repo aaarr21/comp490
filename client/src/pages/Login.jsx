@@ -1,26 +1,26 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import google from '../components/images/googlethumbnail.webp';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const LoginPage = () => {
+    const navigate = useNavigate(); // Define navigate here
 
- // Simulate checking if user is logged in, e.g., via a token or session check
- const checkLoginStatus = async () => {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/status`, {
-        credentials: 'include',
-    });
-    const data = await response.json();
-    if (data.loggedIn) {
-        navigate('/workBoard');
-    }
-};
+    // Simulate checking if user is logged in, e.g., via a token or session check
+    const checkLoginStatus = useCallback(async () => {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/status`, {
+            credentials: 'include',
+        });
+        const data = await response.json();
+        if (data.loggedIn) {
+            navigate('/workBoard');
+        }
+    }, [navigate]);
 
-useEffect(() => {
-    // Check login status on component mount
-    checkLoginStatus();
-}, []);
-
+    useEffect(() => {
+        // Check login status on component mount
+        checkLoginStatus();
+    }, [checkLoginStatus]);
 
     // Define the function to handle the Google login
     const googleLogin = () => {
@@ -37,12 +37,10 @@ useEffect(() => {
             `width=${width},height=${height},top=${top},left=${left}`
         );
     };
-    
 
     const userRef = useRef();
     const [usernameLog, setUsernameLog] = useState('');
     const [passwordLog, setPasswordLog] = useState('');
-    const navigate = useNavigate(); // <-- Define navigate here
 
     useEffect(() => {
         userRef.current.focus();
@@ -76,13 +74,21 @@ useEffect(() => {
                     <div className="or">OR</div>
                 </div>
                 <div className="rightSide">
-                    <input type="text" className="inputField"
+                    <input 
+                        type="text" 
+                        className="inputField"
                         onChange={(e) => setUsernameLog(e.target.value)}
                         ref={userRef}
-                        placeholder="Username" required />
-                    <input type="password" className="inputField"
+                        placeholder="Username" 
+                        required 
+                    />
+                    <input 
+                        type="password" 
+                        className="inputField"
                         onChange={(e) => setPasswordLog(e.target.value)}
-                        placeholder="Password" required />
+                        placeholder="Password" 
+                        required 
+                    />
                     <div className="forgot">
                         <section>
                             <input type="checkbox" id="check" />
