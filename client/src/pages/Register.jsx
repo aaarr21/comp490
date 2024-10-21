@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faCheck, faTimes, faInfoCircle} from "@fortawesome/free-solid-svg-icons";
 
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
 const USER_REGEX = /^[a-zA-Z][a-zA-Z0-9-_]{3,23}$/;
@@ -50,7 +52,7 @@ const Register = () => {
     }
     
     try {
-      const response = await axios.post('/auth/register', { 
+      const response = await axios.post('/api/register', { 
         username, password 
       });
       console.log(response);
@@ -80,7 +82,10 @@ const Register = () => {
             <p ref={errorRef} className={errMsg ? "errmsg" : "erase"} aria-live="assertive">{errMsg}</p>
             <h1 className="mb-4 text-4xl font-extrabold">Register Here!</h1>
             <div className="mb-4">
-              <label htmlFor="username" className="block text-white-700 text-sm font-bold mb-2">Username</label>
+              <label htmlFor="username" className="block text-white-700 text-sm font-bold mb-2">Username:
+              <FontAwesomeIcon icon={faCheck} className = {validName ? "valid" : "hide"}/>
+              <FontAwesomeIcon icon = {faTimes} className = {validName ? "hide" : "invalid"}/>
+              </label>
               <input 
                 type="text"
                 id="username"
@@ -99,7 +104,10 @@ const Register = () => {
               </p>
             </div>
             <div className="mb-6">
-              <label htmlFor="password" className="block text-white-700 text-sm font-bold mb-2">Password</label>
+              <label htmlFor="password" className="block text-white-700 text-sm font-bold mb-2">Password:
+              <FontAwesomeIcon icon={faCheck} className = {validPass ? "valid" : "hide"}/>
+              <FontAwesomeIcon icon = {faTimes} className = {validPass || !password ? "hide" : "invalid"}/>
+              </label>
               <input 
                 type="password" 
                 id="password"
@@ -116,7 +124,10 @@ const Register = () => {
               </p>
             </div>
             <div className="mb-6">
-              <label htmlFor="passMatch" className="block text-white-700 text-sm font-bold mb-2">Confirm Password</label>
+              <label htmlFor="passMatch" className="block text-white-700 text-sm font-bold mb-2">Confirm Password:
+              <FontAwesomeIcon icon={faCheck} className = {validMatch && passwordMatch ? "valid" : "hide"}/>
+              <FontAwesomeIcon icon = {faTimes} className = {validMatch || !passwordMatch ? "hide" : "invalid"}/>
+              </label>
               <input 
                 type="password" 
                 id="passMatch"
