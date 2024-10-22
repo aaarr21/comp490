@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 
-clsas User {
+class User {
 	//constructor to establish the user object
 	constructor(id,email, password,name, role,createdAt) {
 		this.id = id || uuidv4(); //Generate a UUID
