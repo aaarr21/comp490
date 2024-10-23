@@ -1,3 +1,4 @@
+const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const UserRepository = require('../repository/UserRepository');
 
@@ -7,24 +8,22 @@ class UserService {
     }
 
     // Register a new user with additional fields
-    async register(email, password, name, role) {
-        const existingUser = await this.userRepository.findByEmail(email);
-        if (existingUser) {
-            throw new Error('User already exists');
-        }
-        const newUser = await User.register(email, password, name, role);
+    async register(username, email, password, role) {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const newUser = new User(null, username, email, hashedPassword, role);
         await this.userRepository.save(newUser);
         return newUser;
     }
 
-    // Login a user by email and password
-    async login(email, password) {
-        const userRecord = await this.userRepository.findByEmail(email);
+    // Login a user by email or username and password
+    async login(identifier, password) {
+        const userRecord = await this.userRepository.findByUsernameOrEmail(identifier, identifier);
         if (!userRecord) {
             throw new Error('User not found');
         }
         const user = new User(
             userRecord.id,
+            userRecord.username,
             userRecord.email,
             userRecord.password,
             userRecord.name,
@@ -33,11 +32,15 @@ class UserService {
         );
 
         const isAuthenticated = await user.authenticate(password);
-
         if (!isAuthenticated) {
             throw new Error('Invalid password');
         }
         return user;
+    }
+
+    // Find a user by username or email
+    async findByUsernameOrEmail(username, email) {
+        return await this.userRepository.findByUsernameOrEmail(username, email);
     }
 
     // Find user by Google ID or create a new one with tokens
@@ -54,6 +57,11 @@ class UserService {
     async getAllUsers() {
         return await this.userRepository.getAllUsers();
     }
+    // Method to update user profile
+    async updateUserProfile(userId, updatedData) {
+        return await this.userRepository.updateUserProfile(userId, updatedData);
+    }
+
 }
 
 module.exports = UserService;

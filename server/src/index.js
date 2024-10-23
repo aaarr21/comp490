@@ -49,7 +49,7 @@ app.use(passport.session());
 
 // Route handling for user-related requests
 
-app.use('/auth', userRoutes);
+app.use('/auth', userRoutes); 
 
 // MySQL database connection setup
 const db = mysql.createPool({
