@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import google from '../components/images/googlethumbnail.webp';
+import csunlogo from '../components/images/CSUNlogo.png'
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -8,7 +9,7 @@ const LoginPage = () => {
 
     // Simulate checking if user is logged in, e.g., via a token or session check
     const checkLoginStatus = useCallback(async () => {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/status`, {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/uth/status`, {
             credentials: 'include',
         });
         const data = await response.json();
@@ -32,7 +33,7 @@ const LoginPage = () => {
         const top = (window.screen.height / 2) - (height / 2);
     
         window.open(
-            `${process.env.REACT_APP_API_URL}/auth/google`, 
+            `${process.env.REACT_APP_API_URL}/api/google`, 
             'Google Login', 
             `width=${width},height=${height},top=${top},left=${left}`
         );
@@ -41,10 +42,11 @@ const LoginPage = () => {
     const userRef = useRef();
     const [usernameLog, setUsernameLog] = useState('');
     const [passwordLog, setPasswordLog] = useState('');
+    const [errMsg, setErrMsg] = useState('');
 
     useEffect(() => {
         userRef.current.focus();
-    }, []);
+    }, []); 
 
     const handleLocalLogin = async (e) => {
         e.preventDefault();
@@ -60,51 +62,71 @@ const LoginPage = () => {
     };
 
     return (
-        <div className="loginBox">
-            <h1 className="loginTitle">Choose your Login Type</h1>
-            <div className="wrapAround">
-                <div className="leftSide">
-                    <button className="loginButton google" onClick={googleLogin}>
-                        <img src={google} alt="Google" className="icon" />
-                        Sign in with Google
-                    </button>
-                </div>
-                <div className="center">
-                    <div className="line" />
-                    <div className="or">OR</div>
-                </div>
-                <div className="rightSide">
-                    <input 
+        <div className='main'>
+        <div className="container">
+            <section className = "leftSide">
+                 <img src={csunlogo} alt ="csunLogo" className ="csunLogo"/>
+                 <p className="welcome"> Welcome! <br></br> Don't have an Account?</p>
+                 <Link to="/register" className="switchToRegister">
+                   Create Account
+                 </Link>
+  
+            </section>
+            <section className = "rightSide">
+                     <form className ="loginForm">
+                     <h1 className= "formTitle">Login!</h1>
+                        <div className ="inputs">
+                         
+                         <div className = "inputBox">
+                          <label htmlFor='username' className= "labels">Username </label>
+
+                          <input 
                         type="text" 
                         className="inputField"
                         onChange={(e) => setUsernameLog(e.target.value)}
                         ref={userRef}
+                        id="username"
                         placeholder="Username" 
                         required 
                     />
+                    </div>
+                    <div className ="inputBox">
+                    <label htmlFor='password' className = "labels">Password</label>
                     <input 
+                        id='password'
                         type="password" 
                         className="inputField"
                         onChange={(e) => setPasswordLog(e.target.value)}
                         placeholder="Password" 
                         required 
                     />
-                    <div className="forgot">
-                        <section>
-                            <input type="checkbox" id="check" />
-                            <label htmlFor="check">Remember me</label>
-                        </section>
-                        <section>
-                            <a href="#">Forgot Password</a>
-                        </section>
                     </div>
-                    <button className="submitButton" onClick={handleLocalLogin}>Login</button>
+                    </div>
+                     </form>
 
-                    <Link to="/register">
-                        <button className="registerButton"> Sign up!</button>
-                    </Link>
-                </div>
-            </div>
+                     <div className ="auxillary">
+                      <div className ="rememberCheck">
+                     <input type="checkbox" id="check"/> 
+                     <label htmlFor="check">Remember me</label>
+                     </div>
+                     <div className="forgotLink">
+                     <Link to="/forgot" > Forgot password? </Link>
+                     </div>
+                     </div>
+
+                     <div className = "logins">
+                         
+                          <button onSubmit={handleLocalLogin} className="loginButton"> Log In</button>
+                          <p className="or"> OR </p>
+                          <button className="loginButton google" onClick={googleLogin}>
+                        <img src={google} alt="Google" className="icon" />
+                        Sign in 
+                         </button>
+                     </div>
+
+            </section>
+        </div>
+
         </div>
     );
 };
