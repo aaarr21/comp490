@@ -6,6 +6,11 @@ class UserService {
     constructor() {
         this.userRepository = new UserRepository();
     }
+	// centralizing logic for excluding sensitive fields
+	excludeSensitiveFields(user) {
+		const { password: _, ...userData } = user.dataValues;
+		return userData;
+	}
 
     // Register a new user with additional fields
     async register(email, password, name, role) {
@@ -29,9 +34,7 @@ class UserService {
         // Save the new user in the database
         const savedUser = await this.userRepository.save(newUser);
 
-        // Return the user data without the password
-        const { password: _, ...userData } = savedUser.dataValues;
-        return userData;
+        return this.excludeSensitiveFields(savedUser);
     }
 
     // Login a user by email and password
@@ -48,10 +51,55 @@ class UserService {
             throw new Error('Invalid password');
         }
 
-        // Return the user data without the password
-        const { password: _, ...userData } = userRecord.dataValues;
-        return userData;
+        return this.excludeSensitiveFields(userRecord);
     }
+
+
+	//reset password
+	async resetPassword(email, password) {
+		// Retrieve the user record from the database
+		const userRecord = await this.userRepository.findByEmail(email);
+		if (!userRecord) {
+			throw new Error('User not found');
+		}
+		// Hash the new password and update the user record
+		const hashedPassword = await hash(password, 10);
+		userRecord.password = hashedPassword;
+		await this.userRepository.updateUser(userRecord.id, userRecord);
+		return this.excludeSensitiveFields(userRecord);
+	}
+
+	//get user profile
+	async getUserProfile(id) {
+		const user = await this.userRepository.findById(id);
+		if (!user) {
+			throw new Error('User not found');
+		}
+		return this.excludeSensitiveFields(user);
+	}
+
+	//update user profile
+	async updateUserProfile(id, email, name, role) {
+		const user = await this.userRepository.findById(id);
+		if (!user) {
+			throw new Error('User not found');
+		}
+		user.email = email;
+		user.name = name;
+		user.role = role;
+		await this.userRepository.updateUser(id, user);
+		return this.excludeSensitiveFields(user);
+	}
+
+	//delete user
+	async deleteUser(id) {
+		const user = await this.userRepository.findById(id);
+		if (!user) {
+			throw new Error('User not found');
+		}
+		await this.userRepository.deleteUser(id);
+	}
 }
+
 
 export default UserService;

@@ -11,4 +11,4 @@ const validateUserId = (req, res, next) => {
     next();
 };
 
-module.exports = validateUserId;
+export default validateUserId;

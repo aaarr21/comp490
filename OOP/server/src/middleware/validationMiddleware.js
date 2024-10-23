@@ -1,5 +1,5 @@
 // validationMiddleware.js
-const { body, validationResult } = require('express-validator');
+import { body, validationResult } from 'express-validator';
 
 // Validation rules for user registration
 const validateUserRegistration = [
@@ -29,7 +29,7 @@ const validateUserLogin = [
     }
 ];
 
-module.exports = {
+export default {
     validateUserRegistration,
     validateUserLogin
 };

@@ -1,5 +1,5 @@
 // authMiddleware.js
-const jwt = require('jsonwebtoken');
+import { verify } from 'jsonwebtoken';
 
 // Middleware to verify JWT token
 const authenticateJWT = (req, res, next) => {
@@ -11,7 +11,7 @@ const authenticateJWT = (req, res, next) => {
 
     // Verify the token
     try {
-        const decoded = jwt.verify(token.split(' ')[1], process.env.JWT_SECRET);
+        const decoded = verify(token.split(' ')[1], process.env.JWT_SECRET);
         req.user = decoded; // Add decoded token data (like user ID) to the request
         next(); // Continue to the next middleware or route handler
     } catch (error) {
@@ -19,4 +19,4 @@ const authenticateJWT = (req, res, next) => {
     }
 };
 
-module.exports = authenticateJWT;
+export default authenticateJWT;
