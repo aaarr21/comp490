@@ -1,8 +1,8 @@
-import { Router } from 'express';
-import userController from '../controllers/UserController'; // Import the user controller
-import { validateUserRegistration, validateUserLogin } from '../middlewares/validationMiddleware'; // Import validation middleware
-import authenticateJWT from '../middlewares/authMiddleware'; // Import authentication middleware
-import validateUserId from '../middlewares/validateUserId'; // Middleware for validating user ID
+const Router = require('express').Router;
+const userController = require('../controllers/UserController'); // Import the user controller
+const { validateUserRegistration, validateUserLogin } = require('../middlewares/validationMiddleware'); // Import validation middleware
+const authenticateJWT = require('../middlewares/authMiddleware'); // Import authentication middleware
+const validateUserId = require('../middlewares/validateUserId'); // Middleware for validating user ID
 
 const router = Router(); // Create a new router object
 
@@ -22,4 +22,4 @@ router.put('/:id', authenticateJWT, validateUserId, userController.updateUserPro
 router.delete('/:id', authenticateJWT, validateUserId, userController.deleteUser);
 
 // Export the router to use it in index.js or app.js
-export default router;
+module.exports = router;
