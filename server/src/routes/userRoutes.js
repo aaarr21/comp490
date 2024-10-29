@@ -6,7 +6,7 @@ const FRONTEND_URL = "http://localhost:3000/WorkBoard";
 
 // --- User Management Routes ---
 router.post('/register', userController.registerUser);  // Route to register a new user
-router.post('/login', userController.loginUser);  // Route to log in a user
+router.post('/login', userController.loginUser);  // Backend login route
 router.get('/users', userController.getAllUsers);  // Route to get all users
 router.put('/:id', userController.updateUserProfile);  // Route to update user profile
 router.delete('/:id', userController.deleteUser);  // Route to delete a user
@@ -68,8 +68,12 @@ router.post('/logout', (req, res, next) => {
   });
 });
 
+
+
 // moved here because routes are matched to avoid unintenetional matches which was causing the bug where clicking sign in with google would redirect you to blank page
 //Dynamic Route to get user profile by ID 
 router.get('/:id', userController.getUserProfile);  // Route to get user profile by ID (move this last)
+
+
 
 module.exports = router;
