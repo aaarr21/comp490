@@ -20,22 +20,22 @@ const registerUser = async (req, res) => {
         // Register the new user
         const newUser = await userService.register(username, email, password, role);
         res.status(201).json({ message: 'User registered successfully', newUser });
-    } catch (error) {
+	} catch (error) {
         console.error('Error during registration:', error);
         res.status(500).json({ error: 'Registration failed' });
-    }
+	}
 };
 
 
 // Route handler for user login
 const loginUser = async (req, res) => {
     const { identifier, password } = req.body;  // 'identifier' can be email or username
-    try {
+	try {
         const user = await userService.login(identifier, password);  // Let UserService handle identifier checks
-        res.status(200).json({ message: 'Login successful', user });
+		res.status(200).json({ message: 'Login successful', user });
     } catch (error) {
         res.status(401).json({ error: error.message });
-    }
+	}
 };
 
 // Route handler for getting user profile by ID

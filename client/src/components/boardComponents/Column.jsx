@@ -11,7 +11,7 @@ const Column = ({ title, headingColor, column, cards, setCards, activeCardMenu, 
 
   const handleDragOver = (e) => {
     e.preventDefault();
-    setActive(true);
+    setActive(true); //Set to the current column area
     if (highlightIndicator) {
       highlightIndicator(e);
     }
