@@ -4,6 +4,7 @@ import Navibar from './components/NaviBar';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import WorkBoard from './pages/WorkFlowBoard';
+import ForgotPassword from './pages/ForgotPassword';
 
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 
@@ -11,7 +12,7 @@ function App() {
   const location = useLocation();
 
   // Conditionally render Navibar if the current path is not '/login' or '/'
-  const shouldShowNavibar = location.pathname !== '/login' && location.pathname !== '/' && location.pathname !== '/register';
+  const shouldShowNavibar = location.pathname !== '/login' && location.pathname !== '/' && location.pathname !== '/register' && location.pathname !== '/forgot-password';
 
   return (
     <div>
