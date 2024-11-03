@@ -3,6 +3,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../components/styles/ForgotPasswordPage.css';
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faCheck, faTimes, faInfoCircle} from "@fortawesome/free-solid-svg-icons";
 
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
 /* 
@@ -14,6 +16,8 @@ const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
     Do the actually backend part, IE routing to find the email, handle if email is really invalid.
     Send an email, with a code, store it to compare to user input
     Then actually modify password.
+
+    
 */
       
  const ForgotPassword  = () =>{
@@ -21,6 +25,7 @@ const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
          
       
           const [nextPage, setnextPage] = useState(false);
+          const [resetTrue, setresetTrue] = useState(false);
         
       
             
@@ -31,7 +36,7 @@ const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
                     
                     <section className = "forgot-password-section">
                        
-                     {( nextPage ? <EmailCodeSection/> :  <VerifyEmailSection  setcompState={setnextPage}/> )} 
+                     {( resetTrue ? <ResetPassword/> : nextPage ? <EmailCodeSection setCodeState ={setresetTrue}/> :  <VerifyEmailSection  setcompState={setnextPage}/> )} 
                     </section>
                    
                 </div>
@@ -65,13 +70,13 @@ const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
 
         const handleEmailSubmit = async (e) => {
             e.preventDefault();
-            console.log(validEmail);
+            
              if(forgotEmail.includes('@')=== false){ //Check if it's even valid
                  seterrorMsg('Invalid email');
                  return;
              }
              setvalidEmail(true);
-             setcompState(true)
+             setcompState(true);
            
         };
 
@@ -94,24 +99,47 @@ const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
  };
 
 
- const EmailCodeSection = () =>{ //page to deal with email section. IE type in one time code for password reset.
+ const EmailCodeSection = ({setCodeState}) =>{ //page to deal with email section. IE type in one time code for password reset.
                                  //This will probably be act mostly the same as forgotPasswor
           const userRef = useRef();
           const errorRef = useRef();
+          
+          
+          /* 
+            Note: 
+                This creates a string that has 5 digits, the A is set in stnoe for the time being, until I can randomize that.
+          */
+          const generateVerificationCode = () =>{
+            return Math.floor(Math.random() * 10).toString() +  Math.floor(Math.random() * 10).toString()  +  Math.floor(Math.random() * 10).toString()  +  Math.floor(Math.random() * 10).toString() + "A"; 
+          }
 
-         const handleCodeVerification = async (e) =>{ // TBD, guessing we use something to create a code and then check here?
+         const handleCodeVerification = async (e) =>{ //
             e.preventDefault();  
-            let value = '89AE';
-              if(passcode != value){
+
+              if(passcode !== usercode){
                 //Do thing
                 seterrorMsg("invalid code");
                 return;
               }
-             <ResetPassword/>
+            setCodeState(true);
          }
-
+          const [usercode, setUserCode] = useState(generateVerificationCode());
           const [passcode, setPasscode] = useState('');
           const [errMsg, seterrorMsg] = useState("");
+          
+          /*  
+               For the resend link, should update the usercode with a new code. Then send another email.
+               Current issue: Clicking this bricks handleCodeVerification. I presume that usercode isn't updated with the new value in that function.
+               This is kinda hacky, and I should look at code creation in the backend, as the code may change if user refreshes the page.
+          */
+          const ResendCode = () =>{  
+              setUserCode(generateVerificationCode());// update state with new generated code.
+             // console.log(usercode);               
+          }
+
+          useEffect(()=>{
+               // console.log(usercode);
+            },[]);
 
           useEffect(()=> {
              seterrorMsg('');
@@ -132,6 +160,7 @@ const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
                                     
                       />
                      <button className="forgot-password-button">Submit</button>
+                     <p onClick={ResendCode} className="resend-link">Resend Code</p>
 
                 </form>
    
@@ -143,30 +172,45 @@ const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
     const errorRef = useRef();
 
     const [newPassword, setPassword] = useState(""); // This seems exploitable.
-    const [validPassword,setvalidPassword] = useState(false);
-    const [errMsg,seterrMsg] = useState('');
+    const [validPassword,setvalidPassword] = useState(false); // Determine a valid password
+    const [errMsg,seterrMsg] = useState(''); //Error message
+    const [success,setSuccess] = useState(false); //state to determine successful password reset.
+    const navigate = useNavigate();
 
-    const handlePasswordReset = () =>{
-        console.log("LLLLLLLLL");
+
+    useEffect(()=> {
+         setvalidPassword(PWD_REGEX.test(newPassword));
+        
+    },[newPassword]);
+
+    const handlePasswordReset = async (e) =>{
+        e.preventDefault();
+        setSuccess(true);
+        navigate('/login');
+        console.log("pressed");
     }
 
-    return (
+    return ( 
         <form className="forgot-password-form" onSubmit={handlePasswordReset}>
+            
         <h1 className="forgot-password-form-title"> Must be 8-24 characters, one special character, one digit,<br/> one upper and lowercase:</h1>
 
-        <label htmlFor='resetCode'> New Password:   <p ref={errorRef} className={errMsg ? "forgot-invalid" : "forgot-hide"} aria-live="assertive">{errMsg}</p> </label>
+        <label htmlFor='resetCode'> New Password:  
+        <FontAwesomeIcon icon={faCheck} className = {validPassword ? "forgot-valid" : "forgot-hide"}/>
+        <FontAwesomeIcon icon = {faTimes} className = { !validPassword ? "forgot-invalid" : "forgot-hide"}/>     
+        </label>
 
         <input 
         className="forgot-password-input"
         id="resetcode"
-        type= "text"
+        type= "password"
         ref = {userRef}
         onChange = {(e)=> setPassword(e.target.value) } 
                       
         />
-       <button className="forgot-password-button">Submit</button>
+       <button disabled={!validPassword ? true : false} className="forgot-password-button">Submit</button>
 
-  </form>
+  </form> 
     );
   }
 
