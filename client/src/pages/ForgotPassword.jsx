@@ -100,45 +100,52 @@ const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
 
 
  const EmailCodeSection = ({setCodeState}) =>{ //page to deal with email section. IE type in one time code for password reset.
-                                 //This will probably be act mostly the same as forgotPasswor
+                                               // Pass in the setCodeState as a prop, if user entered the correct code, set to true to render the next component.
           const userRef = useRef();
           const errorRef = useRef();
           
           
           /* 
             Note: 
-                This creates a string that has 5 digits, the A is set in stnoe for the time being, until I can randomize that.
+                This creates a string that has 5 digits, the A is set in stone for the time being, until I can randomize that.
           */
-          const generateVerificationCode = () =>{
-            return Math.floor(Math.random() * 10).toString() +  Math.floor(Math.random() * 10).toString()  +  Math.floor(Math.random() * 10).toString()  +  Math.floor(Math.random() * 10).toString() + "A"; 
-          }
-
+         
          const handleCodeVerification = async (e) =>{ //
             e.preventDefault();  
-
+              //console.log(usercode); For testing only
               if(passcode !== usercode){
                 //Do thing
                 seterrorMsg("invalid code");
                 return;
               }
-            setCodeState(true);
+              setCodeState(true);
          }
-          const [usercode, setUserCode] = useState(generateVerificationCode());
+          const [usercode, setUserCode] = useState('');
           const [passcode, setPasscode] = useState('');
           const [errMsg, seterrorMsg] = useState("");
           
           /*  
                For the resend link, should update the usercode with a new code. Then send another email.
                Current issue: Clicking this bricks handleCodeVerification. I presume that usercode isn't updated with the new value in that function.
-               This is kinda hacky, and I should look at code creation in the backend, as the code may change if user refreshes the page.
+               This is kinda hacky and I should look at code creation in the backend, as the code may change if user refreshes the page.
           */
           const ResendCode = () =>{  
-              setUserCode(generateVerificationCode());// update state with new generated code.
-             // console.log(usercode);               
+                      
           }
 
           useEffect(()=>{
-               // console.log(usercode);
+             /*
+                  Fetch call to route /auth/passcode
+                  I feel this should be an async, await but I'm not sure.
+                  It works, that route generates a code, pass it to the request.json, then we setUserCode from here
+               */
+
+             fetch(`${process.env.REACT_APP_API_URL}/auth/passcode`, {
+              credentials: 'include',
+          }).then(res => res.json())
+            .then(data => setUserCode(data.code))  
+              // update state with new generated code.
+               
             },[]);
 
           useEffect(()=> {
