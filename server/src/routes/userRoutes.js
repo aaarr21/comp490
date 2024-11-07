@@ -14,7 +14,7 @@ router.delete('/:id', userController.deleteUser);  // Route to delete a user
 // --- Authentication Routes ---
 // Middleware to check if user is logged in, sends 401 if not
 function isLoggedIN(req, res, next) {
-    req.user ? next() : res.sendStatus(401);
+    req.user ? next() : res.sendStatus(401).json({ success: false, message: "Unauthorized" });
 }
 
 // Google Authentication Route
@@ -48,16 +48,19 @@ router.get('/login/failed', (req, res) => {
 
 // Protected route for checking login status
 router.get('/WorkBoard', isLoggedIN, (req, res) => {
-  if (req.user) {
-    res.status(200).json({
-      success: true,
-      message: "Login successful",
-      user: req.user,
-    });
-  } else {
-    res.status(401).json({ success: false, message: "Unauthorized" });
+
   }
-});
+);
+
+router.get('/passcode', (req,res)=>{
+  const generateVerificationCode = () =>{
+    return Math.floor(Math.random() * 10).toString() +  Math.floor(Math.random() * 10).toString()  +  Math.floor(Math.random() * 10).toString()  +  Math.floor(Math.random() * 10).toString() + "A"; 
+  }
+  const test = generateVerificationCode();
+  res.json({
+    code: test
+  });
+})
 
 // Logout Route
 router.post('/logout', (req, res, next) => {
