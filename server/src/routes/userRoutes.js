@@ -3,6 +3,9 @@ const passport = require('passport');
 const userController = require('../controllers/UserController'); // Import the user controller
 const router = express.Router();
 const FRONTEND_URL = "http://localhost:3000/WorkBoard";
+const emailService = require('../config/emailer');
+const nodemailer = require("nodemailer");
+
 
 // --- User Management Routes ---
 router.post('/register', userController.registerUser);  // Route to register a new user
@@ -52,14 +55,42 @@ router.get('/WorkBoard', isLoggedIN, (req, res) => {
   }
 );
 
-router.get('/passcode', (req,res)=>{
-  const generateVerificationCode = () =>{
-    return Math.floor(Math.random() * 10).toString() +  Math.floor(Math.random() * 10).toString()  +  Math.floor(Math.random() * 10).toString()  +  Math.floor(Math.random() * 10).toString() + "A"; 
-  }
-  const test = generateVerificationCode();
-  res.json({
-    code: test
+
+
+router.post('/reset', (req,res)=> {
+   const emailTo = req.body.userEmail;
+   const usercode = req.body.usercode;
+
+   const userToEmail = {
+    from: process.env.EMAIL,               // Sender address from the .env file
+    to: emailTo,
+    subject: 'Password Reset',
+    text: usercode                         // Should revamp text with html to make it cleaner.
+   };
+
+  
+    
+   const transporter = nodemailer.createTransport({ //Transporter
+    service:"Gmail",
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: false,
+    auth: {
+        user: process.env.EMAIL,
+        pass: process.env.EMAIL_PASSKEY
+    }
+
+});
+
+transporter.sendMail(userToEmail, function(error, info){
+    if (error) {
+      console.log('Error:', error);
+    } else {
+      console.log('Email sent: ', info.response);
+    }
   });
+  
+
 })
 
 // Logout Route

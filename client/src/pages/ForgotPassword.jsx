@@ -26,7 +26,7 @@ const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
       
           const [nextPage, setnextPage] = useState(false);
           const [resetTrue, setresetTrue] = useState(false);
-        
+         const [email,setEmail] = useState("");
       
             
           
@@ -36,7 +36,7 @@ const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
                     
                     <section className = "forgot-password-section">
                        
-                     {( resetTrue ? <ResetPassword/> : nextPage ? <EmailCodeSection setCodeState ={setresetTrue}/> :  <VerifyEmailSection  setcompState={setnextPage}/> )} 
+                     {( resetTrue ? <ResetPassword/> : nextPage ? <EmailCodeSection setCodeState ={setresetTrue} userEmail={email} /> :  <VerifyEmailSection  setcompState={setnextPage} setuserEmail={setEmail}/> )} 
                     </section>
                    
                 </div>
@@ -46,7 +46,7 @@ const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
  }
 
 
- const VerifyEmailSection = ({setcompState}) =>{
+ const VerifyEmailSection = ({setcompState, setuserEmail}) =>{
 
 
     const userRef = useRef();
@@ -71,11 +71,12 @@ const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
         const handleEmailSubmit = async (e) => {
             e.preventDefault();
             
-             if(forgotEmail.includes('@')=== false){ //Check if it's even valid
+             if(forgotEmail.includes('@')=== false){ //Check if it's even valid reminder to use usercontroller to actually find it later.
                  seterrorMsg('Invalid email');
                  return;
              }
              setvalidEmail(true);
+             setuserEmail(forgotEmail);
              setcompState(true);
            
         };
@@ -99,7 +100,7 @@ const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
  };
 
 
- const EmailCodeSection = ({setCodeState}) =>{ //page to deal with email section. IE type in one time code for password reset.
+ const EmailCodeSection = ({setCodeState,userEmail}) =>{ //page to deal with email section. IE type in one time code for password reset.
                                                // Pass in the setCodeState as a prop, if user entered the correct code, set to true to render the next component.
           const userRef = useRef();
           const errorRef = useRef();
@@ -112,15 +113,23 @@ const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
          
          const handleCodeVerification = async (e) =>{ //
             e.preventDefault();  
-              //console.log(usercode); For testing only
+              console.log(usercode); 
               if(passcode !== usercode){
                 //Do thing
                 seterrorMsg("invalid code");
                 return;
               }
               setCodeState(true);
+
+              
          }
-          const [usercode, setUserCode] = useState('');
+         
+         const generateVerificationCode = () =>{
+          return Math.floor(Math.random() * 10).toString() +  Math.floor(Math.random() * 10).toString()  +  Math.floor(Math.random() * 10).toString()  +  Math.floor(Math.random() * 10).toString() + "A"; 
+        }
+       
+
+          const [usercode, setUserCode] = useState(generateVerificationCode());
           const [passcode, setPasscode] = useState('');
           const [errMsg, seterrorMsg] = useState("");
           
@@ -133,18 +142,29 @@ const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
                       
           }
 
+
+          const SendCodetoEmail = async () =>{
+             try {
+                const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/reset`,{
+                   usercode, userEmail
+                },{withCredentials: true});
+
+                
+             } catch (error) {
+              
+             }
+             
+          }
+
           useEffect(()=>{
              /*
                   Fetch call to route /auth/passcode
                   I feel this should be an async, await but I'm not sure.
                   It works, that route generates a code, pass it to the request.json, then we setUserCode from here
                */
-
-             fetch(`${process.env.REACT_APP_API_URL}/auth/passcode`, {
-              credentials: 'include',
-          }).then(res => res.json())
-            .then(data => setUserCode(data.code))  
-              // update state with new generated code.
+           
+             SendCodetoEmail();
+ 
                
             },[]);
 
