@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -7,8 +9,21 @@ import facebookIcon from '../components/images/facebook.png'; // Add the correct
 import twitterIcon from '../components/images/twitter.png';   // Add the correct path
 import linkedinIcon from '../components/images/linkedin.png'; // Add the correct path
 
+
 const LoginPage = () => {
-  const navigate = useNavigate();
+    const navigate = useNavigate(); // Define navigate here
+
+    // Simulate checking if user is logged in, e.g., via a token or session check
+    const checkLoginStatus = useCallback(async () => {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/status`, {
+            credentials: 'include',
+        });
+        const data = await response.json();
+        if (data.loggedIn) {
+            navigate('/workBoard');
+        }
+    }, [navigate]);
+  
 
   // State variables
   const [identifier, setIdentifier] = useState(''); // Store username or email
@@ -16,19 +31,7 @@ const LoginPage = () => {
   const [rememberMe, setRememberMe] = useState(false);
 
   // Check if the user is already logged in
-  const checkLoginStatus = useCallback(async () => {
-    try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/status`, {
-        credentials: 'include',
-      });
-      const data = await response.json();
-      if (data.loggedIn) {
-        navigate('/workBoard');
-      }
-    } catch (error) {
-      console.error('Error checking login status:', error);
-    }
-  }, [navigate]);
+ 
 
   useEffect(() => {
     checkLoginStatus();
