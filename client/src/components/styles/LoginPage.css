@@ -51,6 +51,7 @@ body {
 }
 
 .welcome-logo {
+  margin-left:25%; /* Shove the logo a bit to the right to keep it center*/
   width: 200px;
   height: auto;
 }

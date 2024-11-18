@@ -48,6 +48,8 @@ class UserService {
         return await this.userRepository.findOrCreateByGoogleId(googleId, email, name, accessToken, refreshToken);
     }
 
+
+
     // Find a user by their ID
     async findById(userId) {
         return await this.userRepository.findById(userId);
@@ -62,6 +64,25 @@ class UserService {
         return await this.userRepository.updateUserProfile(userId, updatedData);
     }
 
+     // Save the usercode for password reset
+     async saveUserCode(email, usercode) {
+        return await this.userRepository.saveUserCode(email, usercode);
+    }
+
+    // Verify the usercode for password reset
+    async verifyUserCode(email, usercode) {
+        const user = await this.userRepository.findByEmailAndCode(email, usercode.toString());
+        if (!user) {
+            console.error('Invalid or expired code for user:', email);
+            throw new Error('Invalid or expired code');
+        }
+        return user;
+    }
+
+    async updateUserPassword(userId, newPassword) {
+        console.log('Attempting to update password for userId:', userId); //debug code
+        return await this.userRepository.updateUserPassword(userId, newPassword);
+      }
 }
 
 module.exports = UserService;
