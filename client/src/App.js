@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 
+=======
+// src/App.js
+>>>>>>> 5bc955f0807abe15c870b39adc43cba5a0f5de06
 import './App.css';
 import Navibar from './components/NaviBar';
 import Login from './pages/Login';
