@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-
-=======
-// src/App.js
->>>>>>> 5bc955f0807abe15c870b39adc43cba5a0f5de06
 import './App.css';
 import Navibar from './components/NaviBar';
 import Login from './pages/Login';
@@ -16,13 +11,15 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 function App() {
   const location = useLocation();
 
-  // Conditionally render Navibar if the current path is not '/login' or '/'
-  const shouldShowNavibar = location.pathname !== '/login' && location.pathname !== '/' && location.pathname !== '/register' && location.pathname !== '/forgot-password';
+  // Conditionally render Navibar if the current path is not part of specific paths
+  const pathsWithoutNavibar = ['/login', '/', '/register', '/forgot-password'];
+  const shouldShowNavibar = !pathsWithoutNavibar.includes(location.pathname);
 
   return (
     <div>
       {shouldShowNavibar && <Navibar />}
       <Routes>
+        <Route index element={<Login />} /> {/* Root path "/" now points to Login */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -36,8 +33,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
-        <Route path="/" element={<Login />} />
       </Routes>
     </div>
   );

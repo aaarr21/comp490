@@ -115,7 +115,7 @@ const Register = () => {
               </p>
             </div>
             <div className="mb-4">
-              <label htmlFor="email" className="block text-white-700 text-sm font-bold mb-2">Email
+              <label htmlFor="email" className="block text-white-700 text-sm font-bold mb-2">Email:
                 <FontAwesomeIcon icon = {faCheck} className= {validEmail ? "valid" : "hide"}/>
                 <FontAwesomeIcon icon = {faTimes} className = {validEmail ? "hide" : "invalid"} />
               </label>

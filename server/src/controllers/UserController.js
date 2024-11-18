@@ -29,15 +29,28 @@ const registerUser = async (req, res) => {
 };
 
 
-// Route handler for user login
+// Route handler for user login 
 const loginUser = async (req, res) => {
-    const { identifier, password } = req.body;  // 'identifier' can be email or username
-	try {
-        const user = await userService.login(identifier, password);  // Let UserService handle identifier checks
-		res.status(200).json({ message: 'Login successful', user });
-    } catch (error) {
-        res.status(401).json({ error: error.message });
-	}
+  const { identifier, password } = req.body;  // 'identifier' can be email or username
+  try {
+      const user = await userService.login(identifier, password);  // Let UserService handle identifier checks
+      
+      // Explicitly log the user in and save the session
+      req.login(user, (err) => {
+          if (err) {
+              return res.status(500).json({ error: 'Login failed' });
+          }
+
+          req.session.save((saveErr) => {
+              if (saveErr) {
+                  return res.status(500).json({ error: 'Session not saved' });
+              }
+              res.status(200).json({ message: 'Login successful', user });
+          });
+      });
+  } catch (error) {
+      res.status(401).json({ error: error.message });
+  }
 };
 
 // Route handler for getting user profile by ID

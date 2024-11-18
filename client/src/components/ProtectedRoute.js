@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-
-=======
-// src/components/ProtectedRoute.js
->>>>>>> 5bc955f0807abe15c870b39adc43cba5a0f5de06
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import axios from 'axios';

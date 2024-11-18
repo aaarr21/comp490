@@ -15,13 +15,33 @@ class UserService {
         return newUser;
     }
 
-    // Login a user by email or username and password
-    async login(identifier, password) {
+// Login a user by email or username and password
+async login(identifier, password) {
+    try {
+        // Retrieve the user by identifier (username or email)
         const userRecord = await this.userRepository.findByUsernameOrEmail(identifier, identifier);
+        
         if (!userRecord) {
             throw new Error('User not found');
         }
-        const user = new User(
+        
+        // Check if password from userRecord is not undefined or null
+        if (!userRecord.password) {
+            throw new Error('Password is missing for the user record');
+        }
+
+        // Log the values for debugging
+        console.log('Plaintext password:', password);
+        console.log('Hashed password from DB:', userRecord.password);
+
+        // Verify the password using bcrypt
+        const isAuthenticated = await bcrypt.compare(password, userRecord.password);
+        if (!isAuthenticated) {
+            throw new Error('Invalid password');
+        }
+
+        // Return the user object if the password is correct
+        return new User(
             userRecord.id,
             userRecord.username,
             userRecord.email,
@@ -30,13 +50,11 @@ class UserService {
             userRecord.role,
             userRecord.createdAt
         );
-
-        const isAuthenticated = await user.authenticate(password);
-        if (!isAuthenticated) {
-            throw new Error('Invalid password');
-        }
-        return user;
+    } catch (error) {
+        console.error('Login error:', error);
+        throw error;
     }
+}
 
     // Find a user by username or email
     async findByUsernameOrEmail(username, email) {

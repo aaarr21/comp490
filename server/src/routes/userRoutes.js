@@ -2,12 +2,8 @@ const express = require('express');
 const passport = require('passport');
 const userController = require('../controllers/UserController'); 
 const router = express.Router();
-const FRONTEND_URL = "http://localhost:3000/WorkBoard";
-<<<<<<< HEAD
+const FRONTEND_URL = "http://localhost:3000/workBoard";
 const nodemailer = require("nodemailer");  
-=======
-const nodemailer = require("nodemailer");  // Import nodemailer only once
->>>>>>> 5bc955f0807abe15c870b39adc43cba5a0f5de06
 
 // --- User Management Routes ---
 router.post('/register', userController.registerUser);  // Route to register a new user
@@ -23,11 +19,18 @@ router.post('/verify-reset', userController.verifyResetCode); // Route to verify
 
 // --- Authentication Routes ---
 function isLoggedIN(req, res, next) {
-    req.user ? next() : res.sendStatus(401).json({ success: false, message: "Unauthorized" });
+  if (req.isAuthenticated()) {
+    return next();
+  } else {
+    return res.status(401).json({ success: false, message: "Unauthorized" });
+  }
 }
 
 // Google Authentication Route
-router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+router.get('/google', passport.authenticate('google', {
+  scope: ['profile', 'email'],
+  prompt: 'select_account' 
+}));
 
 // Google Callback Route
 router.get('/google/callback', passport.authenticate('google', {
@@ -52,8 +55,8 @@ router.get('/login/failed', (req, res) => {
 });
 
 // Protected route for checking login status
-router.get('/WorkBoard', isLoggedIN, (req, res) => {
-  res.status(200).json({ success: true, message: "Welcome to the WorkBoard!" });
+router.get('/status', isLoggedIN, (req, res) => {
+  res.status(200).json({ loggedIn: true, user: req.user });
 });
 
 // Logout Route
@@ -74,7 +77,8 @@ router.get('/check-auth', (req, res) => {
   }
 });
 
-// Dynamic Route to get user profile by ID
-router.get('/:id', userController.getUserProfile);
+// moved here because routes are matched to avoid unintended matches which was causing the bug where clicking sign in with google would redirect you to a blank page
+//Dynamic Route to get user profile by ID 
+router.get('/:id', userController.getUserProfile);  // Route to get user profile by ID (move this last)
 
 module.exports = router;

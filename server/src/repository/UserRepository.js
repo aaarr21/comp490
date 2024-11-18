@@ -11,7 +11,7 @@ class UserRepository {
             if (error) {
                 throw new Error("Invalid email format");
             }
-            const [rows] = await db.query("SELECT id, username, email, role, created_at FROM users WHERE email = ?", [email]);
+            const [rows] = await db.query("SELECT id, username, email, password, role, created_at FROM users WHERE email = ?", [email]);
             return rows.length > 0 ? new User(rows[0].id, rows[0].username, rows[0].email, rows[0].password, rows[0].role, rows[0].created_at) : null;
         } catch (error) {
             throw error;
@@ -21,7 +21,7 @@ class UserRepository {
     // Find a user by username
     async findByUsername(username) {
         try {
-            const [rows] = await db.query("SELECT id, username, email, role, created_at FROM users WHERE username = ?", [username]);
+            const [rows] = await db.query("SELECT id, username, email, password, role, created_at FROM users WHERE username = ?", [username]);
             return rows.length > 0 ? new User(rows[0].id, rows[0].username, rows[0].email, rows[0].password, rows[0].role, rows[0].created_at) : null;
         } catch (error) {
             throw error;
@@ -31,7 +31,7 @@ class UserRepository {
     // Find a user by Google ID
     async findByGoogleId(googleId) {
         try {
-            const [rows] = await db.query("SELECT id, username, email, role, created_at FROM users WHERE google_id = ?", [googleId]);
+            const [rows] = await db.query("SELECT id, username, email, password, role, created_at FROM users WHERE google_id = ?", [googleId]);
             return rows.length > 0 ? new User(rows[0].id, rows[0].username, rows[0].email, rows[0].password, rows[0].role, rows[0].created_at) : null;
         } catch (error) {
             console.error("Error finding user by Google ID:", error); // debug code
@@ -43,7 +43,7 @@ class UserRepository {
     async findByUsernameOrEmail(identifier) {
         try {
             const [rows] = await db.query(
-                "SELECT id, username, email, role, created_at FROM users WHERE username = ? OR email = ?",
+                "SELECT id, username, email, password, role, created_at FROM users WHERE username = ? OR email = ?",
                 [identifier, identifier]
             );
             return rows.length > 0 ? new User(rows[0].id, rows[0].username, rows[0].email, rows[0].password, rows[0].role, rows[0].created_at) : null;
@@ -102,8 +102,8 @@ class UserRepository {
             if (typeof id !== 'number') {
                 id = parseInt(id, 10);
             }
-            const [rows] = await db.query("SELECT id, username, email, role, created_at FROM users WHERE id = ?", [id]);
-            return rows.length > 0 ? new User(rows[0].id, rows[0].username, rows[0].email, null, rows[0].role, rows[0].created_at) : null;
+            const [rows] = await db.query("SELECT id, username, email, password, role, created_at FROM users WHERE id = ?", [id]);
+            return rows.length > 0 ? new User(rows[0].id, rows[0].username, rows[0].email, rows[0].password, rows[0].role, rows[0].created_at) : null;
         } catch (error) {
             throw error;
         }
@@ -112,7 +112,7 @@ class UserRepository {
     // Retrieve all users from the database
     async getAllUsers() {
         try {
-            const [rows] = await db.query("SELECT id, username, email, role, created_at FROM users");
+            const [rows] = await db.query("SELECT id, username, email, password, role, created_at FROM users");
             return rows;
         } catch (error) {
             throw error;
@@ -150,7 +150,7 @@ class UserRepository {
         }
         try {
             const [rows] = await db.query(
-                "SELECT id, username, email, role, created_at FROM users WHERE email = ? AND reset_code = ? AND reset_code_expiry > ?",
+                "SELECT id, username, email, password, role, created_at FROM users WHERE email = ? AND reset_code = ? AND reset_code_expiry > ?",
                 [email, usercode, new Date()]
             );
             return rows.length > 0 ? new User(rows[0].id, rows[0].username, rows[0].email, rows[0].password, rows[0].role, rows[0].created_at) : null;
@@ -180,4 +180,5 @@ class UserRepository {
         }
     }
 }
+
 module.exports = UserRepository;
