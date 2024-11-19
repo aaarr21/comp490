@@ -36,7 +36,7 @@ router.get('/google', passport.authenticate('google', {
 router.get('/google/callback', passport.authenticate('google', {
   failureRedirect: '/auth/login/failed'
 }), (req, res) => {
-  console.log("User successfully authenticated, redirecting to WorkBoard...");
+  console.log("User successfully authenticated, redirecting to WorkBoard..."); //debug MSG
   res.send(`
     <script>
       if (window.opener) {

@@ -69,7 +69,7 @@ db.getConnection((err, connection) => {
     console.error('Failed to connect to MySQL:', err.stack);
     return;
   }
-  console.log('Connected to MySQL');
+  console.log('Connected to MySQL'); //debug MSG
   connection.release();
 });
 
@@ -78,4 +78,4 @@ module.exports = db;
 
 // Start the server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log('Listening on port ' + PORT));
+app.listen(PORT, () => console.log('Listening on port ' + PORT)); //debug MSG

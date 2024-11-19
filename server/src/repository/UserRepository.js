@@ -120,57 +120,51 @@ class UserRepository {
     }
 
     // Save usercode to the user's record
-    async saveUserCode(email, usercode) {
-        const emailSchema = Joi.string().email().required();
-        const { error } = emailSchema.validate(email);
-        if (error) {
-            throw new Error("Invalid email format");
+    async saveUserCode(email, usercode, expiryTime) {
+        const query = `
+            UPDATE users
+            SET reset_code = ?, reset_code_expiry = ?
+            WHERE email = ?
+        `;
+        // Convert expiryTime to MySQL datetime string
+        const expiryTimeString = expiryTime.toISOString().slice(0, 19).replace('T', ' ');
+        console.log('Saving reset code:', usercode, 'with expiry:', expiryTimeString); //debug code
+        const [result] = await db.query(query, [usercode, expiryTimeString, email]);
+        if (result.affectedRows === 0) {
+            throw new Error('User not found or no changes made');
         }
-        const expiryTime = new Date(Date.now() + 15 * 60 * 1000); // Set expiry to 15 minutes from now
-        try {
-            const [result] = await db.query(
-                "UPDATE users SET reset_code = ?, reset_code_expiry = ? WHERE email = ?",
-                [usercode, expiryTime, email]
-            );
-            if (result.affectedRows === 0) {
-                throw new Error('User not found or no changes made');
-            }
-            return result;
-        } catch (error) {
-            throw error;
-        }
+        return result;
     }
 
     // Retrieve user by email and usercode to verify
     async findByEmailAndCode(email, usercode) {
-        const emailSchema = Joi.string().email().required();
-        const { error } = emailSchema.validate(email);
-        if (error) {
-            throw new Error("Invalid email format");
+        const currentTime = new Date();
+        const currentTimeString = currentTime.toISOString().slice(0, 19).replace('T', ' ');
+        const query = `
+            SELECT id, username, email, reset_code, reset_code_expiry
+            FROM users
+            WHERE email = ? AND reset_code = ? AND reset_code_expiry > ?
+        `;
+        console.log("Query inputs: ", { email, usercode, currentTimeString }); //debug code//debug code
+        const [rows] = await db.query(query, [email, usercode, currentTimeString]);
+        console.log("Query results: ", rows); //debug code
+        if (rows.length === 0) {
+            throw new Error('Invalid or expired code');
         }
-        try {
-            const [rows] = await db.query(
-                "SELECT id, username, email, password, role, created_at FROM users WHERE email = ? AND reset_code = ? AND reset_code_expiry > ?",
-                [email, usercode, new Date()]
-            );
-            return rows.length > 0 ? new User(rows[0].id, rows[0].username, rows[0].email, rows[0].password, rows[0].role, rows[0].created_at) : null;
-        } catch (error) {
-            throw error;
-        }
+        return rows[0];
     }
-
     // Update user password
     async updateUserPassword(userId, hashedPassword) {
         try {
             if (typeof userId !== 'number') {
                 userId = parseInt(userId, 10);
             }
-            console.log('Executing SQL query to update password for userId:', userId);
+            console.log('Executing SQL query to update password for userId:', userId); //debug code
             const [result] = await db.query(
                 "UPDATE users SET password = ? WHERE id = ?", 
                 [hashedPassword, userId]
             );
-            console.log('Password Update Result:', result);
+            console.log('Password Update Result:', result); //debug code
             if (result.affectedRows === 0) {
                 throw new Error('User not found or no changes made');
             }
@@ -178,6 +172,18 @@ class UserRepository {
             console.error('Error updating user password:', error);
             throw error;
         }
+    }
+    async updateResetCodeLastSent(email) {
+        const query = `
+            UPDATE users
+            SET reset_code_last_sent = NOW()
+            WHERE email = ?
+        `;
+        const [result] = await db.query(query, [email]);
+        if (result.affectedRows === 0) {
+            throw new Error('User not found or no changes made');
+        }
+        return result;
     }
 }
 
