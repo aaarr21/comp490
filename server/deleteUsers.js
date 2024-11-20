@@ -11,7 +11,9 @@ const rl = readline.createInterface({
 // Function to list users
 async function listUsers(connection) {
   try {
-    const [users] = await connection.query('SELECT id, email, name FROM users ORDER BY id');
+    // Select the correct columns (id, email, username)
+    const [users] = await connection.query('SELECT id, email, username FROM users ORDER BY id');
+    
     if (users.length === 0) {
       console.log('No users found in the database.');
       return null;
@@ -19,7 +21,7 @@ async function listUsers(connection) {
 
     console.log('\nAvailable users:');
     users.forEach(user => {
-      console.log(`- ${user.name}: ${user.email}`);
+      console.log(`- ${user.username}: ${user.email}`);
     });
     console.log('\n'); 
 

@@ -10,29 +10,29 @@ import linkedinIcon from '../components/images/linkedin.png'; // Add the correct
 const LoginPage = () => {
   const navigate = useNavigate();
 
-  // State variables
-  const [identifier, setIdentifier] = useState(''); // Store username or email
-  const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
-
-  // Check if the user is already logged in
+  // Function to check if the user is already logged in
   const checkLoginStatus = useCallback(async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/status`, {
-        credentials: 'include',
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/auth/status`, {
+        withCredentials: true, // Include credentials (e.g., cookies)
       });
-      const data = await response.json();
-      if (data.loggedIn) {
-        navigate('/workBoard');
+      if (response.status === 200 && response.data.loggedIn) {
+        navigate('/workBoard', { replace: true }); // Redirect to /workBoard if already authenticated
       }
     } catch (error) {
-      console.error('Error checking login status:', error);
+      console.error('Failed to check login status:', error);
     }
   }, [navigate]);
 
+  // Check login status on component mount
   useEffect(() => {
     checkLoginStatus();
   }, [checkLoginStatus]);
+
+  // State variables for form fields
+  const [identifier, setIdentifier] = useState(''); // Store username or email
+  const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
 
   // Handle form submission
   const handleLocalLogin = async (e) => {
@@ -45,10 +45,10 @@ const LoginPage = () => {
           password: password,
           rememberMe: rememberMe,
         },
-        { withCredentials: true }
+        { withCredentials: true } // Include credentials (e.g., cookies)
       );
       console.log('Login successful:', response.data);
-      navigate('/workBoard');
+      navigate('/workBoard', { replace: true }); // Use replace to avoid going back to login page after success
     } catch (error) {
       console.error('Login failed:', error);
     }
@@ -62,10 +62,11 @@ const LoginPage = () => {
     const top = window.screenY + (window.outerHeight - height) / 2;
 
     window.open(
-      `${process.env.REACT_APP_API_URL}/auth/google`,
+      `${process.env.REACT_APP_API_URL}/auth/google?prompt=select_account`,
       'Google Login',
       `width=${width},height=${height},top=${top},left=${left}`
     );
+    
   };
 
   return (

@@ -15,27 +15,46 @@ class UserService {
         return newUser;
     }
 
+    // Find a user by email
+    async findByEmail(email) {
+        return await this.userRepository.findByEmail(email);
+    }
+
     // Login a user by email or username and password
     async login(identifier, password) {
-        const userRecord = await this.userRepository.findByUsernameOrEmail(identifier, identifier);
-        if (!userRecord) {
-            throw new Error('User not found');
-        }
-        const user = new User(
-            userRecord.id,
-            userRecord.username,
-            userRecord.email,
-            userRecord.password,
-            userRecord.name,
-            userRecord.role,
-            userRecord.createdAt
-        );
+        try {
+            // Retrieve the user by identifier (username or email)
+            const userRecord = await this.userRepository.findByUsernameOrEmail(identifier, identifier);
+            
+            if (!userRecord) {
+                throw new Error('User not found');
+            }
 
-        const isAuthenticated = await user.authenticate(password);
-        if (!isAuthenticated) {
-            throw new Error('Invalid password');
+            if (!userRecord.password) {
+                throw new Error('Password is missing for the user record');
+            }
+
+            console.log('Plaintext password:', password); //debug code
+            console.log('Hashed password from DB:', userRecord.password); //debug code
+
+            const isAuthenticated = await bcrypt.compare(password, userRecord.password);
+            if (!isAuthenticated) {
+                throw new Error('Invalid password');
+            }
+
+            return new User(
+                userRecord.id,
+                userRecord.username,
+                userRecord.email,
+                userRecord.password,
+                userRecord.name,
+                userRecord.role,
+                userRecord.createdAt
+            );
+        } catch (error) {
+            console.error('Login error:', error);
+            throw error;
         }
-        return user;
     }
 
     // Find a user by username or email
@@ -57,11 +76,37 @@ class UserService {
     async getAllUsers() {
         return await this.userRepository.getAllUsers();
     }
+
     // Method to update user profile
     async updateUserProfile(userId, updatedData) {
         return await this.userRepository.updateUserProfile(userId, updatedData);
     }
 
+    // Save the user code for password reset
+    async saveUserCode(email, usercode, expiryTime) {
+        return await this.userRepository.saveUserCode(email, usercode, expiryTime);
+    }
+
+    // Verify the user code for password reset
+    async verifyUserCode(email, usercode) {
+        const user = await this.userRepository.findByEmailAndCode(email, usercode);
+        if (!user) {
+            throw new Error('Invalid or expired code');
+        }
+        return user;
+    }
+
+    // Update the user's password
+    async updateUserPassword(userId, newPassword) {
+        console.log('Attempting to update password for userId:', userId); //debug code
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        return await this.userRepository.updateUserPassword(userId, hashedPassword);
+    }
+
+    
+    async updateResetCodeLastSent(email) {
+        return await this.userRepository.updateResetCodeLastSent(email);
+    }
 }
 
 module.exports = UserService;

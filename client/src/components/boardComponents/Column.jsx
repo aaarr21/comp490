@@ -11,7 +11,7 @@ const Column = ({ title, headingColor, column, cards, setCards, activeCardMenu, 
 
   const handleDragOver = (e) => {
     e.preventDefault();
-    setActive(true);
+    setActive(true); //Set to the current column area
     if (highlightIndicator) {
       highlightIndicator(e);
     }
@@ -24,8 +24,8 @@ const Column = ({ title, headingColor, column, cards, setCards, activeCardMenu, 
   const clearHighlight = (els) => {
     const indicators = els || getIndicators();
     if (indicators.length === 0) return;
-    indicators.forEach((i) => {
-      i.style.opacity = "0";
+    indicators.forEach((i) => { //Get every indicator
+      i.style.opacity = "0";  // make the indicator invisible
     });
   };
 
@@ -62,16 +62,16 @@ const Column = ({ title, headingColor, column, cards, setCards, activeCardMenu, 
     }
   };
 
-  const handleDragLeave = (e) => {
+  const handleDragLeave = (e) => { 
     setActive(false);
     clearHighlight();
   };
 
-  const handleDragEnd = (e) => {
+  const handleDragEnd = (e) => { //Handle end of the drag event
     setActive(false);
     clearHighlight();
 
-    const cardId = e.dataTransfer.getData("cardId");
+    const cardId = e.dataTransfer.getData("cardId"); //get the card t
     const indicators = getIndicators();
     const { element } = getNearestIndicator(e, indicators);
     const before = element.dataset.before || "-1";
@@ -151,7 +151,7 @@ const Column = ({ title, headingColor, column, cards, setCards, activeCardMenu, 
 };
 
 // Define AddCard component
-const AddCard = ({ column, setCards }) => {
+const AddCard = ({ column, setCards }) => {  
   const [text, setText] = useState("");
   const [adding, setAdding] = useState(false);
   const formRef = useRef(null);

@@ -14,7 +14,7 @@ async function listUsers() {
         } else {
             console.log("List of users:");
             users.forEach((user) => {
-                console.log(`ID: ${user.id}, Name: ${user.name}, Email: ${user.email}, Role: ${user.role}`);
+                console.log(`ID: ${user.id}, Username: ${user.username}, Email: ${user.email}, Role: ${user.role}`);
             });
         }
     } catch (error) {
