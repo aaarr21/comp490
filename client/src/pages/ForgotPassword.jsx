@@ -75,9 +75,16 @@ const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
                  seterrorMsg('Invalid email');
                  return;
              }
-             setvalidEmail(true);
-             setuserEmail(forgotEmail);
-             setcompState(true);
+          
+               axios.post(`${process.env.REACT_APP_API_URL}/auth/email-check`,
+                {forgotEmail},{withCredentials: true}
+               ).then(res => {if(forgotEmail === res.data.email) { 
+                  setuserEmail(forgotEmail);
+                  setcompState(true);  
+               }})
+               .catch(error => seterrorMsg(error.response.data.msg));
+
+              
            
         };
 
@@ -138,8 +145,19 @@ const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
                Current issue: Clicking this bricks handleCodeVerification. I presume that usercode isn't updated with the new value in that function.
                This is kinda hacky and I should look at code creation in the backend, as the code may change if user refreshes the page.
           */
-          const ResendCode = () =>{  
-                      
+          const ResendCode = async () =>{  
+              const newCode = generateVerificationCode();
+              
+              setUserCode(newCode);
+              
+              try {
+                 const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/reset`,{
+                    newCode,userEmail
+                 },{withCredentials:true});
+              } catch (error) {
+                
+              }
+
           }
 
 

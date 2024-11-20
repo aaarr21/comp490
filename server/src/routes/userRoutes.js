@@ -3,7 +3,6 @@ const passport = require('passport');
 const userController = require('../controllers/UserController'); // Import the user controller
 const router = express.Router();
 const FRONTEND_URL = "http://localhost:3000/WorkBoard";
-const emailService = require('../config/emailer');
 const nodemailer = require("nodemailer");
 
 
@@ -55,6 +54,16 @@ router.get('/WorkBoard', isLoggedIN, (req, res) => {
   }
 );
 
+router.post('/email-check',(req,res)=>{
+  const email = req.body.forgotEmail;
+    const testemail = 'srousseaus16@gmail.com'; // Test email
+    console.log(email);
+     if(email === testemail)
+      return res.status(200).json({msg: 'valid email!', email: email});
+     else
+     return res.status(300).json({msg: 'invalid email'});
+});
+
 
 
 router.post('/reset', (req,res)=> {
@@ -65,7 +74,7 @@ router.post('/reset', (req,res)=> {
     from: process.env.EMAIL,               // Sender address from the .env file
     to: emailTo,
     subject: 'Password Reset',
-    text: usercode                         // Should revamp text with html to make it cleaner.
+    text: 'The code to reset your password is as follows: ' +usercode                         // Should revamp text with html to make it cleaner.
    };
 
   
