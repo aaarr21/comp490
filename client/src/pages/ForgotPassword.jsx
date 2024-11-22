@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../components/styles/ForgotPasswordPage.css';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faCheck, faTimes, faInfoCircle} from "@fortawesome/free-solid-svg-icons";
 
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
 
@@ -13,25 +13,24 @@ const ForgotPassword = () => {
   const [resetTrue, setResetTrue] = useState(false);
   const [email, setEmail] = useState('');
 
-  return (
-    <main className="forgot-password-container">
+        return (    <main className="forgot-password-container">
       <div className="forgot-password-wrapper">
-        <section className="forgot-password-section">
-          {resetTrue ? (
-            <ResetPassword userEmail={email} userId={userId} />
-          ) : nextPage ? (
-            <EmailCodeSection setCodeState={setResetTrue} userEmail={email} setUserId={setUserId} />
-          ) : (
-            <VerifyEmailSection setCompState={setNextPage} setUserEmail={setEmail} />
-          )}
+                    
+                    <section className = "forgot-password-section">
+                       
+                     {( resetTrue ? <ResetPassword/> : nextPage ? <EmailCodeSection setCodeState ={setresetTrue} userEmail={email} /> :  <VerifyEmailSection  setcompState={setnextPage} setuserEmail={setEmail}/> )} 
         </section>
+                   
       </div>
     </main>
   );
-};
+
+ }
 
 
-const VerifyEmailSection = ({ setCompState, setUserEmail }) => {
+ const VerifyEmailSection = ({setcompState, setuserEmail}) =>{
+
+
   const userRef = useRef();
   const errorRef = useRef();
 
