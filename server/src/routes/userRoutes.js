@@ -3,7 +3,7 @@ const passport = require('passport');
 const userController = require('../controllers/UserController'); 
 const router = express.Router();
 const FRONTEND_URL = "http://localhost:3000/workBoard";
-const nodemailer = require("nodemailer");  
+const nodemailer = require("nodemailer");
 
 // --- User Management Routes ---
 router.post('/register', userController.registerUser);  // Route to register a new user
