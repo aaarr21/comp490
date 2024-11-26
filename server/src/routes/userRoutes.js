@@ -1,10 +1,9 @@
 const express = require('express');
 const passport = require('passport');
-const userController = require('../controllers/UserController'); // Import the user controller
+const userController = require('../controllers/UserController'); 
 const router = express.Router();
-const FRONTEND_URL = "http://localhost:3000/WorkBoard";
+const FRONTEND_URL = "http://localhost:3000/workBoard";
 const nodemailer = require("nodemailer");
-
 
 // --- User Management Routes ---
 router.post('/register', userController.registerUser);  // Route to register a new user
@@ -12,31 +11,38 @@ router.post('/login', userController.loginUser);  // Backend login route
 router.get('/users', userController.getAllUsers);  // Route to get all users
 router.put('/:id', userController.updateUserProfile);  // Route to update user profile
 router.delete('/:id', userController.deleteUser);  // Route to delete a user
+router.post('/reset-password', userController.resetPassword);  // Route to reset the password
+
+// --- Password Reset Routes ---
+router.post('/reset', userController.sendResetCode); // Route to send password reset code
+router.post('/verify-reset', userController.verifyResetCode); // Route to verify reset code
 
 // --- Authentication Routes ---
-// Middleware to check if user is logged in, sends 401 if not
 function isLoggedIN(req, res, next) {
-    req.user ? next() : res.sendStatus(401).json({ success: false, message: "Unauthorized" });
+  if (req.isAuthenticated()) {
+    return next();
+  } else {
+    return res.status(401).json({ success: false, message: "Unauthorized" });
+  }
 }
 
 // Google Authentication Route
-router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+router.get('/google', passport.authenticate('google', {
+  scope: ['profile', 'email'],
+  prompt: 'select_account' 
+}));
 
 // Google Callback Route
 router.get('/google/callback', passport.authenticate('google', {
   failureRedirect: '/auth/login/failed'
 }), (req, res) => {
-  console.log("User successfully authenticated, redirecting to WorkBoard..."); // debug code
-  // Send a script to the popup window to close itself and update the main window
+  console.log("User successfully authenticated, redirecting to WorkBoard..."); //debug MSG
   res.send(`
     <script>
-      // Redirect the main (opener) window to the WorkBoard page
       if (window.opener) {
         window.opener.location = "${FRONTEND_URL}";
-        // Close the popup window
         window.close();
       } else {
-        // If the popup was not opened by the main window, redirect directly
         window.location = "${FRONTEND_URL}";
       }
     </script>
@@ -49,74 +55,30 @@ router.get('/login/failed', (req, res) => {
 });
 
 // Protected route for checking login status
-router.get('/WorkBoard', isLoggedIN, (req, res) => {
-
-  }
-);
-
-router.post('/email-check',(req,res)=>{
-  const email = req.body.forgotEmail;
-    const testemail = 'srousseaus16@gmail.com'; // Test email
-    console.log(email);
-     if(email === testemail)
-      return res.status(200).json({msg: 'valid email!', email: email});
-     else
-     return res.status(300).json({msg: 'invalid email'});
+router.get('/status', isLoggedIN, (req, res) => {
+  res.status(200).json({ loggedIn: true, user: req.user });
 });
-
-
-
-router.post('/reset', (req,res)=> {
-   const emailTo = req.body.userEmail;
-   const usercode = req.body.usercode;
-
-   const userToEmail = {
-    from: process.env.EMAIL,               // Sender address from the .env file
-    to: emailTo,
-    subject: 'Password Reset',
-    text: 'The code to reset your password is as follows: ' +usercode                         // Should revamp text with html to make it cleaner.
-   };
-
-  
-    
-   const transporter = nodemailer.createTransport({ //Transporter
-    service:"Gmail",
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: false,
-    auth: {
-        user: process.env.EMAIL,
-        pass: process.env.EMAIL_PASSKEY
-    }
-
-});
-
-transporter.sendMail(userToEmail, function(error, info){
-    if (error) {
-      console.log('Error:', error);
-    } else {
-      console.log('Email sent: ', info.response);
-    }
-  });
-  
-
-})
 
 // Logout Route
 router.post('/logout', (req, res, next) => {
   req.logout((err) => {
     if (err) { return next(err); }
-    req.session.destroy();
+    req.session.destroy();  // Destroy the session
     res.redirect(FRONTEND_URL);
   });
 });
 
+// Frontend auth check
+router.get('/check-auth', (req, res) => {
+  if (req.isAuthenticated()) {
+    res.status(200).json({ success: true, message: 'User is authenticated' });
+  } else {
+    res.status(401).json({ success: false, message: 'User is not authenticated' });
+  }
+});
 
-
-// moved here because routes are matched to avoid unintenetional matches which was causing the bug where clicking sign in with google would redirect you to blank page
+// moved here because routes are matched to avoid unintended matches which was causing the bug where clicking sign in with google would redirect you to a blank page
 //Dynamic Route to get user profile by ID 
 router.get('/:id', userController.getUserProfile);  // Route to get user profile by ID (move this last)
-
-
 
 module.exports = router;

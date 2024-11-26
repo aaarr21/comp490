@@ -33,13 +33,14 @@ app.options('*',cors());
 
 // Session management
 app.use(session({
-  secret: sessionSecret, // Used to sign the session ID cookie
+  secret: sessionSecret, // Used to sign the session ID cooki
   resave: false, // Prevents saving the session back to the store if not modified
   saveUninitialized: true, // Prevents saving uninitialized sessions
-  cookie: {
+  cookie: { 
     httpOnly: true, // Protects the cookie from being accessed by client-side scripts
-    secure: process.env.NODE_ENV === 'production', // Set `secure` to true only in production for HTTPS
-    sameSite: 'lax' // Helps prevent CSRF attacks
+    secure: process.env.NODE_ENV === 'production',  // Set `secure` to true only in production for HTTPS
+    sameSite: 'lax', // Helps prevent CSRF attacks
+    maxAge: 5 * 60 * 1000 // Set cookie to expire in 5 minutes
   }
 }));
 
@@ -68,7 +69,7 @@ db.getConnection((err, connection) => {
     console.error('Failed to connect to MySQL:', err.stack);
     return;
   }
-  console.log('Connected to MySQL');
+  console.log('Connected to MySQL'); //debug MSG
   connection.release();
 });
 
@@ -77,4 +78,4 @@ module.exports = db;
 
 // Start the server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log('Listening on port ' + PORT));
+app.listen(PORT, () => console.log('Listening on port ' + PORT)); //debug MSG
