@@ -67,6 +67,11 @@ class UserService {
         return await this.userRepository.findOrCreateByGoogleId(googleId, email, name, accessToken, refreshToken);
     }
 
+    //Find user by GitHub ID, or create a new one with tokens.
+    async findOrCreatebyGithubId(githubId, email,name,accessToken,refreshToken){ 
+        return await tihs.userRepository.findOrCreatebyGithubId(githubId,email,name,accessToken,refreshToken);
+    }
+
 
 
     // Find a user by their ID

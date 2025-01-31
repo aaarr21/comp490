@@ -39,6 +39,16 @@ class UserRepository {
         }
     }
 
+    async findByGithubId(githubId) {
+        try{
+             const [rows] = await db.query("SELECT id, username, email,password, role, created_at FROM users WHERE github_id = ?",[githubId]);
+             return rows.length > 0 ? new User(rows[0].id,rows[0].username,rows[0].email,rows[0].password, rows[0].role, rows[0].created_at) : null;
+        }catch(error){
+            console.error("Error finding user by Github ID:", error);
+            throw error;
+        }
+    }
+
     // Add the findByUsernameOrEmail method to handle login via either username or email
     async findByUsernameOrEmail(identifier) {
         try {
@@ -75,6 +85,29 @@ class UserRepository {
             const [result] = await db.query(
                 "INSERT INTO users (google_id, username, email, access_token, refresh_token, password) VALUES (?, ?, ?, ?, ?, NULL)", 
                 [googleId, username, email, accessToken, refreshToken]
+            );
+            return new User(result.insertId, username, email, null, null, new Date());
+        } catch (error) {
+            throw error;
+        }
+    }
+    async findOrCreatebyGithubId(githubId, email,name, accessToken, refreshToken){
+        try {
+             let user = await this.findByGoogleId(githubId);
+             if (user) {
+                 await db.query(
+                    "UPDATE users SET access_token = ?, refresh_token = ? WHERE github_id = ?", 
+                    [accessToken, refreshToken, googleId]
+                 );
+                user.accessToken = accessToken;
+                user.refreshToken = refreshToken;
+                return user;
+             }
+            const username = email.split('@')[0];
+
+            const [result] = await db.query(
+               "INSERT INTO users (github_id,username, email, access_token, refresh_token, password) VALUES (?, ?, ?, ?, ?, NULL)",
+               [githubId, username , email, accessToken, refreshToken]
             );
             return new User(result.insertId, username, email, null, null, new Date());
         } catch (error) {
