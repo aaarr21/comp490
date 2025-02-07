@@ -1,35 +1,34 @@
 const passport = require('passport');
 const GitHubStrategy = require('passport-github2').Strategy;
-const UserService= require ("../services/UserService");
+const UserService= require("../services/UserService");
 const dotenv = require('dotenv');
-const UserService = require('../services/UserService');
-const UserService = require('../services/UserService');
+
 dotenv.config();
 
 passport.use(new GitHubStrategy({
     clientID: process.env.GITHUB_CLIENT_ID,
     clientSecret: process.env.GITHUB_CLIENT_SECRET,
     callbackURL: process.env.GITHUB_CALLBACK_URL,
-    scope:['profile','email']
+    scope:['profile','profile:email']
 }, 
   async (accessToken,refreshToken,profile,done) => {
-    console.log("Incoming Profile: ", profile);
+    console.log("Incoming Profile: ", profile); 
      try{
         const userService = new UserService();
-
+        
         let user = await userService.findOrCreateByGithubId(
             profile.id,
-            profile.email[0].value,
-            profile.displayName,
+            profile.username,
             accessToken,
             refreshToken
         ); // Need to create this soon.
         return done(null,user);
      }catch(error){
-        return done(null,error);
+        return done(error,null);
      }
+        
   })
-
+   
 );
 
 

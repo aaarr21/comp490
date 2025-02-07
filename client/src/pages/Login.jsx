@@ -6,7 +6,7 @@ import axios from 'axios';
 import '../components/styles/LoginPage.css';
 import googleIcon from '../components/images/googlethumbnail.webp'; // Adjust the path accordingly
 import facebookIcon from '../components/images/facebook.png'; // Add the correct path
-import twitterIcon from '../components/images/twitter.png';   // Add the correct path
+import githubIcon from '../components/images/github.webp';   // Add the correct path
 import linkedinIcon from '../components/images/linkedin.png'; // Add the correct path
 
 
@@ -74,6 +74,32 @@ const LoginPage = () => {
     );
     
   };
+  
+  const githubLogin = () => {
+    const width = 500;
+    const height = 600;
+    const left = window.screenX + (window.outerWidth - width) / 2;
+    const top = window.screenY + (window.outerHeight - height) / 2;
+
+     window.open(
+      `${process.env.REACT_APP_API_URL}/auth/github?prompt=select_account`,
+      'Github Login',
+      `width=${width},height=${height},top=${top},left=${left}`
+     );
+  }
+
+  const facebookLogin = () => {
+    const width = 500;
+    const height = 600;
+    const left = window.screenX + (window.outerWidth - width) / 2;
+    const top = window.screenY + (window.outerHeight - height) / 2;
+
+     window.open(
+      `${process.env.REACT_APP_API_URL}/auth/facebook?prompt=select_account`,
+      'Facebook Login',
+      `width=${width},height=${height},top=${top},left=${left}`
+     );
+  }
 
   return (
     <main className="sign-in-container">
@@ -106,11 +132,11 @@ const LoginPage = () => {
               <button type="button" className="social-icon-button" onClick={googleLogin}>
                 <img src={googleIcon} alt="Google" className="social-icon" />
               </button>
-              <button type="button" className="social-icon-button" onClick={googleLogin}>
+              <button type="button" className="social-icon-button" onClick={facebookLogin}>
                 <img src={facebookIcon} alt="Facebook" className="social-icon" />
               </button>
-              <button type="button" className="social-icon-button" onClick={googleLogin}>
-                <img src={twitterIcon} alt="Twitter" className="social-icon" />
+              <button type="button" className="social-icon-button" onClick={githubLogin}>
+                <img src={githubIcon} alt="Twitter" className="social-icon" />
               </button>
               <button type="button" className="social-icon-button" onClick={googleLogin}>
                 <img src={linkedinIcon} alt="LinkedIn" className="social-icon" />

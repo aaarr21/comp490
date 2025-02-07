@@ -7,6 +7,8 @@ const connect_ensure_login = require('connect-ensure-login'); // authorization m
 // const flash = require('connect-flash'); // Flash messages, if needed
 const passport = require('passport');
 require('./config/passport-google'); // Load passport config
+require('./config/passport-github'); //load passport config for github logins
+require('./config/passport-facebook');//load passport config for facebook logins
 const userRoutes = require('./routes/userRoutes');
 
 

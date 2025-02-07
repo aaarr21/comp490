@@ -49,6 +49,58 @@ router.get('/google/callback', passport.authenticate('google', {
   `);
 });
 
+
+  
+   // Github Auth Route
+    router.get('/github', passport.authenticate('github',{
+    scope:['profile','email'],
+    prompt: 'select account'
+    }));
+
+   // Github Callback Route
+    router.get('/github/callback', passport.authenticate('github', {
+  failureRedirect: '/auth/login/failed'
+}), (req, res) => {
+  console.log("User successfully authenticated, redirecting to WorkBoard..."); //debug MSG
+  res.send(`
+    <script>
+      if (window.opener) {
+        window.opener.location = "${FRONTEND_URL}";
+        window.close();
+      } else {
+        window.location = "${FRONTEND_URL}";
+      }
+    </script>
+  `);
+});
+
+
+   // Facebook Auth Route
+    router.get('/facebook', passport.authenticate('facebook',{
+    scope:['profile','email'],
+    prompt: 'select account'
+    }));
+
+    router.get('/facebook/callback', passport.authenticate('facebook', {
+  failureRedirect: '/auth/login/failed'
+}), (req, res) => {
+  console.log("User successfully authenticated, redirecting to WorkBoard..."); //debug MSG
+  res.send(`
+    <script>
+      if (window.opener) {
+        window.opener.location = "${FRONTEND_URL}";
+        window.close();
+      } else {
+        window.location = "${FRONTEND_URL}";
+      }
+    </script>
+  `);
+});
+
+
+
+
+
 // Login Failure Route
 router.get('/login/failed', (req, res) => {
   res.status(401).json({ success: false, message: "Failed to login" });

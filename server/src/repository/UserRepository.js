@@ -41,7 +41,17 @@ class UserRepository {
 
     async findByGithubId(githubId) {
         try{
-             const [rows] = await db.query("SELECT id, username, email,password, role, created_at FROM users WHERE github_id = ?",[githubId]);
+             const [rows] = await db.query("SELECT id, username, email,password, role, created_at FROM users WHERE google_id = ?",[githubId]);
+             return rows.length > 0 ? new User(rows[0].id,rows[0].username,rows[0].email,rows[0].password, rows[0].role, rows[0].created_at) : null;
+        }catch(error){
+            console.error("Error finding user by Github ID:", error);
+            throw error;
+        }
+    }
+
+    async findByFacebookId(facebookId) {
+        try{
+             const [rows] = await db.query("SELECT id, username, email,password, role, created_at FROM users WHERE google_id = ?",[facebookId]);
              return rows.length > 0 ? new User(rows[0].id,rows[0].username,rows[0].email,rows[0].password, rows[0].role, rows[0].created_at) : null;
         }catch(error){
             console.error("Error finding user by Github ID:", error);
@@ -66,8 +76,9 @@ class UserRepository {
     // Find or create a user by Google ID, and update or insert tokens
     async findOrCreateByGoogleId(googleId, email, name, accessToken, refreshToken) {
         try {
-            let user = await this.findByGoogleId(googleId);
+            let user = await this.findByGoogleId(googleId); 
             if (user) {
+               
                 // Update the tokens if the user already exists
                 await db.query(
                     "UPDATE users SET access_token = ?, refresh_token = ? WHERE google_id = ?", 
@@ -78,6 +89,16 @@ class UserRepository {
                 return user;
             }
 
+            let existing_user = await this.findByEmail(email) // Hack to deal with the case if email exists within the database by updating tokens on email. Could be implemented better
+                if(existing_user){
+                    await db.query(
+                        "UPDATE users SET access_token = ?, refresh_token = ? WHERE email = ?",
+                        [accessToken,refreshToken,email]
+                    );
+                    existing_user.accessToken = accessToken;
+                    existing_user.refreshToken = refreshToken;
+                    return existing_user;
+                }
             // Generate a default username from email if username is not provided
             const username = email.split('@')[0];
 
@@ -91,12 +112,37 @@ class UserRepository {
             throw error;
         }
     }
-    async findOrCreatebyGithubId(githubId, email,name, accessToken, refreshToken){
+    async findOrCreatebyGithubId(githubId,profileURL,name, accessToken, refreshToken){
         try {
-             let user = await this.findByGoogleId(githubId);
+             let user = await this.findByGithubId(githubId);
              if (user) {
                  await db.query(
-                    "UPDATE users SET access_token = ?, refresh_token = ? WHERE github_id = ?", 
+                    "UPDATE users SET access_token = ?, refresh_token = ? WHERE google_id = ?", 
+                    [accessToken, refreshToken, githubId]
+                 );
+                user.accessToken = accessToken;
+                user.refreshToken = refreshToken;
+                return user;
+             }
+            const username = name; //uhhhhh
+
+            const [result] = await db.query( //Note: google_id is used here it's the only attribute for non-local logins
+               "INSERT INTO users (google_id,username, email, access_token, refresh_token, password) VALUES (?, ?, ?, ?, ?, NULL)",
+               [githubId, username , profileURL ,accessToken, refreshToken]
+            );
+            
+            return new User(result.insertId, username, profileURL, null, null, new Date());
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async findOrCreatebyFacebookId(facebookId, email,name, accessToken, refreshToken){
+        try {
+             let user = await this.findByFacebookId(FacebookId);
+             if (user) {
+                 await db.query(
+                    "UPDATE users SET access_token = ?, refresh_token = ? WHERE google_id = ?", 
                     [accessToken, refreshToken, googleId]
                  );
                 user.accessToken = accessToken;
@@ -105,9 +151,9 @@ class UserRepository {
              }
             const username = email.split('@')[0];
 
-            const [result] = await db.query(
-               "INSERT INTO users (github_id,username, email, access_token, refresh_token, password) VALUES (?, ?, ?, ?, ?, NULL)",
-               [githubId, username , email, accessToken, refreshToken]
+            const [result] = await db.query( //Note: google_id is as it's the only attribute describing non-local logins
+               "INSERT INTO users (google_id,username, email, access_token, refresh_token, password) VALUES (?, ?, ?, ?, ?, NULL)",
+               [facebookId, username , email, accessToken, refreshToken]
             );
             return new User(result.insertId, username, email, null, null, new Date());
         } catch (error) {
