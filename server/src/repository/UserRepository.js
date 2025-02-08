@@ -124,7 +124,7 @@ class UserRepository {
                 user.refreshToken = refreshToken;
                 return user;
              }
-            const username = name; //uhhhhh
+            const username = name; 
 
             const [result] = await db.query( //Note: google_id is used here it's the only attribute for non-local logins
                "INSERT INTO users (google_id,username, email, access_token, refresh_token, password) VALUES (?, ?, ?, ?, ?, NULL)",
@@ -139,15 +139,25 @@ class UserRepository {
 
     async findOrCreatebyFacebookId(facebookId, email,name, accessToken, refreshToken){
         try {
-             let user = await this.findByFacebookId(FacebookId);
+             let user = await this.findByFacebookId(facebookId);
              if (user) {
                  await db.query(
                     "UPDATE users SET access_token = ?, refresh_token = ? WHERE google_id = ?", 
-                    [accessToken, refreshToken, googleId]
+                    [accessToken, refreshToken, facebookId]
                  );
                 user.accessToken = accessToken;
                 user.refreshToken = refreshToken;
                 return user;
+             }
+
+             let emailCheck = await this.findByEmail(email)
+                if(emailCheck){
+                await db.query("UPDATE users Set access_token = ?, refresh_token = ? Where google_id = ?",
+                    [accessToken,refreshToken,facebookId]
+                );
+                emailCheck.accessToken = accessToken;
+                emailCheck.refreshToken = refreshToken;
+                return emailCheck;
              }
             const username = email.split('@')[0];
 

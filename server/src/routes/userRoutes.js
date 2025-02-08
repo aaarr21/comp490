@@ -77,7 +77,7 @@ router.get('/google/callback', passport.authenticate('google', {
 
    // Facebook Auth Route
     router.get('/facebook', passport.authenticate('facebook',{
-    scope:['profile','email'],
+    scope:['email'],
     prompt: 'select account'
     }));
 
