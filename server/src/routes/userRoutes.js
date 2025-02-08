@@ -77,11 +77,33 @@ router.get('/google/callback', passport.authenticate('google', {
 
    // Facebook Auth Route
     router.get('/facebook', passport.authenticate('facebook',{
-    scope:['email'],
+    scope:'email',
     prompt: 'select account'
     }));
 
     router.get('/facebook/callback', passport.authenticate('facebook', {
+  failureRedirect: '/auth/login/failed'
+}), (req, res) => {
+  console.log("User successfully authenticated, redirecting to WorkBoard..."); //debug MSG
+  res.send(`
+    <script>
+      if (window.opener) {
+        window.opener.location = "${FRONTEND_URL}";
+        window.close();
+      } else {
+        window.location = "${FRONTEND_URL}";
+      }
+    </script>
+  `);
+});
+
+   // LinkedIn Auth Route
+   router.get('/linkedin', passport.authenticate('linkedin',{
+    scope:['profile','email','openid'],
+    prompt: 'select account'
+    }));
+
+    router.get('/linkedin/callback', passport.authenticate('linkedin', {
   failureRedirect: '/auth/login/failed'
 }), (req, res) => {
   console.log("User successfully authenticated, redirecting to WorkBoard..."); //debug MSG

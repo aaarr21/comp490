@@ -101,6 +101,19 @@ const LoginPage = () => {
      );
   }
 
+  const linkedinLogin = () => {
+    const width = 500;
+    const height = 600;
+    const left = window.screenX + (window.outerWidth - width) / 2;
+    const top = window.screenY + (window.outerHeight - height) / 2;
+
+     window.open(
+      `${process.env.REACT_APP_API_URL}/auth/linkedin?prompt=select_account`,
+      'LinkedIn Login',
+      `width=${width},height=${height},top=${top},left=${left}`
+     );
+  }
+
   return (
     <main className="sign-in-container">
       <div className="sign-in-wrapper">
@@ -138,7 +151,7 @@ const LoginPage = () => {
               <button type="button" className="social-icon-button" onClick={githubLogin}>
                 <img src={githubIcon} alt="Twitter" className="social-icon" />
               </button>
-              <button type="button" className="social-icon-button" onClick={googleLogin}>
+              <button type="button" className="social-icon-button" onClick={linkedinLogin}>
                 <img src={linkedinIcon} alt="LinkedIn" className="social-icon" />
               </button>
             </div>

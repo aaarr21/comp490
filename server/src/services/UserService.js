@@ -68,13 +68,17 @@ class UserService {
     }
 
     //Find user by GitHub ID, or create a new one with tokens.
-    async findOrCreateByGithubId(githubId,name,accessToken,refreshToken){ 
-         console.log(githubId + "  " + name);
-       return await this.userRepository.findOrCreatebyGithubId(githubId,name,accessToken,refreshToken);
+    async findOrCreateByGithubId(githubId,profileURL,name,accessToken,refreshToken){ 
+         
+       return await this.userRepository.findOrCreatebyGithubId(githubId,profileURL,name,accessToken,refreshToken);
     }
 
     async findOrCreatebyFacebookId(facebookid, email, name, accessToken, refreshToken){
         return await this.userRepository.findOrCreatebyFacebookId(facebookid,email,name,accessToken,refreshToken);
+    }
+
+    async findOrCreatebyLinkedInId(Linkedinid, email, name, accessToken, refreshToken){
+        return await this.userRepository.findOrCreatebyFacebookId(Linkedinid,email,name,accessToken,refreshToken);
     }
 
 

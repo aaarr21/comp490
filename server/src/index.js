@@ -9,6 +9,7 @@ const passport = require('passport');
 require('./config/passport-google'); // Load passport config
 require('./config/passport-github'); //load passport config for github logins
 require('./config/passport-facebook');//load passport config for facebook logins
+require('./config/passport-linkedin');
 const userRoutes = require('./routes/userRoutes');
 
 
