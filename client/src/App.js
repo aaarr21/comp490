@@ -5,6 +5,7 @@ import Register from './pages/Register';
 import WorkBoard from './pages/WorkFlowBoard';
 import ForgotPassword from './pages/ForgotPassword';
 import ProtectedRoute from './components/ProtectedRoute';
+import Dashbar from './components/DashBar';
 
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 
@@ -13,11 +14,18 @@ function App() {
 
   // Conditionally render Navibar if the current path is not part of specific paths
   const pathsWithoutNavibar = ['/login', '/', '/register', '/forgot-password'];
+  const pathsWithoutDashbar = ['/login', '/' , '/register', '/forgot-password'];
+  
   const shouldShowNavibar = !pathsWithoutNavibar.includes(location.pathname);
+
+  const shouldShowDashbar = !pathsWithoutDashbar.includes(location.pathname);
+
 
   return (
     <div>
-      {shouldShowNavibar && <Navibar />}
+      {shouldShowDashbar && <Dashbar />}
+      {shouldShowNavibar && <Navibar/>}
+    
       <Routes>
         <Route index element={<Login />} /> {/* Root path "/" now points to Login */}
         <Route path="/login" element={<Login />} />

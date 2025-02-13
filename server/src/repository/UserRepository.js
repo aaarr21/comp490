@@ -54,7 +54,18 @@ class UserRepository {
              const [rows] = await db.query("SELECT id, username, email,password, role, created_at FROM users WHERE google_id = ?",[facebookId]);
              return rows.length > 0 ? new User(rows[0].id,rows[0].username,rows[0].email,rows[0].password, rows[0].role, rows[0].created_at) : null;
         }catch(error){
-            console.error("Error finding user by Github ID:", error);
+            console.error("Error finding user by Facebook ID:", error);
+            throw error;
+        }
+    }
+
+    
+    async findByLinkedInId(LinkedInId) {
+        try{
+             const [rows] = await db.query("SELECT id, username, email,password, role, created_at FROM users WHERE google_id = ?",[LinkedInId]);
+             return rows.length > 0 ? new User(rows[0].id,rows[0].username,rows[0].email,rows[0].password, rows[0].role, rows[0].created_at) : null;
+        }catch(error){
+            console.error("Error finding user by LinkedIn ID:", error);
             throw error;
         }
     }
@@ -164,6 +175,40 @@ class UserRepository {
             const [result] = await db.query( //Note: google_id is as it's the only attribute describing non-local logins
                "INSERT INTO users (google_id,username, email, access_token, refresh_token, password) VALUES (?, ?, ?, ?, ?, NULL)",
                [facebookId, username , email, accessToken, refreshToken]
+            );
+            return new User(result.insertId, username, email, null, null, new Date());
+        } catch (error) {
+            throw error;
+        }
+    }
+    //Find or Create a user by LinkedIn Authetnication
+    async findOrCreatebyLinkedInId(LinkedInId, email,name, accessToken, refreshToken){
+        try {
+             let user = await this.findByLinkedInId(LinkedInId);
+             if (user) {
+                 await db.query(
+                    "UPDATE users SET access_token = ?, refresh_token = ? WHERE google_id = ?", 
+                    [accessToken, refreshToken, LinkedInId]
+                 );
+                user.accessToken = accessToken;
+                user.refreshToken = refreshToken;
+                return user;
+             }
+
+             let emailCheck = await this.findByEmail(email)
+                if(emailCheck){
+                await db.query("UPDATE users Set access_token = ?, refresh_token = ? Where google_id = ?",
+                    [accessToken,refreshToken,LinkedInId]
+                );
+                emailCheck.accessToken = accessToken;
+                emailCheck.refreshToken = refreshToken;
+                return emailCheck;
+             }
+            const username = email.split('@')[0];
+
+            const [result] = await db.query( //Note: google_id is as it's the only attribute describing non-local logins
+               "INSERT INTO users (google_id,username, email, access_token, refresh_token, password) VALUES (?, ?, ?, ?, ?, NULL)",
+               [LinkedInId, username , email, accessToken, refreshToken]
             );
             return new User(result.insertId, username, email, null, null, new Date());
         } catch (error) {

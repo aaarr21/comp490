@@ -18,6 +18,7 @@ passport.use(new GitHubStrategy({
         
         let user = await userService.findOrCreateByGithubId(
             profile.id,
+            profile.profileUrl,
             profile.username,
             accessToken,
             refreshToken

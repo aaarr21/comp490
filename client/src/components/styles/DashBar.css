@@ -1,0 +1,44 @@
+.siteNavigation{
+    
+   background-color:brown;
+   width: 10%;
+   height:120vh;
+   float: left;
+   display: inline;
+   margin: 0;
+   padding: 0;
+   margin-right: 10px;
+ 
+  };
+  
+  .dashlistContainer{
+    margin: 0;
+    padding: 0;
+    list-style:none;
+    padding: 0 20px;
+    display:flex;
+    align-items: center;
+   justify-content: space-between;
+    font-size:14px;   
+  }
+
+  .dashlistItem{
+    
+    box-sizing: border-box;
+    margin-top: 50px;
+    margin-bottom: 1em;
+    border-radius:10px;
+    
+  padding: 5vh 3vw; /* Use viewport units for consistent spacing */
+  border-radius: 10px;
+ 
+  height: 100%; /* Ensures the form fills the height of the right column */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+   color:white;
+    
+  }
+
+ 

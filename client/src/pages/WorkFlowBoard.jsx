@@ -2,6 +2,7 @@ import Board from '../components/boardComponents/Board'
 import { useState,useEffect } from 'react';
 import { Axios } from 'axios';
 
+//There is a sinister ) at the bottom that casuses some empty space, unsure of why its there
  const WorkFlowBoard = () =>{
 
       const [Loggedin,setLoggedin] = useState(true); // state if person accessing is even logged in.
@@ -22,9 +23,11 @@ import { Axios } from 'axios';
        logginInCheck();
       } ,[]);
 
-    return ( <div className ="h-screen w-full bg-neutral-900 text neutral-50">
+    return (
+      
+    <div className ="h-screen w-full bg-neutral-900 text neutral-50">
 
-       ({ Loggedin ?  <Board /> : (<section></section>) })
+       ({ Loggedin ?  <Board/> : <section></section> })
     </div>);
 
 

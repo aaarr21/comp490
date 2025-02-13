@@ -1,12 +1,21 @@
 .navibar{
-  height: 50px;
-  background-color:brown;
-  color: white;
+  height: 75px;
+  background-color:white;
+  color: black;
   display: flex;
   align-items: center;
   justify-content: space-around;
+  width:-80%;
   
 }
+
+.logo{
+  font:bolder;
+  font-size:18pt;
+  color:brown;
+}
+
+
 
 .list{
   display: flex;

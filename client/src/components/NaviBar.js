@@ -1,4 +1,5 @@
 const Navibar = () => {
+    
     return (
         <div className="navibar">
            <span className="logo"> Workflowban</span>
