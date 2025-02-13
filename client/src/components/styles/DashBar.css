@@ -7,7 +7,7 @@
    display: inline;
    margin: 0;
    padding: 0;
-   margin-right: 10px;
+   
  
   };
   
@@ -25,20 +25,44 @@
   .dashlistItem{
     
     box-sizing: border-box;
-    margin-top: 50px;
+    margin-top: 25px;
     margin-bottom: 1em;
-    border-radius:10px;
+    
     
   padding: 5vh 3vw; /* Use viewport units for consistent spacing */
-  border-radius: 10px;
+  
  
   height: 100%; /* Ensures the form fills the height of the right column */
-  display: flex;
+  display:grid;
   flex-direction: column;
   justify-content: center;
 
    color:white;
-    
+   
+  }
+  .dashlogo{
+    height:95%;
+  }
+
+  .dashImage{
+    font-size: 20px;
+    width:50%;
+    left:50px;
+  }
+  .dash-text{
+    width:50%;
+  }
+  .dash-attribute{
+    flex-direction: column;
+    display:flex;
+    flex:1;
+    justify-content: center;
+    min-width:100%;
+    min-height:100%;
+    cursor:pointer;
+  }
+  .dash-attribute:hover{
+    background-color:brown;
   }
 
  

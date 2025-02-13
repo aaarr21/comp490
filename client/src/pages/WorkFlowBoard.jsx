@@ -24,14 +24,14 @@ import { Axios } from 'axios';
       } ,[]);
 
     return (
-      
-    <div className ="h-screen w-full bg-neutral-900 text neutral-50">
+    <div className='no-scroll'>
+    <div className ="h-screen w-full bg-white-p-2 text neutral-50">
 
-       ({ Loggedin ?  <Board/> : <section></section> })
-    </div>);
-
-
-       
+       { Loggedin ?  <Board/> : <section></section> }
+    </div>
+    </div>    
+);
+     
 };
 
 
