@@ -6,6 +6,7 @@ import WorkBoard from './pages/WorkFlowBoard';
 import ForgotPassword from './pages/ForgotPassword';
 import ProtectedRoute from './components/ProtectedRoute';
 import Dashbar from './components/DashBar';
+import Tasks from './pages/Tasks';
 
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 
@@ -22,7 +23,7 @@ function App() {
 
 
   return (
-    <div className="no-scroll">
+    <div>
       {shouldShowDashbar && <Dashbar />}
       {shouldShowNavibar && <Navibar/>}
     
@@ -40,6 +41,14 @@ function App() {
               <WorkBoard />
             </ProtectedRoute>
           }
+        />
+        <Route
+        path="/task"
+        element={
+          <ProtectedRoute>
+            <Tasks />
+            </ProtectedRoute>
+        }
         />
       </Routes>
     </div>

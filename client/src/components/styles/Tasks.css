@@ -1,0 +1,27 @@
+/* 
+  Date: 2/20/2025
+        styling for the tasks page and the various functions.
+
+*/
+
+
+.task-button-container{
+    float:left;
+    margin-right:15px;
+    width:250px;
+    height: 100px;
+    font-size:24px;
+}
+
+.task-button{
+    font-size: 24px;
+    margin-top:0.8em;
+    margin-left:0.5em;
+}
+
+.task-button-icon{ /* Not applying for some reason*/
+    color:brown;
+    margin-right:0.5em;
+    scale:1.25;
+
+}

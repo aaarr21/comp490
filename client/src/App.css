@@ -8,8 +8,13 @@
   flex-direction: row;
   width: auto;
   border-color: red;
-  border: 1px solid black;
+  border-bottom: 3px solid black;
 
+}
+
+.no-scroll { /* This is a stupid hack to prevent scrolling */
+  overflow: hidden;
+  height: 100vh;
 }
 
 .logo{
