@@ -54,8 +54,8 @@ const NewTask = ({invertTask, taskStatus}) => {
     return (
         
         <div className="new-task-container">    
-            <div className="new-task-head-close"><h2>Create New Task</h2> <button className="close-button" onClick={closeTask}><FontAwesomeIcon icon={faXmark} className="close-icon" /></button></div>
-            <div className="new-task-people"><label for="person" > For</label> <p className="person" id="person"> Bianca</p>   <label for="placeholderTwo"> In</label> <p className="person" id="placeholderTwo">Project</p> </div>
+            <div className="new-task-head-close"><h2 className="task-head">Create New Task</h2> <button className="close-button" onClick={closeTask}><FontAwesomeIcon icon={faXmark} className="close-icon" /></button></div>
+            <div className="new-task-people"><label for="person" className="task-label"> For</label> <p className="person" id="person"> Bianca</p>   <label for="placeholderTwo" className="task-label"> In</label> <p className="person" id="placeholderTwo">Project</p> </div>
             <form className="new-task-form">            
                 <textarea placeholder="Description...."></textarea>
                 <div className="new-task-form-auxillery">

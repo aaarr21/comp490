@@ -1,6 +1,6 @@
 .siteNavigation{
     
-   background-color:brown;
+   background-color:#d04141;
    width: 10%;
    height:120vh;
    float: left;
@@ -44,12 +44,7 @@
     height:95%;
   }
 
-  textarea{
-    resize:none;
-    border: 2px solid lightskyblue;
-    margin-left: 0.2em;
-    scale:1.25;
-  }
+ 
 
   .dashImage{
     font-size: 20px;
