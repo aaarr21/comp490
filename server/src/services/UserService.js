@@ -78,7 +78,7 @@ class UserService {
     }
 
     async findOrCreatebyLinkedInId(Linkedinid, email, name, accessToken, refreshToken){
-        return await this.userRepository.findOrCreatebyFacebookId(Linkedinid,email,name,accessToken,refreshToken);
+        return await this.userRepository.findOrCreatebyLinkedInId(Linkedinid,email,name,accessToken,refreshToken);
     }
 
 

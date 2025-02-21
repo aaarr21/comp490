@@ -5,18 +5,35 @@
 */
 
 
+.task-page{
+    display:flex;
+    flex-direction: column;
+    background-color: white;
+    width:100%;
+    height:100%;
+    color: #5e5e5e;
+}
+
 .task-button-container{
     float:left;
     margin-right:15px;
-    width:250px;
+    width:280px;
     height: 100px;
     font-size:24px;
+    border-radius: 5px;
 }
 
 .task-button{
     font-size: 24px;
     margin-top:0.8em;
-    margin-left:0.5em;
+    margin-left:1.5em;
+    
+}
+
+.task-button:hover {
+    transform: scale(1.15); /* Slight scaling effect on hover */
+  /* Subtle shadow for more depth on hover */
+     /* Darker border color on hover for better feedback */
 }
 
 .task-button-icon{ /* Not applying for some reason*/
@@ -24,4 +41,143 @@
     margin-right:0.5em;
     scale:1.25;
 
+}
+
+/* styling for the new component*/
+.new-task-container{
+    display:flex;
+    width: 450px;
+    height: 525px;
+    flex-direction: column;
+   
+    border-radius: 5px;
+    border: 2px solid brown;
+    margin-left: 0.5em;
+    font-size: 18px;
+    
+}
+
+textarea{
+    scale:1.0;
+    width: 95%;
+    height: 40%;
+    margin-left:0.68em;
+    border-radius: 5px;
+    border: 3px solid lightcyan;
+    outline-color: teal;
+    margin-top: -9.0em;
+}
+
+.new-task-head-close{
+  width:100%;
+  font-size: 24px;
+  font: bolder;
+  height:15%;
+  display:flex;
+ flex-direction: row;
+ 
+}
+
+h2{
+ margin-top:0.5em;
+ margin-left:0.5em;
+ width:50%;
+ color:#5e5e5e;
+}
+
+.new-task-people{
+    width:100%;
+    height:10%;
+    display:flex;
+    flex-direction: row;
+}
+
+label{
+    margin-left:2.0em;
+}
+
+.person{
+    width:30%;
+    height: 30px;
+    background-color: lightgrey;
+    border-radius: 5px;
+    margin-left:1.0em;
+    text-align: center;
+}
+
+.close-button{
+     float:right;
+     margin-left:40%;
+     margin-bottom: 25%;
+}
+
+.close-button:hover{
+    transform: scale(1.10);
+ 
+}
+.close-icon{
+    scale:1.00;
+    color: grey;
+}
+
+.close-icon:hover{
+    color:red;
+}
+.new-task-form{
+    height:80%; /* Ensures the form fills the height of the right column */
+    width:100%;
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-left: 0em;
+    margin-top:3.5em;
+}
+
+.new-task-form-auxillery{
+    width:100%;
+    height:20%;
+    display:flex;
+    flex-direction:row;
+}
+
+.auxillery-icon{
+    color: #a8a8a8;
+    scale:1.45;
+    margin-left:2.2em;
+    margin-top:1.0em;
+}
+
+.person-share{
+    float:right;
+    scale:1.45;
+    color:#a8a8a8;
+    margin-left:40%;
+    margin-top: 0.7em;
+}
+
+.new-task-submit{
+    
+    width:100%;
+    height:50px;
+    display:flex;
+    justify-content: center;;
+}
+
+.task-submit-button{
+    width:75%;
+    margin-top:1.0em;
+    height:100%;
+    
+    font:bolder;
+    margin-top:2.5em;
+    background-color: #2f81ed;
+    text-align: center;
+    font-size:18px;
+    color:white;
+    border-radius: 5px;
+}
+
+.new-task-head{
+    font-size: 20px;
+    margin-bottom:0.5;
 }
