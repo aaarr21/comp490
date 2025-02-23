@@ -50,6 +50,15 @@ const NewTask = ({invertTask, taskStatus}) => {
         invertTask(!taskStatus);
      }
 
+     const [file,setFile] = useState(null);
+
+     function handleFileChange(event){
+        if(event.target.files){
+            setFile(event.target.files[0]);
+            console.log(file);
+        }
+     }
+
 
     return (
         
@@ -61,7 +70,10 @@ const NewTask = ({invertTask, taskStatus}) => {
                 <div className="new-task-form-auxillery">
                    <FontAwesomeIcon icon={faA} className="auxillery-icon" />
                    <FontAwesomeIcon icon={faFaceSmile} className="auxillery-icon" />
-                   <FontAwesomeIcon icon={faPaperclip} className="auxillery-icon"/>
+                   <input type="file" style = {{display: 'none'}} onChange={handleFileChange} id="attachment-upload" accept=".pdf,.xml,.docx" />
+                   <label htmlFor="attachment-upload">
+                    <FontAwesomeIcon icon={faPaperclip} className="auxillery-icon"/>
+                    </label>
                    <FontAwesomeIcon icon={faCalendar}  className="auxillery-icon"/>
                    <FontAwesomeIcon icon={faUserPlus} className = "person-share" />
                 </div>

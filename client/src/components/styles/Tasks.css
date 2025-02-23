@@ -146,14 +146,24 @@ textarea{
     scale:1.45;
     margin-left:2.2em;
     margin-top:1.0em;
+    cursor: pointer;
+}
+
+.auxillery-icon:hover{
+    color: #d04141;
 }
 
 .person-share{
     float:right;
-    scale:1.45;
+    scale:1.45; 
     color:#a8a8a8;
     margin-left:40%;
     margin-top: 0.7em;
+    cursor:pointer;
+}
+
+.person-share:hover{
+    color:#d04141;
 }
 
 .new-task-submit{
