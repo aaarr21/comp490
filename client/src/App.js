@@ -7,6 +7,7 @@ import ForgotPassword from './pages/ForgotPassword';
 import ProtectedRoute from './components/ProtectedRoute';
 import Dashbar from './components/DashBar';
 import Tasks from './pages/Tasks';
+import "@fontsource/inter";
 
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 

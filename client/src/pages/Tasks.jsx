@@ -4,7 +4,6 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import { faCircleXmark, faXmark,faPaperclip, faFaceSmile,faCalendar, faUserPlus, faA } from '@fortawesome/free-solid-svg-icons';
 import '../components/styles/Tasks.css';
 
-
 const Tasks = () => {
 
     const [Loggedin,setLoggedin] = useState(true); // state if person accessing is even logged in.
@@ -50,14 +49,40 @@ const NewTask = ({invertTask, taskStatus}) => {
         invertTask(!taskStatus);
      }
 
-     const [file,setFile] = useState(null);
+     
 
-     function handleFileChange(event){
-        if(event.target.files){
-            setFile(event.target.files[0]);
-            console.log(file);
+     const [files,setFiles] = useState([]); //Handle the files
+
+     const[displayfile,setDisplayFile] = useState(false); //Display the attachments when they exist in context.
+
+     const handleFileChange = (event) => {
+        if(event.target.files){ //Ensure that user did upload a pdf.
+   
+           
+            try {
+                if(!displayfile) { // This is probably not needed, but I need to work on other projects before I can modify.
+                    setFiles(Array.from(event.target.files));
+                    setDisplayFile(true);
+                 
+                   } else{
+                    const yoinkedFiles = Array.from(event.target.files); //use from to convert from FilesList to Array. I need to do this so I can use the map array function.
+                    let finalList = [...files,...yoinkedFiles]; //Use spread operator to create a final list of all file elements
+                    
+                    setFiles(finalList); //Set to final array
+                    
+                   }
+            } catch (error) {
+             
+            }
+           
+           
+            
         }
      }
+
+     const deleteAttachment = (fileId) => {
+         setFiles(files.filter((file) => file.size !== (fileId *10)));
+     } 
 
 
     return (
@@ -70,12 +95,19 @@ const NewTask = ({invertTask, taskStatus}) => {
                 <div className="new-task-form-auxillery">
                    <FontAwesomeIcon icon={faA} className="auxillery-icon" />
                    <FontAwesomeIcon icon={faFaceSmile} className="auxillery-icon" />
-                   <input type="file" style = {{display: 'none'}} onChange={handleFileChange} id="attachment-upload" accept=".pdf,.xml,.docx" />
+                   <input type="file" style = {{display: 'none'}} onChange={handleFileChange} id="attachment-upload" accept=".pdf,.xml,.docx" multiple />
                    <label htmlFor="attachment-upload">
                     <FontAwesomeIcon icon={faPaperclip} className="auxillery-icon"/>
                     </label>
                    <FontAwesomeIcon icon={faCalendar}  className="auxillery-icon"/>
                    <FontAwesomeIcon icon={faUserPlus} className = "person-share" />
+                </div>
+                <div>
+                    <div className="attachment-section"> 
+                     <label >Attachments:</label> <span id="attach">{ displayfile && files.map(file =>(
+                        <FileInfo key = {file.size} fileName={file.name} deleteAttachment={deleteAttachment}/>
+                     ))}</span>
+                    </div>
                 </div>
                 <div className="new-task-submit">
                       <button className="task-submit-button"> Create Task</button>
@@ -86,5 +118,16 @@ const NewTask = ({invertTask, taskStatus}) => {
         </div>
     )
 };
+
+
+
+const FileInfo = ({key,fileName, deleteAttachment}) => {
+    const fileID = (key / 10);
+    return (
+        <div className="file-card">
+            {fileName} <button style = {{display: 'none'}} onClick={deleteAttachment}><FontAwesomeIcon icon={faXmark} className="close"/> </button>
+        </div>
+    )
+}
 
 export default Tasks;

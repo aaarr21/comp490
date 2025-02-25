@@ -12,6 +12,10 @@
 
 }
 
+body{
+  font-family: "Inter";
+}
+
 .no-scroll { /* This is a stupid hack to prevent scrolling */
   overflow: hidden;
   height: 100vh;
