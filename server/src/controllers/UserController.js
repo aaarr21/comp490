@@ -3,6 +3,7 @@ const userService = new UserService();
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const Joi = require('joi');
+const Task = require('../models/Task');
 
 // Route handler for user registration
 const registerUser = async (req, res) => {
@@ -25,6 +26,25 @@ const registerUser = async (req, res) => {
         console.error('Error during registration:', error);
         res.status(500).json({ error: 'Registration failed' });
 	}
+};
+
+
+// create a new task object, should be moved to a new TaskController.
+const createNewTask = async (req,res) => {
+    
+    console.log(JSON.stringify(req.body));
+     const {person, texttoPass, taskDate, files} = req.body;
+     console.log("New Task acquired!\n" + person + " " + taskDate + "  " + " " + files + texttoPass);
+    try{
+       let newTask = new Task(person ,taskDate,texttoPass,files);
+       
+      res.status(201).json({message: 'Task Created!', newTask});
+    } catch(error){
+        console.log('Error during task intilization', error);
+        res.status(401).json({error: 'task creation failed'});
+    }
+     
+    
 };
 
 // Route handler for user login
@@ -217,4 +237,5 @@ module.exports = {
     sendResetCode,
     verifyResetCode,
     resetPassword,
+    createNewTask,
 };

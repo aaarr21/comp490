@@ -19,7 +19,7 @@ const ForgotPassword = () => {
                     
                     <section className = "forgot-password-section">
                        
-                     {( resetTrue ? <ResetPassword/> : nextPage ? <EmailCodeSection setCodeState ={setResetTrue} userEmail={email} /> :  <VerifyEmailSection  setcompState={setNextPage} setuserEmail={setEmail}/> )} 
+                     {( resetTrue ? <ResetPassword/> : nextPage ? <EmailCodeSection setCodeState={setResetTrue} userEmail={email} /> :  <VerifyEmailSection  setcompState={setNextPage} setuserEmail={setEmail}/> )} 
                     </section>
                    
                 </div>

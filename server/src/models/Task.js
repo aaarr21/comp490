@@ -12,3 +12,28 @@
 
 
 */
+
+
+class Task {
+      constructor(person,date,text,attachments){
+         this.person = person;
+         this.date = date;
+         this.text = text;
+         this.attachments = attachments;
+      }
+      
+  //Generic setter methods, probably useful for the dashboard so users can edit the tasks.
+   async editDate(newDate){
+      this.date = newDate;
+   }
+
+   async editPerson(newPerson){
+      this.person = this.person;
+   }
+
+   async editText(newText){
+      this.text = newText;
+   }
+}
+
+module.exports = Task;

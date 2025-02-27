@@ -1,5 +1,5 @@
 import { useState,useEffect,useRef } from 'react';
-import { Axios } from 'axios';
+import axios from 'axios';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import { faCircleXmark, faXmark,faPaperclip, faFaceSmile,faCalendar, faUserPlus, faA } from '@fortawesome/free-solid-svg-icons';
 import '../components/styles/Tasks.css';
@@ -161,6 +161,29 @@ const NewTask = ({invertTask, taskStatus}) => {
         setselectedDepartment(chosenDepartment);
         
      }
+      //create new instance of task object to the back end.
+     const handleTaskupload = async (e) =>{
+          e.preventDefault();
+          const text = e.target;
+          const textData = new FormData(text);
+
+          const texttoPass = textData.get("textPart");
+          console.log(files);
+          if(taskDate == null){
+            //Use toastify here to create a reponsive error message
+            console.log("No date set for task. Please set a date.");
+            return;
+          }
+         const response = await axios.post('http://localhost:5000/auth/create-new-task', {  // Updated to use port 5000
+              person,
+              texttoPass,
+              taskDate,
+              files,
+         }, { withCredentials: true });
+
+         console.log(response);
+
+     }
 
      const deleteAttachment = (fileId) => {
        // e.preventDefault();
@@ -179,13 +202,13 @@ const NewTask = ({invertTask, taskStatus}) => {
             </div>
 
             <div className="new-task-people"><label for="person" className="task-label"> For</label> 
-            <DepartmentSelect options={PeopleList} onChanges={ (person) => setPerson(person)}/>  
+            <DepartmentSelect options={PeopleList} onChanges={ (person) => setPerson(person.value)}/>  
             
             <label for="placeholderTwo" className="task-label"> In</label> 
                <DepartmentSelect options={DepartmentList} onChanges={handleDepartmentSelection}/>
              </div>
-            <form className="new-task-form">            
-                <textarea placeholder="Description...." id="textArea" ref={textRef}></textarea>
+            <form className="new-task-form" onSubmit={handleTaskupload}>            
+                <textarea placeholder="Description...." id="textArea" ref={textRef} required name="textPart"></textarea>
                   
                 <div className="new-task-form-auxillery">
                    <FontAwesomeIcon icon={faA} className="auxillery-icon" />

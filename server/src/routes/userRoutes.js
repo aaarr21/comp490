@@ -12,6 +12,7 @@ router.get('/users', userController.getAllUsers);  // Route to get all users
 router.put('/:id', userController.updateUserProfile);  // Route to update user profile
 router.delete('/:id', userController.deleteUser);  // Route to delete a user
 router.post('/reset-password', userController.resetPassword);  // Route to reset the password
+router.post('/create-new-task', userController.createNewTask); // Route to create a new task 
 
 // --- Password Reset Routes ---
 router.post('/reset', userController.sendResetCode); // Route to send password reset code
