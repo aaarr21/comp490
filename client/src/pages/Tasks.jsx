@@ -165,21 +165,23 @@ const NewTask = ({invertTask, taskStatus}) => {
      const handleTaskupload = async (e) =>{
           e.preventDefault();
           const text = e.target;
-          const textData = new FormData(text);
+          console.log(text);
+          const taskData = new FormData(text);
+          taskData.append("date", taskDate);
+          taskData.append("person", person);
 
-          const texttoPass = textData.get("textPart");
-          console.log(files);
+          files.map((file) => taskData.append("attachment", file, file.name));
+          console.log(taskData);          
+          //console.log(files);
           if(taskDate == null){
             //Use toastify here to create a reponsive error message
             console.log("No date set for task. Please set a date.");
             return;
           }
-         const response = await axios.post('http://localhost:5000/auth/create-new-task', {  // Updated to use port 5000
-              person,
-              texttoPass,
-              taskDate,
-              files,
-         }, { withCredentials: true });
+         const response = await axios.post('http://localhost:5000/auth/create-new-task', taskData, {headers: {
+            'Content-Type': 'multipart/form-data',
+             withCredentials: true }
+          });
 
          console.log(response);
 
@@ -207,7 +209,7 @@ const NewTask = ({invertTask, taskStatus}) => {
             <label for="placeholderTwo" className="task-label"> In</label> 
                <DepartmentSelect options={DepartmentList} onChanges={handleDepartmentSelection}/>
              </div>
-            <form className="new-task-form" onSubmit={handleTaskupload}>            
+            <form className="new-task-form" onSubmit={handleTaskupload} action="/newTask" enctype="multipart/form-data" >            
                 <textarea placeholder="Description...." id="textArea" ref={textRef} required name="textPart"></textarea>
                   
                 <div className="new-task-form-auxillery">
@@ -236,7 +238,7 @@ const NewTask = ({invertTask, taskStatus}) => {
                     </div>
                 </div>
                 <div className="new-task-submit">
-                      <button className="task-submit-button"> Create Task</button>
+                      <button  type="submit"className="task-submit-button"> Create Task</button>
                 </div>
             </form>
            

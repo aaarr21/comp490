@@ -4,6 +4,19 @@ const userController = require('../controllers/UserController');
 const router = express.Router();
 const FRONTEND_URL = "http://localhost:3000/workBoard";
 const nodemailer = require("nodemailer");
+const multer = require('multer');
+
+
+
+const storage = multer.diskStorage({
+  destination: "src/tasks/",
+  filename: function(req, file, cb) {
+    // null as first argument means no error
+    cb(null, file.originalname);
+  },
+});
+
+const upload = multer({storage: storage});
 
 // --- User Management Routes ---
 router.post('/register', userController.registerUser);  // Route to register a new user
@@ -12,7 +25,10 @@ router.get('/users', userController.getAllUsers);  // Route to get all users
 router.put('/:id', userController.updateUserProfile);  // Route to update user profile
 router.delete('/:id', userController.deleteUser);  // Route to delete a user
 router.post('/reset-password', userController.resetPassword);  // Route to reset the password
-router.post('/create-new-task', userController.createNewTask); // Route to create a new task 
+router.post('/create-new-task', upload.array('attachment',5), userController.createNewTask); // Route to create a new task 
+
+// --- Task Routes ---
+
 
 // --- Password Reset Routes ---
 router.post('/reset', userController.sendResetCode); // Route to send password reset code
