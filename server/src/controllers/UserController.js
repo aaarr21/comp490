@@ -32,15 +32,7 @@ const registerUser = async (req, res) => {
 };
 
 
-// create a new task object, should be moved to a new TaskController.
-const createNewTask = async (req,res) => {
-    
-    console.log(JSON.stringify(req.body));
-    console.log(JSON.stringify(req.files));
-    res.status(201).json({test: 'displaying in backend the task data received.'})
-     
-    
-};
+
 
 // Route handler for user login
 const loginUser = async (req, res) => {
