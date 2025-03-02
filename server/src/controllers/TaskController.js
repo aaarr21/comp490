@@ -1,19 +1,17 @@
-
+const Task = require('../models/Task');
+const multer = require('multer');
 
 
 const createNewTask = async (req,res) => {
-    
+    //To Be Done.
     console.log(JSON.stringify(req.body));
-     const {person, texttoPass, taskDate, files} = req.body;
-     console.log("New Task acquired!\n" + person + " " + taskDate + "  " + " " + files + texttoPass);
-    try{
-       let newTask = new Task(person ,taskDate,texttoPass,files);
-       
-      res.status(201).json({message: 'Task Created!', newTask});
-    } catch(error){
-        console.log('Error during task intilization', error);
-        res.status(401).json({error: 'task creation failed'});
-    }
-     
-    
+    console.log(JSON.stringify(req.files));
+    res.status(201).json({test: 'displaying in backend the task data received.'})
+      
+};
+
+
+
+module.exports = {
+    createNewTask
 };

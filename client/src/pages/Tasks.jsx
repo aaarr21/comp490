@@ -9,13 +9,23 @@ import 'react-date-picker/dist/DatePicker.css';
 import 'react-calendar/dist/Calendar.css';
 import Select from 'react-select';
 import { text } from '@fortawesome/fontawesome-svg-core';
+import { Toaster, toast } from 'sonner';
 
 const Tasks = () => {
 
     const [Loggedin,setLoggedin] = useState(true); // state if person accessing is even logged in.
                                                    //Revert to false to test.
     const [shownewTask,setnewTask] = useState(false) // state to determine if the new task should be viewable, 
-                                                     // this gets modified by clicking upon the new task button.
+                                                     // this gets modified by clicking upon the new task button. 
+
+        const successNotify = (dialog) => {
+              toast.success(dialog);
+        }
+
+        const failNotify = (dialog) => {
+            toast.error(dialog);
+      }
+
 
            useEffect(()=>{  
                  const logginInCheck = async () =>{
@@ -51,7 +61,8 @@ const Tasks = () => {
        onClick={createNewTask}
       ><FontAwesomeIcon icon={faCircleXmark} className="task-button-icon"/>Create New Task!</button>
       </div>
-       {  Loggedin && (shownewTask ? < NewTask invertTask = {setnewTask} taskStatus={shownewTask} /> : '')} 
+       {  Loggedin && (shownewTask ? < NewTask invertTask = {setnewTask} taskStatus={shownewTask} taskSuccess ={successNotify} taskFail ={failNotify}/> : '')} 
+         <Toaster position="bottom-center" richColors />
 
  </div> </div>
 );  
@@ -64,7 +75,7 @@ const Tasks = () => {
 
 
 
-const NewTask = ({invertTask, taskStatus}) => {
+const NewTask = ({invertTask, taskStatus, taskSuccess, taskFail}) => {
     // Determine if this should get any passed in props to determine owner, 
     //should talk to see if we should get a custom object to represent the task and the various attributes.
      const closeTask = () =>{ //close task, this deletes all of the contents of the task and when clicked again renders a new task.
@@ -97,7 +108,7 @@ const NewTask = ({invertTask, taskStatus}) => {
 
      const [files,setFiles] = useState([]); //Handle the files
 
-     const [departList,setdepartList] = useState(DepartmentList); //this feels wasteful for now, keep for when we can really do api calls to database.
+     //const [departList,setdepartList] = useState(DepartmentList); //this feels wasteful for now, keep for when we can really do api calls to database.
 
      const [person,setPerson] = useState(null);
 
@@ -153,7 +164,7 @@ const NewTask = ({invertTask, taskStatus}) => {
 
      const appendDate = (date) =>{
         settaskDate(date);
-        
+        taskSuccess(("Date Chosen: " + date))
         setDisplayDate(false);
      }
 
@@ -168,22 +179,28 @@ const NewTask = ({invertTask, taskStatus}) => {
           console.log(text);
           const taskData = new FormData(text);
           taskData.append("date", taskDate);
-          taskData.append("person", person);
+          taskData.append("person", person)
 
           files.map((file) => taskData.append("attachment", file, file.name));
           console.log(taskData);          
           //console.log(files);
-          if(taskDate == null){
+          if(taskDate == null || person == null){
             //Use toastify here to create a reponsive error message
-            console.log("No date set for task. Please set a date.");
+            taskFail("One or More empty fields for task, please fix them.")
             return;
           }
-         const response = await axios.post('http://localhost:5000/auth/create-new-task', taskData, {headers: {
+         const response = await axios.post('http://localhost:5000/auth/create-new-task', taskData, {
             'Content-Type': 'multipart/form-data',
-             withCredentials: true }
-          });
+              withCredentials: true });  
 
-         console.log(response);
+            toast.promise(response, {
+                loading: 'sending task to server...',
+                success: (data) =>{
+                    invertTask(!taskStatus);
+                    return 'Task created Successfully';
+                },
+                error: "Error Occured",
+            });
 
      }
 
@@ -219,7 +236,7 @@ const NewTask = ({invertTask, taskStatus}) => {
                     <div className="emoji-position">   { displayEmoji && <Picker onEmojiClick={appendEmoji} />  }  </div>
                    <label htmlFor="emoji-picker"> <FontAwesomeIcon icon={faFaceSmile}  className="auxillery-icon" /> </label>
                    <input type="file" style = {{display: 'none'}} onChange={handleFileChange} id="attachment-upload"
-                    accept=".pdf,.xml,.docx" multiple />
+                    accept=".pdf,.xml,.docx" multiple  />
                    <label htmlFor="attachment-upload">
                     <FontAwesomeIcon icon={faPaperclip} className="auxillery-icon"/>
                     </label>
