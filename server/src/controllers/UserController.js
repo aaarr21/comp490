@@ -33,7 +33,6 @@ const registerUser = async (req, res) => {
 
 
 
-
 // Route handler for user login
 const loginUser = async (req, res) => {
     const { identifier, password } = req.body;
@@ -224,5 +223,5 @@ module.exports = {
     sendResetCode,
     verifyResetCode,
     resetPassword,
-    createNewTask,
+    
 };

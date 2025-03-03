@@ -8,8 +8,8 @@ const nodemailer = require("nodemailer");
 const multer = require('multer');
 
 
-
-const storage = multer.diskStorage({
+//multer storage set up, using memoryStorage because I don't want this to be in our server.
+const storage = multer.memoryStorage({
   destination: "src/tasks/",
   filename: function(req, file, cb) {
     // null as first argument means no error
@@ -17,7 +17,9 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({storage: storage});
+const upload = multer({storage: storage,
+                       limits: {fileSize : 10000000000, files:5}
+});
 
 // --- User Management Routes ---
 router.post('/register', userController.registerUser);  // Route to register a new user
@@ -26,7 +28,7 @@ router.get('/users', userController.getAllUsers);  // Route to get all users
 router.put('/:id', userController.updateUserProfile);  // Route to update user profile
 router.delete('/:id', userController.deleteUser);  // Route to delete a user
 router.post('/reset-password', userController.resetPassword);  // Route to reset the password
-router.post('/create-new-task', upload.array('attachment',5), userController.createNewTask); // Route to create a new task 
+router.post('/create-new-task', upload.array('attachment',5), taskController.createNewTask); // Route to create a new task 
 
 // --- Task Routes ---
 
