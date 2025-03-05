@@ -18,6 +18,8 @@ const Tasks = () => {
     const [shownewTask,setnewTask] = useState(false) // state to determine if the new task should be viewable, 
                                                      // this gets modified by clicking upon the new task button. 
 
+    const [deptMembers,setDeptMembers] = useState(null); // state for a list of all possible members to add to task.
+
         const successNotify = (dialog) => {
               toast.success(dialog);
         }
@@ -29,7 +31,7 @@ const Tasks = () => {
 
            useEffect(()=>{  
                  const logginInCheck = async () =>{
-                const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/Task`, {
+                const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/status`, {
                             credentials: 'include',
                         })    
                              if(response.status === 401)
@@ -40,7 +42,24 @@ const Tasks = () => {
                                                        // const data = await response.json();
                                                         //console.log(data);
                                             }
+
+
+                    const getTheUsers = async () => {
+
+                        const response = await axios.get(`${process.env.REACT_APP_API_URL}/auth/get-all-members`,
+                            {credentials: 'include'},
+                        ) 
+                             
+                              if(response.status === 500)
+                                 failNotify(response.error);
+                             else{
+                                setDeptMembers(response.data);
+                                successNotify("Sucessfully acquired department members!");
+                             }
+
+                    }
                                              logginInCheck();
+                                             getTheUsers();
                  } ,[]);
    
       const createNewTask = () => {               
@@ -55,13 +74,13 @@ const Tasks = () => {
     <div className ="task-page"> 
        
         <div className="task-button-container">
-            <div clasName=""></div>
+            
       <button className="task-button"
        aria-describedby="passNote"
        onClick={createNewTask}
       ><FontAwesomeIcon icon={faCircleXmark} className="task-button-icon"/>Create New Task!</button>
       </div>
-       {  Loggedin && (shownewTask ? < NewTask invertTask = {setnewTask} taskStatus={shownewTask} taskSuccess ={successNotify} taskFail ={failNotify}/> : '')} 
+       {  Loggedin && (shownewTask ? < NewTask invertTask = {setnewTask} taskStatus={shownewTask} taskSuccess ={successNotify} taskFail ={failNotify} members ={deptMembers}/> : '')} 
          <Toaster position="bottom-center" richColors />
 
  </div> </div>
@@ -75,7 +94,7 @@ const Tasks = () => {
 
 
 
-const NewTask = ({invertTask, taskStatus, taskSuccess, taskFail}) => {
+const NewTask = ({invertTask, taskStatus, taskSuccess, taskFail,members}) => {
     // Determine if this should get any passed in props to determine owner, 
     //should talk to see if we should get a custom object to represent the task and the various attributes.
      const closeTask = () =>{ //close task, this deletes all of the contents of the task and when clicked again renders a new task.
@@ -89,32 +108,21 @@ const NewTask = ({invertTask, taskStatus, taskSuccess, taskFail}) => {
          for the people within that department, another api call.
      */
 
-     const DepartmentList = [ //Test list for the select option
-        {value: "CompSci", label: "CompSci"},
-        {value: "Biology", label: "Biology"},
-        {value: "Archives", label: "Archives"},
-        {value: "Administration", label: "Administration"}
-     ];
-
-      const PeopleList = [ //Test List for the people option
-        {value: "Sebastian Sunga", label:"Sebastian"},
-        {value: "John Dong" , label:"John"},
-        {value: "Bianca Loera", label:"Bianca"},
-        {value: "Alyssa Gomez", label: "Alyssa"},
-        {value:"Bryan Abrego", label:"Bryan"}
-      ]
-
-
-
      const [files,setFiles] = useState([]); //Handle the files
 
      //const [departList,setdepartList] = useState(DepartmentList); //this feels wasteful for now, keep for when we can really do api calls to database.
 
-     const [person,setPerson] = useState(null);
+     const [person,setPerson] = useState(null); //Delete this,numbskull french
+
+     const [chosenMembers,setchosenMembers] = useState(null);
 
      const[displayfile,setDisplayFile] = useState(false); //Display the attachments when they exist in context.
 
      const[displayEmoji,setEmoji] = useState(false); // for emoji picker render
+
+     const [displayMembers,setDisplayMembers] = useState(false);
+
+     const [displayChosen, setdisplayChosen] = useState(false);
 
      const[displayDate,setDisplayDate] = useState(false); // to render date picker
      
@@ -129,7 +137,7 @@ const NewTask = ({invertTask, taskStatus, taskSuccess, taskFail}) => {
         if(event.target.files){ //Ensure that user did upload a pdf.          
             try {
             
-                    setFiles(Array.from(event.target.files));
+                    //setFiles(Array.from(event.target.files));
                     setDisplayFile(true);                   
                     const yoinkedFiles = Array.from(event.target.files); //use from to convert from FilesList to Array. 
                                                                          // I need to do this so I can use the map array function.
@@ -143,6 +151,9 @@ const NewTask = ({invertTask, taskStatus, taskSuccess, taskFail}) => {
             }            
         }
      }
+
+  
+
 
      const renderEmoji = (event) =>{
        
@@ -168,15 +179,20 @@ const NewTask = ({invertTask, taskStatus, taskSuccess, taskFail}) => {
         setDisplayDate(false);
      }
 
-     const handleDepartmentSelection = (chosenDepartment) =>{
-        setselectedDepartment(chosenDepartment);
-        
+     
+     const renderMembers = () =>{
+        //e.preventDefault();
+    
+        setDisplayMembers(!displayMembers);
+        console.log(chosenMembers);
      }
+
+    
       //create new instance of task object to the back end.
      const handleTaskupload = async (e) =>{
           e.preventDefault();
           const text = e.target;
-          console.log(text);
+         
           const taskData = new FormData(text);
           taskData.append("date", taskDate);
           taskData.append("person", person)
@@ -211,6 +227,13 @@ const NewTask = ({invertTask, taskStatus, taskSuccess, taskFail}) => {
          setFiles(tempArr); //set files state to that temporary array
      } 
 
+     const deletePeople = (memberId) => {
+      // e.preventDefault();
+       
+       let tempArr = chosenMembers.filter((member, index) => memberId !== index); //Temp array for the filtered array      
+        setchosenMembers(tempArr); //set files state to that temporary array
+    } 
+
 
     return (
         
@@ -220,21 +243,22 @@ const NewTask = ({invertTask, taskStatus, taskSuccess, taskFail}) => {
             <button className="close-button" onClick={closeTask}><FontAwesomeIcon icon={faXmark} className="close-icon" /></button>
             </div>
 
-            <div className="new-task-people"><label for="person" className="task-label"> For</label> 
-            <DepartmentSelect options={PeopleList} onChanges={ (person) => setPerson(person.value)}/>  
+            <div className="new-task-people">
             
-            <label for="placeholderTwo" className="task-label"> In</label> 
-               <DepartmentSelect options={DepartmentList} onChanges={handleDepartmentSelection}/>
+                     <label >For:</label> <span id="attach">{ displayChosen && chosenMembers.map( (member,index) =>(
+                        <MemberInfo memberId = {index} memberName={member} deletePeople={deletePeople}/>
+                     ))}</span>
+                    
              </div>
-            <form className="new-task-form" onSubmit={handleTaskupload} action="/newTask" enctype="multipart/form-data" >            
+            <form className="new-task-form" onSubmit={handleTaskupload} enctype="multipart/form-data" >            
                 <textarea placeholder="Description...." id="textArea" ref={textRef} required name="textPart"></textarea>
                   
                 <div className="new-task-form-auxillery">
-                   <FontAwesomeIcon icon={faA} className="auxillery-icon" />
+                   
 
                   <button type="button"  onClick={renderEmoji} id="emoji-picker" style = {{display: 'none'}}>   </button>         
                     <div className="emoji-position">   { displayEmoji && <Picker onEmojiClick={appendEmoji} />  }  </div>
-                   <label htmlFor="emoji-picker"> <FontAwesomeIcon icon={faFaceSmile}  className="auxillery-icon" /> </label>
+                   <label htmlFor="emoji-picker" className="label-please"> <FontAwesomeIcon icon={faFaceSmile}  className="auxillery-icon" /> </label>
                    <input type="file" style = {{display: 'none'}} onChange={handleFileChange} id="attachment-upload"
                     accept=".pdf,.xml,.docx" multiple  />
                    <label htmlFor="attachment-upload">
@@ -242,11 +266,16 @@ const NewTask = ({invertTask, taskStatus, taskSuccess, taskFail}) => {
                     </label>
 
                     <button type="button"  onClick={renderDate} id="date-picker" style = {{display: 'none'}}>   </button>
-                   <label htmlFor="date-picker">   <FontAwesomeIcon icon={faCalendar}  className="auxillery-icon"/> </label>
+                   <label htmlFor="date-picker" className="label-please">   <FontAwesomeIcon icon={faCalendar}  className="auxillery-icon"/> </label>
                    <div className="date-position" >   { displayDate && <DatePicker 
                         selected ={taskDate} onChange={appendDate} /> }  </div>
-                   <FontAwesomeIcon icon={faUserPlus} className = "person-share" />
+
+
+                     <button type="button"  onClick={renderMembers} id="member-picker">   </button>
+                  <label htmlFor="member-picker" >  <FontAwesomeIcon icon={faUserPlus} className = "person-share" /></label>
+                     
                 </div>
+                
                 <div>
                     <div className="attachment-section"> 
                      <label >Attachments:</label> <span id="attach">{ displayfile && files.map( (file,index) =>(
@@ -258,6 +287,8 @@ const NewTask = ({invertTask, taskStatus, taskSuccess, taskFail}) => {
                       <button  type="submit"className="task-submit-button"> Create Task</button>
                 </div>
             </form>
+            <div className="member-position">{displayMembers && < MemberChecklist deptMemberList={members} 
+                 close={renderMembers} setChosenMembers={setchosenMembers} chosen ={chosenMembers} displayChosen={setdisplayChosen}/>}</div>
            
             
         </div>
@@ -291,5 +322,62 @@ const FileInfo = ({id,fileName, deleteAttachment}) => {
         </div>
     )
 }
+const MemberInfo = ({memberId,memberName, deletePeople}) => {
+  let memberID = memberId;
+      console.log("Weegee:" + memberID);
+return (
+    <div className="member-card">
+        {memberName} <button  onClick={()=> {deletePeople(memberID)}} type="button"><FontAwesomeIcon icon={faXmark} 
+        className="close"/> </button>
+    </div>
+)
+}
+
+const MemberChecklist = ({ deptMemberList, close, setChosenMembers, displayChosen, chosen  }) => {
+  const handleMemberSelection = (e) => {
+       e.preventDefault();
+    
+    const memberData = e.target;
+     const formData = new FormData(memberData);
+     const chosenList = [];
+     for (let [key, value] of formData.entries()) {
+       chosenList.push(value);
+     }
+       let combinedList = [...chosen,...chosenList];
+     setChosenMembers(combinedList);
+     displayChosen(true);
+    close();  
+  };
+    return (
+      <div className="check-list-container">
+        <form className="check-list" onSubmit={handleMemberSelection}>
+          <ul>
+            {deptMemberList.map((member) => (
+              <li className="check-list-option" key={member.username}>
+                <input
+                  type="checkbox"
+                  id={member.username}
+                  name="members"
+                  value={member.username}
+                />
+                <label htmlFor={member.username}>{member.username}</label>
+              </li>
+            ))}
+          </ul>
+  
+          <div className="adjacent-check-list">
+            <button type="button" className="check-list-close" onClick={close}>
+              Close
+            </button>
+            <button  type="submit" className="check-list-accept">
+              Accept
+            </button>
+          </div>
+        </form>
+      </div>
+    );
+  };
+
+
 
 export default Tasks;

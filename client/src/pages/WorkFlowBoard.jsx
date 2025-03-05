@@ -5,7 +5,7 @@ import { Axios } from 'axios';
 //There is a sinister ) at the bottom that casuses some empty space, unsure of why its there
  const WorkFlowBoard = () =>{
 
-      const [Loggedin,setLoggedin] = useState(true); // state if person accessing is even logged in.
+      const [Loggedin,setLoggedin] = useState(false); // state if person accessing is even logged in.
                                                      //Revert to false to test.
       useEffect(()=>{  
         const logginInCheck = async () =>{
@@ -17,8 +17,8 @@ import { Axios } from 'axios';
         else{
             setLoggedin(true);
         }
-       // const data = await response.json();
-        //console.log(data);
+        const data = await response.json();
+        console.log(data);
     }
        logginInCheck();
       } ,[]);

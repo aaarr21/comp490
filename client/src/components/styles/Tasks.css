@@ -12,6 +12,7 @@
     width:100%;
     height:100%;
     color: #5e5e5e;
+    margin: 0;
 }
 
 .task-button-container{
@@ -48,6 +49,7 @@
     display:flex;
     width: 450px;
     height: 525px;
+    max-height: 525px;
     flex-direction: column;
    
     border-radius: 5px;
@@ -90,6 +92,9 @@ textarea{
     height:10%;
     display:flex;
     flex-direction: row;
+    font-size: 18px;
+    margin-left:1.0em;
+
 }
 
 .task-label{
@@ -142,6 +147,8 @@ textarea{
     flex-direction:row;
 }
 
+
+
 .auxillery-icon{
     color: #a8a8a8;
     scale:1.45;
@@ -155,13 +162,15 @@ textarea{
 }
 
 .person-share{
-    float:right;
+    
     scale:1.45; 
     color:#a8a8a8;
-    margin-left:40%;
+    margin-left:240px;
     margin-top: 0.7em;
     cursor:pointer;
 }
+
+
 
 .person-share:hover{
     color:#d04141;
@@ -210,12 +219,30 @@ textarea{
 .file-card{
     height:100%;
  
-    font-size:8px;
+    font-size: 8px;
+    font:bolder;
     margin-left:2.0em;
-    background-color: lightgray;
+    background-color: #d04141;
+    color:white;
     border-radius: 5px;
     justify-content: center;
     display:inline-block;
+    padding:12px;
+    min-width: 25%;
+    min-height:50%;
+}
+
+.member-card{
+    height:100%;
+    
+    font-size:12px;
+    margin-left:2.0em;
+    background-color: #d04141;
+    border-radius: 5px;
+    justify-content: center;
+    display:inline-block;
+    padding:12px;
+    color:white;
 }
 
 .close{
@@ -235,10 +262,22 @@ textarea{
     z-index: 1000;
 }
 
+
 .date-position{
     position:absolute; 
 
     z-index: 1000;
+    left:325px;
+    bottom:240px;
+    background-color: white;
+    border-radius:5px;
+}
+
+.member-position{
+    position: absolute;
+    z-index:1000;
+    left: 500px;
+    bottom:100px;
 }
 
 .date-stuff{
@@ -251,3 +290,44 @@ textarea{
     border-radius: 5px;
     z-index:1000;
 }
+
+
+.check-list-container{
+    border: 2px solid black;
+    border-radius: 5px;
+    width: 300px;
+    max-height: 250px;
+    display:flex;
+    flex-direction: column;
+    background-color: white;
+}
+
+.check-list{
+    
+    overflow:hidden;
+    overflow-y:scroll;
+   
+    
+}
+
+.check-list-option{
+    
+    border-bottom: 1px solid black;
+}
+
+.check-button-wrapper{
+    display:flex;
+    flex-direction: row;
+}
+
+.check-list-close{
+   width:50%;
+   background-color: #d04141;
+}
+
+.check-list-accept{
+    width:45%;
+
+    background-color: green;
+}
+

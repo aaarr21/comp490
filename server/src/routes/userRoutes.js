@@ -29,6 +29,7 @@ router.put('/:id', userController.updateUserProfile);  // Route to update user p
 router.delete('/:id', userController.deleteUser);  // Route to delete a user
 router.post('/reset-password', userController.resetPassword);  // Route to reset the password
 router.post('/create-new-task', upload.array('attachment',5), taskController.createNewTask); // Route to create a new task 
+router.get('/get-all-members', userController.getAllUsers);
 
 // --- Task Routes ---
 
@@ -45,6 +46,8 @@ function isLoggedIN(req, res, next) {
     return res.status(401).json({ success: false, message: "Unauthorized" });
   }
 }
+
+
 
 // Google Authentication Route
 router.get('/google', passport.authenticate('google', {
