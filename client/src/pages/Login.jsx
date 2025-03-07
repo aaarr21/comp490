@@ -1,6 +1,6 @@
 
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../components/styles/LoginPage.css';
@@ -15,7 +15,8 @@ const LoginPage = () => {
 
   
   
-
+    const [errMsg, setErrMsg] = useState('');
+    const errorRef = useRef();
   // Function to check if the user is already logged in
   const checkLoginStatus = useCallback(async () => {
     try {
@@ -56,9 +57,15 @@ const LoginPage = () => {
       console.log('Login successful:', response.data);
       navigate('/workBoard', { replace: true }); // Use replace to avoid going back to login page after success
     } catch (error) {
-      console.error('Login failed:', error);
+      setErrMsg(error.response.data.error);
+      errorRef.current.focus();
     }
   };
+   
+  useEffect(() => {
+    setErrMsg('');
+  }, [identifier,password]);
+
 
   // Google login handler
   const googleLogin = () => {
@@ -170,9 +177,11 @@ const LoginPage = () => {
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)} // Store either username or email
             />
+           
             <label htmlFor="password" className="input-label">
-              Password
-            </label>
+              Password:  <p ref={errorRef} className={errMsg ? "errmsg" : "erase"} aria-live="assertive">{errMsg}</p>
+            </label> 
+            
             <input
               type="password"
               id="password"

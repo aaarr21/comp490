@@ -13,6 +13,7 @@
     height:100%;
     color: #5e5e5e;
     margin: 0;
+    overflow:hidden;
 }
 
 .task-button-container{
@@ -68,6 +69,7 @@ textarea{
     border: 3px solid lightcyan;
     outline-color: teal;
     margin-top: -9.0em;
+    padding: 0;
 }
 
 .new-task-head-close{
@@ -146,8 +148,17 @@ textarea{
     display:flex;
     flex-direction:row;
 }
+.new-task-form-auxillery > label {
+     min-width: 32.625px;
+     max-width: 32.625px;
+     margin-right: 1.5em;
+    
+}
 
-
+.person-label{
+    margin-left: 50%;
+    
+}
 
 .auxillery-icon{
     color: #a8a8a8;
@@ -155,6 +166,7 @@ textarea{
     margin-left:2.2em;
     margin-top:1.0em;
     cursor: pointer;
+    transition: background-color 0.5s;
 }
 
 .auxillery-icon:hover{
@@ -165,11 +177,17 @@ textarea{
     
     scale:1.45; 
     color:#a8a8a8;
-    margin-left:240px;
+
     margin-top: 0.7em;
     cursor:pointer;
+    transition: background-color 0.5s;
 }
 
+.member-btn{
+    float:left;
+    width:20%;
+    margin-left:15%;
+}
 
 
 .person-share:hover{
@@ -196,6 +214,7 @@ textarea{
     font-size:18px;
     color:white;
     border-radius: 5px;
+    transition: background-color 0.5s;
 }
 
 .task-submit-button:hover{
@@ -214,6 +233,7 @@ textarea{
     font-size:12px;
     display:flex;
     flex-direction:row;
+    margin: 0;
 }
 
 .file-card{
@@ -230,6 +250,7 @@ textarea{
     padding:12px;
     min-width: 25%;
     min-height:50%;
+    margin: 0;
 }
 
 .member-card{
@@ -323,11 +344,20 @@ textarea{
 .check-list-close{
    width:50%;
    background-color: #d04141;
+   transition: background-color 0.5s;
+}
+
+.check-list-close:hover{
+    background-color: grey;
 }
 
 .check-list-accept{
     width:45%;
-
+    transition: background-color 0.5s;
     background-color: green;
+}
+
+.check-list-accept:hover{
+    background-color: grey;
 }
 

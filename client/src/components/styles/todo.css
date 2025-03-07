@@ -1,0 +1,67 @@
+.toDo-container{
+    border-radius: 2.5%;
+    right: 100px;
+    top: 125px;
+    width:450px;
+    height: 250px;
+    margin-left: 75%;
+    background-color: #fff;
+     /* Use viewport units for consistent spacing */
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    position: absolute;
+    color: black;
+    
+}
+
+.todo-body{
+    overflow: hidden;
+    overflow-y: scroll;
+}
+
+.toDo-container > h2{
+    border-bottom: 1px solid lightgrey;
+    font-size: 16px;
+    padding:10px;
+}
+
+.progress-column{
+    float:left;
+    width:45%;
+    padding-right:3px;
+    min-height:175px;
+}
+
+.task-headers{
+    border-bottom: 1px solid lightgrey;
+    padding: 5px;
+}
+
+.task-headers > label{
+    margin-left: 2.5em;}
+
+.toDolabels{
+  display:block;
+  padding-left: 100px;
+}
+
+
+.status-column{
+    float:left;
+    width:25%;
+    padding-right:3px;
+    min-height:175px;
+}
+
+.owner-column{
+    display:flex;
+    flex-direction: column;
+    width:25%;
+    padding-left:15px;
+    
+}
+
+.owner-column > label{
+    margin-bottom: 1.5em;
+    
+}

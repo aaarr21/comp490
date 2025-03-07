@@ -7,7 +7,7 @@ import Picker from 'emoji-picker-react'; // for the emoji section
 import DatePicker from 'react-date-picker';
 import 'react-date-picker/dist/DatePicker.css';
 import 'react-calendar/dist/Calendar.css';
-import Select from 'react-select';
+import ToDo from '../components/TasksToDo';
 import { text } from '@fortawesome/fontawesome-svg-core';
 import { Toaster, toast } from 'sonner';
 
@@ -80,9 +80,10 @@ const Tasks = () => {
        onClick={createNewTask}
       ><FontAwesomeIcon icon={faCircleXmark} className="task-button-icon"/>Create New Task!</button>
       </div>
+      <ToDo />
        {  Loggedin && (shownewTask ? < NewTask invertTask = {setnewTask} taskStatus={shownewTask} taskSuccess ={successNotify} taskFail ={failNotify} members ={deptMembers}/> : '')} 
          <Toaster position="bottom-center" richColors />
-
+         
  </div> </div>
 );  
 };
@@ -109,10 +110,7 @@ const NewTask = ({invertTask, taskStatus, taskSuccess, taskFail,members}) => {
      */
 
      const [files,setFiles] = useState([]); //Handle the files
-
-     //const [departList,setdepartList] = useState(DepartmentList); //this feels wasteful for now, keep for when we can really do api calls to database.
-
-     const [person,setPerson] = useState(null); //Delete this,numbskull french
+     
 
      const [chosenMembers,setchosenMembers] = useState(null);
 
@@ -120,13 +118,13 @@ const NewTask = ({invertTask, taskStatus, taskSuccess, taskFail,members}) => {
 
      const[displayEmoji,setEmoji] = useState(false); // for emoji picker render
 
-     const [displayMembers,setDisplayMembers] = useState(false);
+     const [displayMembers,setDisplayMembers] = useState(false); // Boolean logic to render Display Members component
 
-     const [displayChosen, setdisplayChosen] = useState(false);
+     const [displayChosen, setdisplayChosen] = useState(false); // Boolean logic to render the chosen members
 
      const[displayDate,setDisplayDate] = useState(false); // to render date picker
      
-     const[taskDate,settaskDate] = useState(null);
+     const[taskDate,settaskDate] = useState(null); // State for the chosen date
 
      const textRef = useRef(null); //Ref hook for text area
   
@@ -166,45 +164,46 @@ const NewTask = ({invertTask, taskStatus, taskSuccess, taskFail,members}) => {
          event.preventDefault();
          setDisplayDate(!displayDate);
      }
-
+     // take a passed in emojiObject from the EmojiPicker and append it to our task text area
      const appendEmoji = (emojiObject) =>{
         
         textRef.current.value += emojiObject.emoji;
         setEmoji(!displayEmoji);
      }
 
+     // Take chosen date and set it to our task date.
      const appendDate = (date) =>{
         settaskDate(date);
         taskSuccess(("Date Chosen: " + date))
         setDisplayDate(false);
      }
 
-     
+     // Render the members list component.
      const renderMembers = () =>{
-        //e.preventDefault();
+       
     
         setDisplayMembers(!displayMembers);
-        console.log(chosenMembers);
+      
      }
 
     
-      //create new instance of task object to the back end.
+      //create new instance of task object and store it within our seleted users.
      const handleTaskupload = async (e) =>{
           e.preventDefault();
-          const text = e.target;
-         
-          const taskData = new FormData(text);
-          taskData.append("date", taskDate);
-          taskData.append("person", person)
-
-          files.map((file) => taskData.append("attachment", file, file.name));
-          console.log(taskData);          
-          //console.log(files);
-          if(taskDate == null || person == null){
+          const TaskForm = e.target;
+          if(taskDate == null || chosenMembers == null){
             //Use toastify here to create a reponsive error message
             taskFail("One or More empty fields for task, please fix them.")
             return;
           }
+          const taskData = new FormData(TaskForm);
+          taskData.append("date", taskDate);
+          taskData.append("people", chosenMembers)
+
+          files.map((file) => taskData.append("attachment", file, file.name));
+          console.log(taskData);          
+          
+          
          const response = await axios.post('http://localhost:5000/auth/create-new-task', taskData, {
             'Content-Type': 'multipart/form-data',
               withCredentials: true });  
@@ -220,18 +219,19 @@ const NewTask = ({invertTask, taskStatus, taskSuccess, taskFail,members}) => {
 
      }
 
+     //Helper function to the file component to delete from files array once user clicks on the x mark.
      const deleteAttachment = (fileId) => {
-       // e.preventDefault();
+      
         
         let tempArr = files.filter((file, index) => fileId !== index); //Temp array for the filtered array      
          setFiles(tempArr); //set files state to that temporary array
      } 
 
      const deletePeople = (memberId) => {
-      // e.preventDefault();
+     
        
        let tempArr = chosenMembers.filter((member, index) => memberId !== index); //Temp array for the filtered array      
-        setchosenMembers(tempArr); //set files state to that temporary array
+        setchosenMembers(tempArr); //set chosenMembers state to that temporary array
     } 
 
 
@@ -258,7 +258,8 @@ const NewTask = ({invertTask, taskStatus, taskSuccess, taskFail,members}) => {
 
                   <button type="button"  onClick={renderEmoji} id="emoji-picker" style = {{display: 'none'}}>   </button>         
                     <div className="emoji-position">   { displayEmoji && <Picker onEmojiClick={appendEmoji} />  }  </div>
-                   <label htmlFor="emoji-picker" className="label-please"> <FontAwesomeIcon icon={faFaceSmile}  className="auxillery-icon" /> </label>
+                   <label htmlFor="emoji-picker" className="label-please"> <FontAwesomeIcon icon={faFaceSmile} 
+                    className="auxillery-icon" /> </label>
                    <input type="file" style = {{display: 'none'}} onChange={handleFileChange} id="attachment-upload"
                     accept=".pdf,.xml,.docx" multiple  />
                    <label htmlFor="attachment-upload">
@@ -266,13 +267,14 @@ const NewTask = ({invertTask, taskStatus, taskSuccess, taskFail,members}) => {
                     </label>
 
                     <button type="button"  onClick={renderDate} id="date-picker" style = {{display: 'none'}}>   </button>
-                   <label htmlFor="date-picker" className="label-please">   <FontAwesomeIcon icon={faCalendar}  className="auxillery-icon"/> </label>
+                   <label htmlFor="date-picker" >   <FontAwesomeIcon icon={faCalendar} 
+                    className="auxillery-icon"/> </label>
                    <div className="date-position" >   { displayDate && <DatePicker 
                         selected ={taskDate} onChange={appendDate} /> }  </div>
 
 
-                     <button type="button"  onClick={renderMembers} id="member-picker">   </button>
-                  <label htmlFor="member-picker" >  <FontAwesomeIcon icon={faUserPlus} className = "person-share" /></label>
+                     <button type="button"  onClick={renderMembers} id="member-picker"style = {{display: 'none'}}>   </button>
+                  <label htmlFor="member-picker" className="person-label"  >  <FontAwesomeIcon icon={faUserPlus} className = "person-share" /></label>
                      
                 </div>
                 
@@ -288,7 +290,8 @@ const NewTask = ({invertTask, taskStatus, taskSuccess, taskFail,members}) => {
                 </div>
             </form>
             <div className="member-position">{displayMembers && < MemberChecklist deptMemberList={members} 
-                 close={renderMembers} setChosenMembers={setchosenMembers} chosen ={chosenMembers} displayChosen={setdisplayChosen}/>}</div>
+                 close={renderMembers} setChosenMembers={setchosenMembers} chosen ={chosenMembers} 
+                 displayChosen={setdisplayChosen}/>}</div>
            
             
         </div>
@@ -296,19 +299,7 @@ const NewTask = ({invertTask, taskStatus, taskSuccess, taskFail,members}) => {
 };
 
 
-const DepartmentSelect = ({options,onChanges}) => {
 
-       const cpyList = options;
-  
-    
-
-    return (
-        <Select
-            options={cpyList}
-            onChange={onChanges} />
-        
-    )
-}
 
 
 
@@ -322,9 +313,11 @@ const FileInfo = ({id,fileName, deleteAttachment}) => {
         </div>
     )
 }
+
+//Same as FileInfo, but for members
 const MemberInfo = ({memberId,memberName, deletePeople}) => {
   let memberID = memberId;
-      console.log("Weegee:" + memberID);
+      
 return (
     <div className="member-card">
         {memberName} <button  onClick={()=> {deletePeople(memberID)}} type="button"><FontAwesomeIcon icon={faXmark} 
@@ -343,8 +336,13 @@ const MemberChecklist = ({ deptMemberList, close, setChosenMembers, displayChose
      for (let [key, value] of formData.entries()) {
        chosenList.push(value);
      }
+       if(chosen !== null){
        let combinedList = [...chosen,...chosenList];
-     setChosenMembers(combinedList);
+       setChosenMembers(combinedList);
+       }
+       else{
+           setChosenMembers(chosenList);
+       }
      displayChosen(true);
     close();  
   };

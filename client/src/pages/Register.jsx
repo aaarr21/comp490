@@ -49,7 +49,7 @@ const Register = () => {
 
   const handleRegistration = async (e) => {
     e.preventDefault();
-  console.log("is this even working?")
+ 
     const subtestuser = USER_REGEX.test(username);
     const subtestEmail = email.includes('@');
     const subtestPass = PWD_REGEX.test(password);
