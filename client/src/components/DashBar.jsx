@@ -17,28 +17,37 @@ const DashBar = () =>{
                 className="dashlogo"
                 alt="logo"
               /></li>
+               <Link to="/workBoard">
           <li className="dashlistItem">
-          <Link to="/workBoard">
+         
          <FontAwesomeIcon icon= {faHouse} className="dashImage"/> 
-            <div className="dash-test">Dashboard</div>
-           </Link>
-            </li>
-          <li className="dashlistItem">
-            <Link to="/task">
-              <FontAwesomeIcon icon= {faStar}className="dashImage"/>Task
-              </Link>
-          </li>
-         <li className="dashlistItem"> 
-         <Link to="/request">
-          <FontAwesomeIcon icon={faBox}className="dashImage"/><div className="dash-text">Request</div>
-          </Link>
-          </li>
+            <div className="dash-text"><h2>Dashboard</h2></div>
           
-          <li className="dashlistItem"> 
-          <Link to="/request">
-            <FontAwesomeIcon icon= {faCog}className="dashImage"/><div className="dash-test">Settings</div>
-          </Link>
+            </li>
+            </Link>
+
+            <Link to="/task" className="dash-link">
+          <li className="dashlistItem">
+            
+              <FontAwesomeIcon icon= {faStar}className="dashImage"/>
+              <div className="dash-text">Tasks</div>
+             
           </li>
+          </Link>
+          <Link to="/request">
+         <li className="dashlistItem"> 
+         
+          <FontAwesomeIcon icon={faBox}className="dashImage"/><div className="dash-text">Request</div>
+          
+          </li>
+          </Link>
+          <Link to="/settings">
+          <li className="dashlistItem"> 
+          
+            <FontAwesomeIcon icon= {faCog}className="dashImage"/><div className="dash-test">Settings</div>
+         
+          </li>
+          </Link>
           </ul>
           </nav>
         

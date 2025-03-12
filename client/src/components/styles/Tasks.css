@@ -33,7 +33,7 @@
 }
 
 .task-button:hover {
-    transform: scale(1.15); /* Slight scaling effect on hover */
+    transform: scale(1.05); /* Slight scaling effect on hover */
   /* Subtle shadow for more depth on hover */
      /* Darker border color on hover for better feedback */
 }
