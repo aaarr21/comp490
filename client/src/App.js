@@ -6,7 +6,7 @@ import WorkBoard from './pages/WorkFlowBoard';
 import ForgotPassword from './pages/ForgotPassword';
 import ProtectedRoute from './components/ProtectedRoute';
 import Dashbar from './components/DashBar';
-import Tasks from './pages/Tasks';
+import AssignTask from './pages/AssignTask';
 import "@fontsource/inter";
 
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
@@ -47,7 +47,7 @@ function App() {
         path="/task"
         element={
           <ProtectedRoute>
-            <Tasks />
+            <AssignTask />
             </ProtectedRoute>
         }
         />

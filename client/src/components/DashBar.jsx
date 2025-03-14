@@ -26,7 +26,7 @@ const DashBar = () =>{
             </li>
             </Link>
 
-            <Link to="/task" className="dash-link">
+            <Link to="/assigntask" className="dash-link">
           <li className="dashlistItem">
             
               <FontAwesomeIcon icon= {faStar}className="dashImage"/>

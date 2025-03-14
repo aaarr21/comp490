@@ -20,11 +20,21 @@ class Task {
          this.date = date;
          this.text = text;
          this.attachments = attachments;
+         this.status = 1; // 1, as task was just created, 2 should designate as completed, and 0 as overdue
       }
       
   //Generic setter methods, probably useful for the dashboard so users can edit the tasks.
    async editDate(newDate){
       this.date = newDate;
+   }
+
+
+   async setToCompleted() {
+      this.status = 2;
+   }
+
+   async setToOverdue(){
+      this.status = 0;
    }
 
    async editPerson(newPerson){

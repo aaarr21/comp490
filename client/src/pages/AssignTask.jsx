@@ -128,22 +128,20 @@ const NewTask = ({invertTask, taskStatus, taskSuccess, taskFail,members}) => {
 
      const textRef = useRef(null); //Ref hook for text area
   
-
-     const [selectedDepartment,setselectedDepartment] = useState();
         //Handle file upload from user by concating to current file array.
      const handleFileChange = (event) => {
         if(event.target.files){ //Ensure that user did upload a pdf.          
             try {
             
-                    //setFiles(Array.from(event.target.files));
+                    setFiles(Array.from(event.target.files));
                     setDisplayFile(true);                   
-                    const yoinkedFiles = Array.from(event.target.files); //use from to convert from FilesList to Array. 
+                    //const yoinkedFiles = Array.from(event.target.files); //use from to convert from FilesList to Array. 
                                                                          // I need to do this so I can use the map array function.
                   
-                   let combinedList = [...files,...yoinkedFiles]; //Use spread operator to create a final list of all file elements
+                 //  let combinedList = [...files,...yoinkedFiles]; //Use spread operator to create a final list of all file elements
                   
                      
-                    setFiles(combinedList); //Set to final array                   
+                   // setFiles(combinedList); //Set to final array                   
             } catch (error) {
              
             }            
@@ -261,7 +259,7 @@ const NewTask = ({invertTask, taskStatus, taskSuccess, taskFail,members}) => {
                    <label htmlFor="emoji-picker" className="label-please"> <FontAwesomeIcon icon={faFaceSmile} 
                     className="auxillery-icon" /> </label>
                    <input type="file" style = {{display: 'none'}} onChange={handleFileChange} id="attachment-upload"
-                    accept=".pdf,.xml,.docx" multiple  />
+                    accept=".pdf,.xml,.docx" />
                    <label htmlFor="attachment-upload">
                     <FontAwesomeIcon icon={faPaperclip} className="auxillery-icon"/>
                     </label>
