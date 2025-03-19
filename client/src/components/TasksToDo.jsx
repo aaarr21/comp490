@@ -1,6 +1,6 @@
 import '../components/styles/todo.css'
 const ToDo = () => {
-    console.log("ToDo rendered");
+   
     return (
          
        <div className='toDo-container'>

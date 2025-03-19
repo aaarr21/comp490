@@ -7,8 +7,8 @@ const multer = require('multer');
 const createNewTask = async (req,res) => {
    
     try{
-         let attachments = req.files;
-         const newTask = new Task(req.body.people, req.body.date,req.body.textPart,attachments);
+         let attachment = req.file;
+         const newTask = new Task(req.body.people, req.body.date,req.body.textPart,attachment,req.body.column);
          console.log(newTask);
     }catch(error){
       return  res.status(500).json({error: 'Something went Wrong'});

@@ -5,6 +5,7 @@ import Register from './pages/Register';
 import WorkBoard from './pages/WorkFlowBoard';
 import ForgotPassword from './pages/ForgotPassword';
 import ProtectedRoute from './components/ProtectedRoute';
+import Test from './pages/Test' //Comment this out if you don't have a test component.
 import Dashbar from './components/DashBar';
 import AssignTask from './pages/AssignTask';
 import "@fontsource/inter";
@@ -15,8 +16,9 @@ function App() {
   const location = useLocation();
 
   // Conditionally render Navibar if the current path is not part of specific paths
-  const pathsWithoutNavibar = ['/login', '/', '/register', '/forgot-password'];
-  const pathsWithoutDashbar = ['/login', '/' , '/register', '/forgot-password'];
+  // Remove /test as that only exists for me to test component design --Sebastian Sunga
+  const pathsWithoutNavibar = ['/login', '/', '/register', '/forgot-password','/test']; 
+  const pathsWithoutDashbar = ['/login', '/' , '/register', '/forgot-password','/test'];
   
   const shouldShowNavibar = !pathsWithoutNavibar.includes(location.pathname);
 
@@ -33,7 +35,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        
+        <Route path="/test" element={<Test />} /> 
         {/* Protected Route for /workBoard */}
         <Route
           path="/workBoard"
@@ -44,7 +46,7 @@ function App() {
           }
         />
         <Route
-        path="/task"
+        path="/assigntask"
         element={
           <ProtectedRoute>
             <AssignTask />

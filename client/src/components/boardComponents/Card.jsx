@@ -1,10 +1,14 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 
-const Card = ({ title, id, column, handleDragStart, onEdit, onDelete }) => {
+const Card = ({ title, id, status, column, handleDragStart, onEdit, onDelete,onEditStatus }) => {
   const [menuVisible, setMenuVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isEditingStatus,setIsEditingStatus] = useState(false)
   const [editTitle, setEditTitle] = useState(title);
+  const [editStatus, setEditStatus] = useState(status);
   const menuRef = useRef(null);
+
+
 
   const handleClickOutside = useCallback(
     (e) => {
@@ -33,11 +37,18 @@ const Card = ({ title, id, column, handleDragStart, onEdit, onDelete }) => {
     }
   };
 
+  const handleSaveStatus = () => {
+    if(editStatus.trim() !== ""){
+      onEditStatus(id, editStatus)
+      setIsEditingStatus(false);
+    }
+  }
+
   return (
     <div
       draggable="true"
       onDragStart={(e) => handleDragStart(e, { title, id, column })}
-      className="relative cursor-grab rounded border border-neutral-700 bg-neutral-800 p-3 active:cursor-grabbing"
+      className="rounded-lg p-2 m-2 px-3 shadow-lg bg-white active:cursor_grabbing max-w-full shadow-lg min-h-24 relative"
     >
       {/* Horizontal three-dot menu button, adjusted for extra spacing */}
       <button
@@ -47,9 +58,9 @@ const Card = ({ title, id, column, handleDragStart, onEdit, onDelete }) => {
       >
         &#x2026; {/* Horizontal ellipsis */}
       </button>
-
+      <div className ="text-sm py-2">
       {isEditing ? (
-        <textarea
+        <input
           value={editTitle}
           onChange={(e) => setEditTitle(e.target.value)}
           onBlur={handleSaveEdit}
@@ -60,12 +71,34 @@ const Card = ({ title, id, column, handleDragStart, onEdit, onDelete }) => {
             }
           }}
           autoFocus
-          className="w-full bg-neutral-800 text-neutral-100 p-1 rounded focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none"
+          className="w-full bg-neutral-100 text-neutral-800 p-1 rounded focus:outline-none focus:ring-2 focus:ring-violet-500 "
         />
       ) : (
-        <p className="text-sm text-neutral-100 break-words">{title}</p>
+        
+          <p className=" border-b-2 border-y-black font-medium font-inter">{title}</p>
+        
+       
+        
       )}
-
+      {
+          isEditingStatus ? <input
+          value={editStatus}
+          onChange={(e) => setEditStatus(e.target.value)}
+          onBlur={handleSaveStatus}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              handleSaveStatus();
+            }
+          }}
+          autoFocus
+          className="w-full bg-neutral-100 text-neutral-800 p-1 mt-5 rounded focus:outline-none focus:ring-2 focus:ring-red-500 "
+        />
+         : (<div className="text-md flex gap-4 justify-between mt-5 py-1 text-grey-800"> 
+                <p>{status}</p>
+          </div>)
+      }
+       </div>
       {/* Dropdown menu for Edit and Delete */}
       {menuVisible && (
         <div
@@ -80,7 +113,7 @@ const Card = ({ title, id, column, handleDragStart, onEdit, onDelete }) => {
               }}
               className="cursor-pointer px-3 py-1 rounded hover:bg-violet-100 transition-colors"
             >
-              ✏️ Edit
+              ✏️ Edit Task
             </li>
             <li
               onClick={() => {
@@ -90,6 +123,15 @@ const Card = ({ title, id, column, handleDragStart, onEdit, onDelete }) => {
               className="cursor-pointer px-3 py-1 rounded hover:bg-red-100 transition-colors"
             >
               🗑️ Delete
+            </li>
+            <li
+              onClick={() => {
+                setIsEditingStatus(true);
+                setMenuVisible(false);
+              }}
+              className="cursor-pointer px-3 py-1 rounded hover:bg-teal-100 transition-colors"
+            >
+              🔧 Edit Task Status
             </li>
           </ul>
         </div>

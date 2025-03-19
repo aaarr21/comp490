@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import Card from './Card';
 import DropIndicator from "./DropIndicator";
+import NewTask from './newTask';
 
-const Column = ({ title, headingColor, column, cards, setCards, activeCardMenu, setActiveCardMenu }) => {
+const Column = ({ title, headingColor, column, cards, setCards, activeCardMenu, setActiveCardMenu, taskMembers, success,fail }) => {
   const [active, setActive] = useState(false);
 
   const handleDragStart = (e, card) => {
@@ -109,17 +110,25 @@ const Column = ({ title, headingColor, column, cards, setCards, activeCardMenu, 
     }
   };
 
+  const handleEditStatus = (cardId, newStatus) =>{
+    if(newStatus) {
+      setCards((prevCards)=> prevCards.map((card)=>
+        card.id === cardId ? {...card,status: newStatus} : card
+      ));
+    }
+  }
+
   const handleDeleteCard = (cardId) => {
     setCards((prevCards) => prevCards.filter((card) => card.id !== cardId));
   };
 
   const filteredCards = cards.filter((c) => c.column === column);
-
+  
   return (
-    <div className="w-56 shrink-0">
+    <div className="w-56 shrink-0 bg-zinc-300 rounded-lg shadow-lg" >
       <div className="mb-3 flex items-center justify-between">
-        <h3 className={`font-medium ${headingColor}`}>{title}</h3>
-        <span className="rounded text-sm text-neutral-400">
+        <h3 className={`font-medium font-title ${headingColor} ml-2`}>{title}</h3>
+        <span className="rounded text-sm text-neutral-400 mr-1">
           {filteredCards.length}
         </span>
       </div>
@@ -137,85 +146,40 @@ const Column = ({ title, headingColor, column, cards, setCards, activeCardMenu, 
             {...c}
             handleDragStart={handleDragStart}
             onEdit={handleEditCard}
+            onEditStatus={handleEditStatus}
             onDelete={handleDeleteCard}
             activeCardMenu={activeCardMenu}
             setActiveCardMenu={setActiveCardMenu}
-          />
+          /> 
         ))}
         <DropIndicator beforeId="-1" column={column} />
         {/* AddCard Component was missing */}
-        <AddCard column={column} setCards={setCards} />
+        <AddCard column={column} setCards={setCards} success={success} failure={fail} members={taskMembers} />
       </div>
     </div>
   );
 };
 
 // Define AddCard component
-const AddCard = ({ column, setCards }) => {  
+const AddCard = ({ column, setCards, success,failure, members}) => {  
   const [text, setText] = useState("");
+  const [status,setStatus] = useState("");
   const [adding, setAdding] = useState(false);
   const formRef = useRef(null);
 
-  const handleSubmit = () => {
-    const trimmedText = text.trim();
-    if (!trimmedText.length) return;
-
-    const newCard = {
-      column,
-      title: trimmedText,
-      id: Math.random().toString(),
-    };
-
-    setCards((prev) => [...prev, newCard]);
-    setText(""); // Clear input field
-    setAdding(false); // Close the form after adding
-  };
-
-  const handleClickOutside = (e) => {
-    if (formRef.current && !formRef.current.contains(e.target)) {
-      setAdding(false); // Just close the form without saving
-    }
-  };
-
-  useEffect(() => {
-    if (adding) {
-      document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [adding]);
-
+  
   return (
     <>
       {adding ? (
-        <form ref={formRef} onSubmit={(e) => e.preventDefault()}>
-          <textarea
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            autoFocus
-            placeholder="Add new Form..."
-            className="w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-sm text-neutral-50 placeholder-violet-300 focus:outline-0"
-          />
-          <div className="mt-1.5 flex items-center justify-end gap-1.5">
-            <button
-              onClick={() => {
-                handleSubmit();
-              }}
-              className="flex items-center gap-1.5 rounded bg-neutral-50 px-3 py-1.5 text-xs text-neutral-950 transition-colors hover:bg-neutral-300"
-            >
-              <span>Add</span>
-            </button>
-          </div>
-        </form>
+        <NewTask invertTask={setAdding} taskStatus={adding} taskSuccess={success} taskFail={failure} members={members} 
+          setCards={setCards} column = {column}
+        /> /* Satan*/
       ) : (
         <button
           onClick={() => setAdding(true)}
-          className="flex w-full items-center gap-1.5 px-3 py-1.5 text-xs text-neutral-400 transition-colors hover:text-neutral-50"
+          className="flex w-full items-center gap-1.5 px-3 py-1.5 text-xs text-neutral-700 transition-colors hover:text-neutral-50"
         >
-          <span>Add new form</span>
+          <span>Add new task</span>
         </button>
       )}
     </>

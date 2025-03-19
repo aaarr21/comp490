@@ -9,7 +9,7 @@ const DashBar = () =>{
     //Goal of this is to act as the naviagtion between the pages.
     
     return(
-      <div className="siteNavigation" role="region" aria-label="navigation">
+      <div className="siteNavigation font-inter" role="region" aria-label="navigation">
           <nav className="nav">
           <ul id="menu" className="dashlistContainer">
           <li > <img
