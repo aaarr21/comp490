@@ -18,7 +18,7 @@ const storage = multer.memoryStorage({
 });
 
 const upload = multer({storage: storage,
-                       limits: {fileSize : 10000000000, files:5}
+                       limits: {fileSize : 10000000000}
 });
 
 // --- User Management Routes ---
@@ -28,7 +28,8 @@ router.get('/users', userController.getAllUsers);  // Route to get all users
 router.put('/:id', userController.updateUserProfile);  // Route to update user profile
 router.delete('/:id', userController.deleteUser);  // Route to delete a user
 router.post('/reset-password', userController.resetPassword);  // Route to reset the password
-router.post('/create-new-task', upload.array('attachment',5), taskController.createNewTask); // Route to create a new task 
+router.post('/create-new-task', upload.single('attachment'), taskController.createNewTask); // Route to create a new task 
+router.post('/create-new-goal', taskController.createGoal);
 router.get('/get-all-members', userController.getAllUsers);
 
 // --- Task Routes ---

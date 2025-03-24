@@ -30,7 +30,7 @@ const DashBar = () =>{
           <li className="dashlistItem">
             
               <FontAwesomeIcon icon= {faStar}className="dashImage"/>
-              <div className="dash-text">Tasks</div>
+              <div className="dash-text">Create</div>
              
           </li>
           </Link>

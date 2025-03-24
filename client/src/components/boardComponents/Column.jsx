@@ -177,7 +177,7 @@ const AddCard = ({ column, setCards, success,failure, members}) => {
       ) : (
         <button
           onClick={() => setAdding(true)}
-          className="flex w-full items-center gap-1.5 px-3 py-1.5 text-xs text-neutral-700 transition-colors hover:text-neutral-50"
+          className="flex w-full items-center gap-1.5 px-3 py-1.5 text-xs text-neutral-700 transition-colors hover:text-blue-500"
         >
           <span>Add new task</span>
         </button>

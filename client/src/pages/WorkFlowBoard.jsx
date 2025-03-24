@@ -50,7 +50,7 @@ import { Toaster, toast } from 'sonner';
 
     return (
     <div className='no-scroll'>
-    <div className ="h-screen w-full bg-white-p-2 text neutral-50 font-inter">
+    <div className ="h-screen w-full bg-slate-200 p-2 text neutral-50 font-inter">
 
        { Loggedin ?  <Board success={successNotify} fail={failNotify} members={deptMembers}/> : <section></section> }
        <Toaster position="bottom-center" richColors />

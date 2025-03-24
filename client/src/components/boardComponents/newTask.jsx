@@ -104,7 +104,7 @@ const NewTask = ({invertTask, taskStatus, taskSuccess, taskFail,members, setCard
 
      const handleClickOutside  = (e) => {
       if(formRef.current && !formRef.current.contains(e.target)){
-        invertTask(taskStatus)
+        invertTask(!taskStatus)
       }
      };
 
