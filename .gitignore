@@ -11,7 +11,8 @@ node_modules/
 
 #test stuff
 client/src/pages/Test.jsx
-# testing
+
+# testingg
 /coverage
 
 src/tasks

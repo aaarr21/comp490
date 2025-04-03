@@ -3,19 +3,20 @@ import Card from './Card';
 import DropIndicator from "./DropIndicator";
 import NewTask from './newTask';
 
-const Column = ({ title, headingColor, column, cards, setCards, activeCardMenu, setActiveCardMenu, taskMembers, success,fail }) => {
+const Column = ({ title, headingColor, column, cards, setCards, activeCardMenu, setActiveCardMenu,taskMembers, success,fail }) => {
   const [active, setActive] = useState(false);
 
   const handleDragStart = (e, card) => {
     e.dataTransfer.setData("cardId", card.id);
   };
 
+   
+
   const handleDragOver = (e) => {
     e.preventDefault();
     setActive(true); //Set to the current column area
-    if (highlightIndicator) {
-      highlightIndicator(e);
-    }
+    highlightIndicator(e);
+    
   };
 
   const getIndicators = () => {
@@ -24,7 +25,7 @@ const Column = ({ title, headingColor, column, cards, setCards, activeCardMenu, 
 
   const clearHighlight = (els) => {
     const indicators = els || getIndicators();
-    if (indicators.length === 0) return;
+ 
     indicators.forEach((i) => { //Get every indicator
       i.style.opacity = "0";  // make the indicator invisible
     });
@@ -55,12 +56,12 @@ const Column = ({ title, headingColor, column, cards, setCards, activeCardMenu, 
 
   const highlightIndicator = (e) => {
     const indicators = getIndicators();
-    if (indicators.length === 0) return;
+    
     clearHighlight(indicators);
     const el = getNearestIndicator(e, indicators);
-    if (el && el.element) {
+    
       el.element.style.opacity = "1";
-    }
+    
   };
 
   const handleDragLeave = (e) => { 
@@ -69,10 +70,10 @@ const Column = ({ title, headingColor, column, cards, setCards, activeCardMenu, 
   };
 
   const handleDragEnd = (e) => { //Handle end of the drag event
+    
+    const cardId = e.dataTransfer.getData("cardId"); //get the card t
     setActive(false);
     clearHighlight();
-
-    const cardId = e.dataTransfer.getData("cardId"); //get the card t
     const indicators = getIndicators();
     const { element } = getNearestIndicator(e, indicators);
     const before = element.dataset.before || "-1";
@@ -152,7 +153,7 @@ const Column = ({ title, headingColor, column, cards, setCards, activeCardMenu, 
             setActiveCardMenu={setActiveCardMenu}
           /> 
         ))}
-        <DropIndicator beforeId="-1" column={column} />
+        <DropIndicator beforeId={null} column={column} />
         {/* AddCard Component was missing */}
         <AddCard column={column} setCards={setCards} success={success} failure={fail} members={taskMembers} />
       </div>
@@ -172,7 +173,7 @@ const AddCard = ({ column, setCards, success,failure, members}) => {
     <>
       {adding ? (
         <NewTask invertTask={setAdding} taskStatus={adding} taskSuccess={success} taskFail={failure} members={members} 
-          setCards={setCards} column = {column}
+          setCards={setCards} column = {column} 
         /> /* Satan*/
       ) : (
         <button

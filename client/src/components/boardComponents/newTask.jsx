@@ -16,6 +16,7 @@ const NewTask = ({invertTask, taskStatus, taskSuccess, taskFail,members, setCard
     //should talk to see if we should get a custom object to represent the task and the various attributes.
      const closeTask = () =>{ //close task, this deletes all of the contents of the task and when clicked again renders a new task.
         invertTask(!taskStatus);
+        
      }
 
      /* 
@@ -43,7 +44,7 @@ const NewTask = ({invertTask, taskStatus, taskSuccess, taskFail,members, setCard
      
      const[taskDate,settaskDate] = useState(null); // State for the chosen date
 
-     const textRef = useRef(null); //Ref hook for text area
+   
   
         //Handle file upload from user by concating to current file array.
      const handleFileChange = (event) => {
@@ -83,12 +84,13 @@ const NewTask = ({invertTask, taskStatus, taskSuccess, taskFail,members, setCard
      // take a passed in emojiObject from the EmojiPicker and append it to our task text area
      const appendEmoji = (emojiObject) =>{
         
-        textRef.current.value += emojiObject.emoji;
+        setText((prevText) => prevText + emojiObject.emoji);
         setEmoji(!displayEmoji);
      }
 
      // Take chosen date and set it to our task date.
      const appendDate = (date) =>{
+       
         settaskDate(date);
         taskSuccess(("Date Chosen: " + date))
         setDisplayDate(false);
@@ -101,23 +103,6 @@ const NewTask = ({invertTask, taskStatus, taskSuccess, taskFail,members, setCard
         setDisplayMembers(!displayMembers);
       
      }
-
-     const handleClickOutside  = (e) => {
-      if(formRef.current && !formRef.current.contains(e.target)){
-        invertTask(!taskStatus)
-      }
-     };
-
-     useEffect(() => { //Moved from AddCard to newTask
-       if (taskStatus) {
-         document.addEventListener("mousedown", handleClickOutside);
-       } else{
-         document.removeEventListener("mousedown", handleClickOutside);
-       }
-         return () =>{
-          document.removeEventListener("mousedown", handleClickOutside)
-         };
-     },[taskStatus])
 
     
       //create new instance of task object and store it within our seleted users.
@@ -146,12 +131,14 @@ const NewTask = ({invertTask, taskStatus, taskSuccess, taskFail,members, setCard
             toast.promise(response, {
                 loading: 'sending task to server...',
                 success: (data) =>{
+                  
                     invertTask(!taskStatus);
                     const newCard = {
                      column,
                      title: text,
                      id: Math.random().toString(),
                      status: "STARTED",
+                     file: files[0],
                      people: chosenMembers,
                      attachment: taskData.attachment,
       
@@ -184,8 +171,8 @@ const NewTask = ({invertTask, taskStatus, taskSuccess, taskFail,members, setCard
 
     return (
         
-        <div className="absolute flex w-[450px] h-[525px] max-h-[525px] flex-col ml-[0.5em] border font-inter 
-        rounded-md inset-y-0 left-0 text-[18px] bg-white m-auto left-1/3 right-1/3">   
+        <div className="fixed flex w-[450px] h-[525px] max-h-[525px] flex-col ml-[0.5em] border font-inter 
+        rounded-md inset-y-0 left-0 text-[18px] bg-white m-auto left-1/3 right-1/3 z-50">   
            
             <div className="w-full text-[24px] font-bold h-[15%] flex flex-row"><h2 className="w-[50%] ml-[0.5em] mt-[0.5em]">Create New Task</h2> 
             <button className="float-right mb-[5%] ml-[40%] hover:scale-115" onClick={closeTask}><FontAwesomeIcon icon={faXmark} 
@@ -193,9 +180,9 @@ const NewTask = ({invertTask, taskStatus, taskSuccess, taskFail,members, setCard
             /></button>
             </div>
 
-            <div className="w-full h-[10%] flex flex-row text-[18ox] ml-[1.0em];">
+            <div className="w-full h-[10%] flex flex-row text-[18ox] ml-[1.0em]; mb-2">
             
-                     <label >For:</label> <span id="attach">{ displayChosen && chosenMembers.map( (member,index) =>(
+                     <label className='ml-2'>For:</label> <span id="attach">{ displayChosen && chosenMembers.map( (member,index) =>(
                         <MemberInfo memberId = {index} memberName={member} deletePeople={deletePeople}/>
                      ))}</span>
                     
@@ -205,51 +192,59 @@ const NewTask = ({invertTask, taskStatus, taskSuccess, taskFail,members, setCard
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 autoFocus
-                className='scale-100 w-[95%] h-[40%] ml-[0.68em] border-solid border-3 border-cyan-600 rounded-md mt-[-9.0] p-0'
-                placeholder="Give the task a name!" id="textArea" ref={textRef} required name="textPart"/>
+                className='scale-100 w-[95%]  h-[40%] ml-[0.68em] border-solid border-3 border-cyan-600 rounded-md mt-[-9.0] p-0'
+                placeholder="Give the task a name!" id="textArea"  required name="textPart"/>
 
-                <div className="w-full h-[20%] flex flex-row">
+                <div className="w-full h-[20%] flex flex-row items-center">
                    
 
                   <button type="button"  onClick={renderEmoji} id="emoji-picker" style = {{display: 'none'}}>   </button>         
-                    <div className="absolute top-1 left-1 z-[1000]">   { displayEmoji && <Picker onEmojiClick={appendEmoji} />  }  </div>
-                   <label htmlFor="emoji-picker"> <FontAwesomeIcon icon={faFaceSmile} 
-                    className="scale-145 ml-[2.2em] mt-[1.0em] cursor-pointer  transition: background-color 0.5s hover:text-red-500" /> {/*auxillery-icon */}
+                    <div className="absolute top-1 left-1 z-[1000]">   { displayEmoji && <Picker onEmojiClick={appendEmoji} />  }  
+                    </div>
+                   <label htmlFor="emoji-picker" className="cursor-pointer  transition: background-color 0.5s hover:text-red-500  ml-[2.2em]"> 
+                    <FontAwesomeIcon icon={faFaceSmile} 
+                    className="scale-145  mt-[0.5em] " /> {/*auxillery-icon */}
                      </label>
                    <input type="file" style = {{display: 'none'}} onChange={handleFileChange} id="attachment-upload"
                     accept=".pdf,.xml,.docx" />
-                   <label htmlFor="attachment-upload">
-                    <FontAwesomeIcon icon={faPaperclip} className="scale-145 ml-[2.2em] mt-[1.0em] 
-                    cursor-pointer transition: background-color 0.5s hover:text-red-500"/> {/*auxillery-icon */}
+                   <label htmlFor="attachment-upload"  className="cursor-pointer  transition: background-color 0.5s hover:text-red-500  ml-[2.2em]">
+                    <FontAwesomeIcon icon={faPaperclip} className="scale-145  mt-[0.5em] "/> {/*auxillery-icon */}
                     </label>
 
                     <button type="button"  onClick={renderDate} id="date-picker" style = {{display: 'none'}}>   </button>
-                   <label htmlFor="date-picker" >   <FontAwesomeIcon icon={faCalendar} 
-                    className="scale-145 ml-[2.2em] mt-[1.0em] cursor-pointer  transition: background-color 0.5s hover:text-red-500
-                        "/> </label>
-                   <div className="absolute left-[325px] bottom-[240px] bg-white rounded-md z-[1000]" >  {/* .date-position*/}
-                     { displayDate && <DatePicker  selected ={taskDate} onChange={appendDate} /> }  </div>
-
+                   <label htmlFor="date-picker"  className="cursor-pointer  transition: background-color 0.5s hover:text-red-500 ml-[2.2em]" >  
+                     <FontAwesomeIcon icon={faCalendar} 
+                    className="scale-145  mt-[0.5em]  "/> </label>
+                   <div className="absolute left-[150px] bottom-[220px] bg-white rounded-md z-[1000]" >  {/* .date-position*/}
+                     { displayDate && <DatePicker  selected={taskDate} onChange={appendDate} /> }  </div>
+                    
+                    {taskDate && (
+                       <p className="ml-[2.2em] text-sm text-gray-700 font-inter">
+                          Selected Date: {taskDate.toLocaleDateString()}
+                       </p>
+                    )}
 
                      <button type="button"  onClick={renderMembers} id="member-picker"style = {{display: 'none'}}>   </button>
-                  <label htmlFor="member-picker" className="ml-[50%]"  >  <FontAwesomeIcon icon={faUserPlus} 
+                  <label htmlFor="member-picker"  className="cursor-pointer  transition: background-color 0.5s hover:text-red-500 left-[400px] absolute"  > 
+                     <FontAwesomeIcon icon={faUserPlus} 
                   className = "scale-145 text-grey-400 cursor-pointer mt-[0.7em]" /></label> {/*person-share*/}
                      
                 </div>
                 
-                <div>
-                    <div className="w-full h-[15%] text-[12px] flex m-0 flex-row"> {/*.attachments-section*/} 
-                     <label >Attachments:</label> <span id="attach">{ displayfile && files.map( (file,index) =>(
+                <div className="flex h-[40px]">
+                    <div className="w-full  h-[15%] text-[12px] flex  flex-wrap m-0 "> {/*.attachments-section*/} 
+                     <label className="ml-2" >Attachments:</label> <span id="attach">{ displayfile && files.map( (file,index) =>(
                         <FileInfo id = {index} fileName={file.name} deleteAttachment={deleteAttachment}/>
                      ))}</span>
                     </div>
                 </div>
-                <div className="w-full h-[50px] flex justify-center"> {/*new-task-submit */}
+                <div className="flex justify-center"> {/*new-task-submit */}
                       <button  type="submit"className="w-[75%] mt-[1.0em] h-full font-bold mt-[2.5em] bg-cyan-500 
                          text-center text-[18px]
                          text-white rounded-md transition delay-150 hover:bg-indigo-500 
                       "> Create Task</button>  {/*task-submit-button*/}
                 </div>
+              
             </form>
             <div className="absolute z-[1000] left-[500px] bottom-[100px]">{displayMembers && < MemberChecklist deptMemberList={members} 
                  close={renderMembers} setChosenMembers={setchosenMembers} chosen ={chosenMembers} 
@@ -269,8 +264,8 @@ const FileInfo = ({id,fileName, deleteAttachment}) => {
       let fileID = id;
    
     return (
-        <div className="h-full text-[8px] font-bold ml-[2.0em] bg-red-700 text-white rounded-md justify-center
-        inline-block p-[12px] min-w-[25%] min-h-[50%] m-0 p-0"> {/*file-card*/}
+        <div className="h-[40px] text-[12px] font-bold ml-[2.0em] bg-red-700 text-white rounded-md justify-center
+        inline-block p-[12px] min-w-[25%] min-h-[50%] m-0 p-0 "> {/*file-card*/}
             {fileName} <button  onClick={()=> {deleteAttachment(fileID)}} type="button"><FontAwesomeIcon icon={faXmark} 
             className="close"/> </button>
         </div>
@@ -282,7 +277,7 @@ const MemberInfo = ({memberId,memberName, deletePeople}) => {
   let memberID = memberId;
       
 return (
-    <div className="h-full text-[12px] ml-[2.0em] bg-red-700 justify-center inline-block p-[12px] text-white"> {/*   */}
+    <div className="h-[40px] text-[12px] ml-[2.0em] bg-red-700 justify-center rounded-md inline-block p-[12px] text-white"> {/*   */}
         {memberName} <button  onClick={()=> {deletePeople(memberID)}} type="button"><FontAwesomeIcon icon={faXmark} 
         className="close"/> </button>
     </div>

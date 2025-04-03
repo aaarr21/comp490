@@ -5,6 +5,7 @@ const Board = ({success,fail,members}) => {
   const [cards, setCards] = useState(DEFAULT_CARDS);
   const [activeCardMenu, setActiveCardMenu] = useState(null); // Manage active card menu globally
   
+  
   const testList = [{
     title: "CAIN",
     column: "CAIN",
@@ -22,8 +23,8 @@ const Board = ({success,fail,members}) => {
 
 
   return (
-   
-    <div className="flex h-full w-full gap-3  p-12">
+   <div>
+    <div className="flex h-full w-full gap-4  p-12">
       {columns.map((column) => <Column
          title={column.title}
          column={column.column}
@@ -32,6 +33,7 @@ const Board = ({success,fail,members}) => {
          setCards={setCards}
          activeCardMenu={activeCardMenu}
          setActiveCardMenu={setActiveCardMenu}
+        
          taskMembers ={members}
          success = {success}
          fail = {fail}
@@ -39,7 +41,9 @@ const Board = ({success,fail,members}) => {
   )}
      
     </div>
-  );
+    </div>
+   ); 
+  
 };
 
 const DEFAULT_CARDS = [

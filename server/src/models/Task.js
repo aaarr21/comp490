@@ -15,12 +15,13 @@
 
 
 class Task {
-      constructor(person,date,text,attachments){
+      constructor(person,date,text,attachments, column){
          this.person = person;
          this.date = date;
          this.text = text;
          this.attachments = attachments;
          this.status = 1; // 1, as task was just created, 2 should designate as completed, and 0 as overdue
+         this.column = column
       }
       
   //Generic setter methods, probably useful for the dashboard so users can edit the tasks.

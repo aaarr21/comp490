@@ -1,11 +1,17 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPaperclip } from "@fortawesome/free-solid-svg-icons";
+import DropIndicator from "./DropIndicator";
+import {motion} from "framer-motion"
 
-const Card = ({ title, id, status, column, handleDragStart, onEdit, onDelete,onEditStatus }) => {
+const Card = ({ title, id, status,file,people,date, column, handleDragStart, onEdit, onDelete,onEditStatus }) => {
   const [menuVisible, setMenuVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isEditingStatus,setIsEditingStatus] = useState(false)
   const [editTitle, setEditTitle] = useState(title);
   const [editStatus, setEditStatus] = useState(status);
+  const [attachment,setAttachment] = useState(file); // Attached file
+
   const menuRef = useRef(null);
 
 
@@ -45,7 +51,11 @@ const Card = ({ title, id, status, column, handleDragStart, onEdit, onDelete,onE
   }
 
   return (
-    <div
+    <>
+    <DropIndicator beforeId={id} column={column} />
+    <motion.div
+      layout
+      layoutId={id}
       draggable="true"
       onDragStart={(e) => handleDragStart(e, { title, id, column })}
       className="rounded-lg p-2 m-2 px-3 shadow-lg bg-white active:cursor_grabbing max-w-full shadow-lg min-h-24 relative"
@@ -95,9 +105,16 @@ const Card = ({ title, id, status, column, handleDragStart, onEdit, onDelete,onE
           className="w-full bg-neutral-100 text-neutral-800 p-1 mt-5 rounded focus:outline-none focus:ring-2 focus:ring-red-500 "
         />
          : (<div className="text-md flex gap-4 justify-between mt-5 py-1 text-grey-800"> 
-                <p>{status}</p>
-          </div>)
+                <p>{status}</p> 
+               
+               { attachment !== undefined ? <a href={URL.createObjectURL(file)}  
+                 download={file.name}> <FontAwesomeIcon icon={faPaperclip} 
+                 className="scale-145 ml-[2.2em] mt-[1.0em] 
+                    cursor-pointer transition: background-color 0.5s hover:text-red-500" 
+                    onClick={console.log(attachment)} /> </a> : <section></section> }
+          </div> )
       }
+       
        </div>
       {/* Dropdown menu for Edit and Delete */}
       {menuVisible && (
@@ -136,7 +153,8 @@ const Card = ({ title, id, status, column, handleDragStart, onEdit, onDelete,onE
           </ul>
         </div>
       )}
-    </div>
+    </motion.div>
+    </>
   );
 };
 
