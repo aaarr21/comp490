@@ -11,7 +11,7 @@ passport.use(new GoogleStrategy({
   scope: ['profile', 'email'],
 },
 async (accessToken, refreshToken, profile, done) => {
-  console.log("Profile received", profile); // Debug to check profile
+  // console.log("Profile received", profile); // Debug to check profile
   try {
       const userService = new UserService();
       // Pass accessToken and refreshToken to the method
@@ -30,6 +30,7 @@ async (accessToken, refreshToken, profile, done) => {
 ));
 
 passport.serializeUser((user, cb) => { // Serialize only the user ID
+  console.log('serialized user:', user);
   cb(null, user.id);
 });
 

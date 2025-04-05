@@ -25,6 +25,7 @@ const upload = multer({storage: storage,
 router.post('/register', userController.registerUser);  // Route to register a new user
 router.post('/login', userController.loginUser);  // Backend login route
 router.get('/users', userController.getAllUsers);  // Route to get all users
+router.get('/get-current-user', userController.getUserProfile);
 router.put('/:id', userController.updateUserProfile);  // Route to update user profile
 router.delete('/:id', userController.deleteUser);  // Route to delete a user
 router.post('/reset-password', userController.resetPassword);  // Route to reset the password
@@ -154,6 +155,8 @@ router.get('/login/failed', (req, res) => {
 
 // Protected route for checking login status
 router.get('/status', isLoggedIN, (req, res) => {
+  console.log("Session: ", req.session);
+  console.log("Passport: ", req.session.passport);
   res.status(200).json({ loggedIn: true, user: req.user });
 });
 

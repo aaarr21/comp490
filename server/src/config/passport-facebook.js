@@ -14,9 +14,9 @@ passport.use(new FacebookStrategy({
 
 },
 async (accessToken,refreshToken,profile,done) => {
-    console.log("Incoming Profile: ", profile);
+   // console.log("Incoming Profile: ", profile);
 
-     console.log(profile._json.email);
+     //console.log(profile._json.email);
     
      try{
         const userService = new UserService();
@@ -40,6 +40,7 @@ async (accessToken,refreshToken,profile,done) => {
 );
 
 passport.serializeUser((user, cb) => { // Serialize only the user ID
+    console.log('serialized user:', user); 
     cb(null, user.id);
   });
   

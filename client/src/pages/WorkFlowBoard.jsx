@@ -3,15 +3,17 @@ import { useState,useEffect } from 'react';
 import axios from 'axios';
 import { Toaster, toast } from 'sonner';
 
-//There is a sinister ) at the bottom that casuses some empty space, unsure of why its there
  const WorkFlowBoard = () =>{
 
-      const [Loggedin,setLoggedin] = useState(false); // state if person accessing is even logged in.
+
+    const [Loggedin,setLoggedin] = useState(false); // state if person accessing is even logged in.
                                                      //Revert to false to test.
+    const [loggedUser,setLoggedUser] = useState(null);                
+                                                     
      const [deptMembers,setDeptMembers] = useState(null); // state for a list of all possible members to add to task.
       useEffect(()=>{  
         const logginInCheck = async () =>{
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/WorkBoard`, {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/status`, {
             credentials: 'include',
         })    
         if(response.status === 401)
@@ -20,7 +22,7 @@ import { Toaster, toast } from 'sonner';
             setLoggedin(true);
         }
         const data = await response.json();
-        console.log(data);
+        setLoggedUser(data.user.username);
     }
     const getTheUsers = async () => {
     

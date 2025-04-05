@@ -37,6 +37,7 @@ passport.use(new LinkedInStrategy({
 
 
 passport.serializeUser((user, cb) => { // Serialize only the user ID
+    console.log('serialized user:', user);  
     cb(null, user.id);
   });
   

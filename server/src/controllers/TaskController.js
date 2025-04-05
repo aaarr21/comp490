@@ -1,8 +1,8 @@
 const Task = require('../models/Task');
 const Column = require('../models/Column');
 const multer = require('multer');
-//const taskService = require('../services/TaskService');
-//const taskservice = new taskService();
+const TaskService = require('../services/TaskService');
+const taskService = new TaskService();
 
 
 const createNewTask = async (req,res) => {
@@ -19,13 +19,19 @@ const createNewTask = async (req,res) => {
 };
 
 const createGoal = async (req,res) => {
-    try{
-      const newColumn = new Column(req.body.columnName, req.body.columnName, req.body.color)
-      console.log(newColumn)
+    const {column, columnName, color, loggedInUser } = req.body;
+     console.log(column);
+     if(!column || !columnName || !color || !loggedInUser)
+        return res.status(401).json({error: "At least one field is missing"});
+
+    try{    
+
+       const newColumn = await taskService.registerColumn( columnName, column, color, loggedInUser);
+       res.status(201).json({ message: 'Goal Created', newColumn }); 
     }catch(error){
          return res.status(500).json({error: "Something went Wrong"});
     }
-    return res.status(201).json({test: "Received back end data"})
+
 };
 
 

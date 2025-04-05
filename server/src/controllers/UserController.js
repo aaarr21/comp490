@@ -57,13 +57,18 @@ const loginUser = async (req, res) => {
 
 // Route handler for getting user profile by ID
 const getUserProfile = async (req, res) => {
-    const userId = req.params.id;
+   // const userId = req.session.passport.user;
+      if(!req.session.passport){
+        return res.status(401).json({error: 'Non-authenticated user.'});
+      }
+      // const userId = req.session.passport.user;
     try {
         const user = await userService.findById(userId);
+        const username = user.username;
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
-        res.status(200).json({ user });
+        res.status(200).json({ username });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

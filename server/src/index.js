@@ -38,12 +38,12 @@ app.options('*',cors());
 app.use(session({
   secret: sessionSecret, // Used to sign the session ID cooki
   resave: false, // Prevents saving the session back to the store if not modified
-  saveUninitialized: true, // Prevents saving uninitialized sessions
+  saveUninitialized: false, // Prevents saving uninitialized sessions
   cookie: { 
     httpOnly: true, // Protects the cookie from being accessed by client-side scripts
     secure: process.env.NODE_ENV === 'production',  // Set `secure` to true only in production for HTTPS
     sameSite: 'lax', // Helps prevent CSRF attacks
-    maxAge: 5 * 60 * 1000 // Set cookie to expire in 5 minutes
+    maxAge: 1000 * 60 * 60 * 24 // Set cookie to expire in 5 minutes
   }
 }));
 

@@ -15,8 +15,8 @@ import { Toaster, toast } from 'sonner';
 
 const AssignTask = () => {
 
-    const [Loggedin,setLoggedin] = useState(true); // state if person accessing is even logged in.
-                                                   //Revert to false to test.
+    const [Loggedin,setLoggedin] = useState(false); // state if person accessing is even logged in. Revert to test
+    const [loggedInUser, setLoggedInUser] = useState("") // Take the username of the current user in session.
     const [shownewColumn,setnewColumn] = useState(false) // state to determine if the new task should be viewable, 
                                                      // this gets modified by clicking upon the new task button. 
   
@@ -50,8 +50,10 @@ const AssignTask = () => {
                                      else{
                                           setLoggedin(true);
                                                 }
-                                                       // const data = await response.json();
+                                                       const data = await response.json();
+                                                       setLoggedInUser(data.user.username);
                                                         //console.log(data);
+                                                        
                                             }
 
 
@@ -69,8 +71,11 @@ const AssignTask = () => {
                              }
 
                     }
+
+                 
                                              logginInCheck();
                                              getTheUsers();
+                                            
                  } ,[]);
    
       const createNewColumn = () => {   
@@ -99,7 +104,7 @@ const AssignTask = () => {
       ><FontAwesomeIcon icon={faCircleXmark} className=  "task-button-icon hover:animate-bounce "/> {btnMsg}  </button>
       </div>
       <ToDo />
-       {  Loggedin && (  shownewColumn ?  <NewColumn invertRender={setnewColumn} setBtnMsg={setBtnMsg} members={deptMembers}  /> :'')} 
+       {  Loggedin && (  shownewColumn ?  <NewColumn invertRender={setnewColumn} setBtnMsg={setBtnMsg} members={deptMembers} loggedInUser={loggedInUser} /> :'')} 
          <Toaster position="bottom-center" richColors />
          
  </div> </div>
@@ -113,7 +118,7 @@ const AssignTask = () => {
 
 
 
-const NewColumn = ({invertRender,setBtnMsg, success, fail,members}) => {
+const NewColumn = ({invertRender,setBtnMsg, success, fail,members, loggedInUser}) => {
     // Determine if this should get any passed in props to determine owner, 
     //should talk to see if we should get a custom object to represent the task and the various attributes.
        const [columnName,setColumnName] = useState("")
@@ -130,9 +135,9 @@ const NewColumn = ({invertRender,setBtnMsg, success, fail,members}) => {
               fail("Please enter a name for the column")
                 return;
              }
-             setColumn(columnName)
+             
 
-             const response = await axios.post('http://localhost:5000/auth/create-new-goal',{column, columnName, color},
+             const response = await axios.post('http://localhost:5000/auth/create-new-goal',{column, columnName, color, loggedInUser},
               {withCredentials: true}
              );
                toast.promise(response,{
@@ -140,7 +145,7 @@ const NewColumn = ({invertRender,setBtnMsg, success, fail,members}) => {
                  success: (data) =>{
                   setBtnMsg("Create a New Goal")
                   invertRender(false)
-                    return "Successfully created Goal!";
+                    return data;
                  },
                  error: "Error Occured"
                })
@@ -168,7 +173,7 @@ const NewColumn = ({invertRender,setBtnMsg, success, fail,members}) => {
                 <textarea
                    required
                    value={columnName}
-                   onChange={(e) => setColumnName(e.target.value)}
+                   onChange={(e) => {setColumnName(e.target.value); setColumn(e.target.value);}}
                    placeholder="Give your goal a name."
                    className = " m-0 h-[35px] absolute  border-red-500 border-1 rounded-md resize-none font-inter bg-grey-150 text-black"
                 />
