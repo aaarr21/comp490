@@ -44,14 +44,18 @@ class TaskRepository{
      }
 
      async deleteTask (cardId) {
-        const [rows] =  db.query(`SELECT * FROM tasks where id = ${cardId}`); //Check if task exists within the system
+        
+        const [rows] = await db.query(`SELECT * FROM tasks where id =  ?`,[cardId]); // is it this?
+        console.log(rows);
         if(rows.length === 0)
-            throw error;
-        try {
-            const [result] = db.query(`DELETE FROM tasks WHERE id = ${cardId}`);
-            return cardId;
-        }catch(error){
+            throw new Error("Task Not Found");
 
+        try {
+            const [result] = await db.query(`DELETE FROM tasks WHERE id = ?`,[cardId]);
+            console.log(result);
+            return result;
+        }catch(error){
+             throw new Error("Unable to delete Task");
         }
      }
 

@@ -28,8 +28,7 @@ useEffect(()=> {
          if(response.status === 500)
             fail(response.error);
         else{
-            success('Retrived Tasks!');
-            console.log(response.data);
+           
              setCards(response.data);
            // setColumns(response.data); //store column state
         }
@@ -47,7 +46,7 @@ useEffect(()=> {
          title={column.title}
          column={column.columnAsg}
          headingColor={column.color}
-         creater= {column.creator}
+         creator= {column.creator}
          cards={cards}
          setCards={setCards}
          activeCardMenu={activeCardMenu}

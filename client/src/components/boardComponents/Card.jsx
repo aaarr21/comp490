@@ -4,7 +4,7 @@ import { faPaperclip } from "@fortawesome/free-solid-svg-icons";
 import DropIndicator from "./DropIndicator";
 import {motion} from "framer-motion"
 
-const Card = ({ title,creator, id, status,file, assigned,date, column, handleDragStart, onEdit, onDelete,onEditStatus }) => {
+const Card = ({ title,creator, id, status,file, assigned,date, columnId, handleDragStart, onEdit, onDelete,onEditStatus }) => {
   const [menuVisible, setMenuVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isEditingStatus,setIsEditingStatus] = useState(false)
@@ -14,6 +14,8 @@ const Card = ({ title,creator, id, status,file, assigned,date, column, handleDra
 
   const menuRef = useRef(null);
 
+
+  
 
 
   const handleClickOutside = useCallback(
@@ -52,12 +54,12 @@ const Card = ({ title,creator, id, status,file, assigned,date, column, handleDra
 
   return (
     <>
-    <DropIndicator beforeId={id} column={column} />
+    <DropIndicator beforeId={id} column={columnId} />
     <motion.div
       layout
       layoutId={id}
       draggable="true"
-      onDragStart={(e) => handleDragStart(e, { title, id, column })}
+      onDragStart={(e) => handleDragStart(e, { title, id, columnId })}
       className="rounded-lg p-2 m-2 px-3 shadow-lg bg-white active:cursor_grabbing max-w-full shadow-lg min-h-24 relative"
     >
       {/* Horizontal three-dot menu button, adjusted for extra spacing */}
@@ -135,7 +137,8 @@ const Card = ({ title,creator, id, status,file, assigned,date, column, handleDra
             <li
               onClick={() => {
                // console.log(id);
-                onDelete(id);
+                
+                onDelete(id,creator);
                 setMenuVisible(false);
               }}
               className="cursor-pointer px-3 py-1 rounded hover:bg-red-100 transition-colors"

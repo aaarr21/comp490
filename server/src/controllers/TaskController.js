@@ -62,10 +62,10 @@ const getAllTasks = async (req,res) => {
 const deleteTask = async (req,res) => {
   
     const {cardId} = req.query;
-
+   
   try{
        await taskService.deleteTask(cardId);
-       return res.status(200).json({msg : "Successfully deleted task!"})
+       return res.status(201).json({msg : "Successfully deleted task!"})
   }catch(error){
     res.status(500).json({error: error})
   }

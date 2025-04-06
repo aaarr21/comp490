@@ -72,28 +72,33 @@ const Column = ({ title, column, headingColor, creator, cards, setCards, activeC
   };
 
   const handleDragEnd = (e) => { //Handle end of the drag event
+    const cardId = e.dataTransfer.getData("cardId"); //get the card 
     
-    const cardId = e.dataTransfer.getData("cardId"); //get the card t
+     
     setActive(false);
     clearHighlight();
     const indicators = getIndicators();
     const { element } = getNearestIndicator(e, indicators);
+    
     const before = element.dataset.before || "-1";
-
-    if (before !== cardId) {
+     
+    if ( parseInt(before) !== parseInt(cardId) ) {
       let copy = [...cards];
-      let cardToMove = copy.find((c) => c.id === cardId);
-      if (!cardToMove) return;
+     
+      let cardToMove = copy.find((c) => c.id === parseInt(cardId) ); //why does this do nothing?
+    
+      if (!cardToMove) 
+            return;
+      let columnId = column;
+      cardToMove = { ...cardToMove, columnId };
+      copy = copy.filter((c) => c.id !== parseInt(cardId) );
 
-      cardToMove = { ...cardToMove, column };
-      copy = copy.filter((c) => c.id !== cardId);
+      const moveBack = parseInt(before) === -1;
 
-      const moveBack = before === "-1";
-
-      if (moveBack) {
+        if(moveBack) {
         copy.push(cardToMove);
       } else {
-        const insertAtIndex = copy.findIndex((el) => el.id === before);
+        const insertAtIndex = copy.findIndex((el) => el.id === parseInt(before) );
         if (insertAtIndex === undefined) return;
 
         copy.splice(insertAtIndex, 0, cardToMove);
@@ -121,14 +126,29 @@ const Column = ({ title, column, headingColor, creator, cards, setCards, activeC
     }
   }
 
-  const handleDeleteCard = async (cardId) => {
-     const response = axios.delete(`${process.env.REACT_APP_API_URL}/auth/delete-task`,
+  const handleDeleteCard = async (cardId, taskCreator) => {
+    
+     if(loggedUser !== taskCreator){
+        fail("Not the Creator of the task, please notify the task creator.");
+        return;
+     }
+     try{
+     const response = await axios.delete(`${process.env.REACT_APP_API_URL}/auth/delete-task`,
       {
         params: {cardId},
         credentials: 'include'
       }
      );
-    setCards((prevCards) => prevCards.filter((card) => card.id !== cardId));
+     if(response.status === 201){
+        setCards((prevCards) => prevCards.filter((card) => card.id !== cardId)); //filter 
+        success("Task removed!");
+     }
+     else{
+        fail("Failed to delete task.");
+     }
+    } catch(error) {
+        fail("Internal Server Error: Code: " + error.response.status);
+    }
   };
 
   const filteredCards = cards.filter((c) => c.columnId === column);
@@ -145,12 +165,15 @@ const Column = ({ title, column, headingColor, creator, cards, setCards, activeC
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDragEnd}
-        className={`h-full w-full transition-colors flex flex-col  ${
+        className={`h-full w-full transition-colors flex flex-col overflow-y-auto ${
           active ? "bg-neutral-800/50" : "bg-neutral-800/0"
         } `}
       >
-         <div className="flex-1 overflow-y-auto">
-        {filteredCards.map((c) => (
+         
+        {filteredCards.map((c) => 
+           
+          (
+           
           <Card
             key={c.id}
             {...c}
@@ -161,14 +184,14 @@ const Column = ({ title, column, headingColor, creator, cards, setCards, activeC
             activeCardMenu={activeCardMenu}
             setActiveCardMenu={setActiveCardMenu}
           /> 
-        ))}
+        ) )}
         <DropIndicator beforeId={null} column={column} />
         {/* AddCard Component was missing */}
-        <div className="mt-[5px]">
+        
         <AddCard column={column} setCards={setCards} success={success} failure={fail} members={taskMembers} creator={loggedUser} />
+        
         </div>
-        </div>
-      </div>
+      
     </div>
   );
 };
