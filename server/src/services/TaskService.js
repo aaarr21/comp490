@@ -16,9 +16,16 @@ class TaskService {
      async registerColumn(columnName, columnAsg, columnColor, creator){
 
            const newColumn = new Column(columnName, columnAsg, columnColor, creator)
-           console.log(newColumn);
+           
            await this.taskRepository.createColumn(newColumn);
            return newColumn;
+     }
+
+     async registerTask(textPart, date, assigned, column, creator){
+       const newTask = new Task(textPart, date,assigned,column,creator);
+        console.log(newTask);
+        await this.taskRepository.createTask(newTask);
+        return newTask;
      }
 
      async findorCreateTask(taskTitle, taskDate, taskAttachment, taskperson, taskCreator, status, column){
@@ -27,6 +34,18 @@ class TaskService {
 
      async deleteColumn(columnName, columnAsg,columnColor,creator){
         return await TaskRepository.deleteColumn(columnName,columnAsg, columnColor, creator)
+     }
+
+     async deleteTask(cardId){
+       return await this.taskRepository.deleteTask(cardId);
+     }
+
+     async getAllGoals(){
+       return await this.taskRepository.getAllGoals();
+     }
+
+     async getAllTasks(){
+      return await this.taskRepository.getAllTasks();
      }
 }
 

@@ -4,7 +4,7 @@ import { faPaperclip } from "@fortawesome/free-solid-svg-icons";
 import DropIndicator from "./DropIndicator";
 import {motion} from "framer-motion"
 
-const Card = ({ title, id, status,file,people,date, column, handleDragStart, onEdit, onDelete,onEditStatus }) => {
+const Card = ({ title,creator, id, status,file, assigned,date, column, handleDragStart, onEdit, onDelete,onEditStatus }) => {
   const [menuVisible, setMenuVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isEditingStatus,setIsEditingStatus] = useState(false)
@@ -134,6 +134,7 @@ const Card = ({ title, id, status,file,people,date, column, handleDragStart, onE
             </li>
             <li
               onClick={() => {
+               // console.log(id);
                 onDelete(id);
                 setMenuVisible(false);
               }}

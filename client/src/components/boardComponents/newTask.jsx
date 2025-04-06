@@ -11,7 +11,7 @@ import 'react-calendar/dist/Calendar.css';
 
 
 
-const NewTask = ({invertTask, taskStatus, taskSuccess, taskFail,members, setCards, column}) => {
+const NewTask = ({invertTask, taskStatus, taskSuccess, taskFail,members, setCards, column, creator}) => {
     // Determine if this should get any passed in props to determine owner, 
     //should talk to see if we should get a custom object to represent the task and the various attributes.
      const closeTask = () =>{ //close task, this deletes all of the contents of the task and when clicked again renders a new task.
@@ -115,36 +115,27 @@ const NewTask = ({invertTask, taskStatus, taskSuccess, taskFail,members, setCard
             return;
           }
           const taskData = new FormData(TaskForm);
-          taskData.append("date", taskDate);
-          taskData.append("people", chosenMembers)
+          taskData.append("date", taskDate.toISOString().slice(0,19).replace('T',' '));
+          taskData.append("assigned", chosenMembers)
           taskData.append('column', column)
-
+          taskData.append('creator', creator)
           files.map((file) => taskData.append("attachment", file, file.name));
-          console.log(taskData);          
+                   
           
           
           
          const response = await axios.post('http://localhost:5000/auth/create-new-task', taskData, {
             'Content-Type': 'multipart/form-data',
               withCredentials: true });  
-
+             
             toast.promise(response, {
                 loading: 'sending task to server...',
                 success: (data) =>{
                   
                     invertTask(!taskStatus);
-                    const newCard = {
-                     column,
-                     title: text,
-                     id: Math.random().toString(),
-                     status: "STARTED",
-                     file: files[0],
-                     people: chosenMembers,
-                     attachment: taskData.attachment,
-      
-                    };
-      
-                   setCards((prev) => [...prev, newCard]);
+                           
+                   setCards((prev) => [...prev, response.data.newTask]); //Something screwy is going on here.
+                   console.log()
                    setText(""); // Clear input field
                     return 'Task created Successfully';
                 },

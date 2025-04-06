@@ -67,7 +67,7 @@ const AssignTask = () => {
                                  failNotify(response.error);
                              else{
                                 setDeptMembers(response.data);
-                                successNotify("Sucessfully acquired department members!");
+                               
                              }
 
                     }
@@ -131,13 +131,13 @@ const NewColumn = ({invertRender,setBtnMsg, success, fail,members, loggedInUser}
 
        const handleColumnCreation = async (e) => {
              e.preventDefault()
-             if(columnName == ""){
+             if(columnName === ""){
               fail("Please enter a name for the column")
                 return;
              }
              
 
-             const response = await axios.post('http://localhost:5000/auth/create-new-goal',{column, columnName, color, loggedInUser},
+             const response = await axios.post('http://localhost:5000/auth/create-new-goal',{columnName, column, color, loggedInUser},
               {withCredentials: true}
              );
                toast.promise(response,{
@@ -145,7 +145,7 @@ const NewColumn = ({invertRender,setBtnMsg, success, fail,members, loggedInUser}
                  success: (data) =>{
                   setBtnMsg("Create a New Goal")
                   invertRender(false)
-                    return data;
+                    return "Goal added to board!";
                  },
                  error: "Error Occured"
                })

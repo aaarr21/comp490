@@ -8,9 +8,9 @@ import { Toaster, toast } from 'sonner';
 
     const [Loggedin,setLoggedin] = useState(false); // state if person accessing is even logged in.
                                                      //Revert to false to test.
-    const [loggedUser,setLoggedUser] = useState(null);                
-                                                     
-     const [deptMembers,setDeptMembers] = useState(null); // state for a list of all possible members to add to task.
+    const [loggedUser,setLoggedUser] = useState(null);               
+    const [columns,setColumns] = useState([]);   
+    const [deptMembers,setDeptMembers] = useState(null); // state for a list of all possible members to add to task.
       useEffect(()=>{  
         const logginInCheck = async () =>{
         const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/status`, {
@@ -34,12 +34,27 @@ import { Toaster, toast } from 'sonner';
                                      failNotify(response.error);
                                  else{
                                     setDeptMembers(response.data);
-                                    successNotify("Sucessfully acquired department members!");
+                                    
+                                    
                                  }
     
+                          
                         }
+    const getColumns = async () => {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/auth/get-all-goals`, //get columns from database
+            {credentials: 'include'},
+           )
+             if(response.status === 500)
+                failNotify(response.error);
+            else{
+                
+                setColumns(response.data); //store column state
+            }
+    }
+    
        logginInCheck();
        getTheUsers();
+       getColumns();
       } ,[]);
 
        const successNotify = (dialog) => {
@@ -49,12 +64,12 @@ import { Toaster, toast } from 'sonner';
               const failNotify = (dialog) => {
                   toast.error(dialog);
             }
-
+      
     return (
     <div className='no-scroll'>
     <div className ="h-screen w-full bg-slate-200 p-2 text neutral-50 font-inter">
 
-       { Loggedin ?  <Board success={successNotify} fail={failNotify} members={deptMembers}/> : <section></section> }
+       { Loggedin ?  <Board success={successNotify} fail={failNotify} members={deptMembers} columns ={columns} setColumns = {setColumns} loggedUser={loggedUser}/> : <section></section> }
        <Toaster position="bottom-center" richColors />
     </div>
     </div>    

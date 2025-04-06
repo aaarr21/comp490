@@ -1,38 +1,58 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import Column from './Column';
 
-const Board = ({success,fail,members}) => {
+const Board = ({success,fail,members, columns,setColumns, loggedUser}) => {
   const [cards, setCards] = useState(DEFAULT_CARDS);
   const [activeCardMenu, setActiveCardMenu] = useState(null); // Manage active card menu globally
+
+
+  /* 
+       column: column,
+                     title: text,
+                     date: taskDate,
+                     creator: creator,
+                     id: Math.random().toString(),
+                     status: "STARTED",
+                     file: files[0],
+                     people: chosenMembers,
+                     attachment: taskData.attachment,
   
   
-  const testList = [{
-    title: "CAIN",
-    column: "CAIN",
-    headingColor: "text-neutral-500"   
-}, {
-    title: "UNDER/HEAVEN",
-    column: "UNDER/HEAVEN",
-    headingColor:"text-red-800"
+  */
+useEffect(()=> {
+  const getTasks = async () => {
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/auth/get-all-tasks`, //get tasks from database
+        {credentials: 'include'},
+       )
+         if(response.status === 500)
+            fail(response.error);
+        else{
+            success('Retrived Tasks!');
+            console.log(response.data);
+             setCards(response.data);
+           // setColumns(response.data); //store column state
+        }
 }
- ]
+          getTasks();
+},[])
 
-
-  const [columns,setColumns] = useState(testList)
-   
 
 
   return (
    <div>
     <div className="flex h-full w-full gap-4  p-12">
       {columns.map((column) => <Column
+         
          title={column.title}
-         column={column.column}
-         headingColor={column.headingColor}
+         column={column.columnAsg}
+         headingColor={column.color}
+         creater= {column.creator}
          cards={cards}
          setCards={setCards}
          activeCardMenu={activeCardMenu}
          setActiveCardMenu={setActiveCardMenu}
+         loggedUser={loggedUser}
         
          taskMembers ={members}
          success = {success}

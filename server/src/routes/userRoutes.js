@@ -27,11 +27,15 @@ router.post('/login', userController.loginUser);  // Backend login route
 router.get('/users', userController.getAllUsers);  // Route to get all users
 router.get('/get-current-user', userController.getUserProfile);
 router.put('/:id', userController.updateUserProfile);  // Route to update user profile
+router.delete('/delete-task',taskController.deleteTask);
 router.delete('/:id', userController.deleteUser);  // Route to delete a user
 router.post('/reset-password', userController.resetPassword);  // Route to reset the password
 router.post('/create-new-task', upload.single('attachment'), taskController.createNewTask); // Route to create a new task 
 router.post('/create-new-goal', taskController.createGoal);
 router.get('/get-all-members', userController.getAllUsers);
+router.get('/get-all-goals', taskController.getAllGoals);
+router.get('/get-all-tasks', taskController.getAllTasks);
+
 
 // --- Task Routes ---
 

@@ -1,16 +1,18 @@
 import { useState, useRef, useEffect } from "react";
 import Card from './Card';
+import axios from 'axios';
 import DropIndicator from "./DropIndicator";
 import NewTask from './newTask';
 
-const Column = ({ title, headingColor, column, cards, setCards, activeCardMenu, setActiveCardMenu,taskMembers, success,fail }) => {
+const Column = ({ title, column, headingColor, creator, cards, setCards, activeCardMenu, loggedUser, 
+  setActiveCardMenu,taskMembers, success,fail}) => {
   const [active, setActive] = useState(false);
 
   const handleDragStart = (e, card) => {
     e.dataTransfer.setData("cardId", card.id);
   };
 
-   
+    
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -119,16 +121,22 @@ const Column = ({ title, headingColor, column, cards, setCards, activeCardMenu, 
     }
   }
 
-  const handleDeleteCard = (cardId) => {
+  const handleDeleteCard = async (cardId) => {
+     const response = axios.delete(`${process.env.REACT_APP_API_URL}/auth/delete-task`,
+      {
+        params: {cardId},
+        credentials: 'include'
+      }
+     );
     setCards((prevCards) => prevCards.filter((card) => card.id !== cardId));
   };
 
-  const filteredCards = cards.filter((c) => c.column === column);
+  const filteredCards = cards.filter((c) => c.columnId === column);
   
   return (
-    <div className="w-56 shrink-0 bg-zinc-300 rounded-lg shadow-lg" >
-      <div className="mb-3 flex items-center justify-between">
-        <h3 className={`font-medium font-title ${headingColor} ml-2`}>{title}</h3>
+    <div className="w-56 shrink-0 bg-zinc-300 rounded-lg shadow-lg h-[500px] " >
+      <div className="mb-3 flex items-center justify-between px-2">
+        <h3 className={`font-medium font-title ml-2` } style={{ color: headingColor}}>{title}</h3>
         <span className="rounded text-sm text-neutral-400 mr-1">
           {filteredCards.length}
         </span>
@@ -137,10 +145,11 @@ const Column = ({ title, headingColor, column, cards, setCards, activeCardMenu, 
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDragEnd}
-        className={`h-full w-full transition-colors ${
+        className={`h-full w-full transition-colors flex flex-col  ${
           active ? "bg-neutral-800/50" : "bg-neutral-800/0"
-        }`}
+        } `}
       >
+         <div className="flex-1 overflow-y-auto">
         {filteredCards.map((c) => (
           <Card
             key={c.id}
@@ -155,14 +164,17 @@ const Column = ({ title, headingColor, column, cards, setCards, activeCardMenu, 
         ))}
         <DropIndicator beforeId={null} column={column} />
         {/* AddCard Component was missing */}
-        <AddCard column={column} setCards={setCards} success={success} failure={fail} members={taskMembers} />
+        <div className="mt-[5px]">
+        <AddCard column={column} setCards={setCards} success={success} failure={fail} members={taskMembers} creator={loggedUser} />
+        </div>
+        </div>
       </div>
     </div>
   );
 };
 
 // Define AddCard component
-const AddCard = ({ column, setCards, success,failure, members}) => {  
+const AddCard = ({ column, setCards, success,failure, members,creator}) => {  
   const [text, setText] = useState("");
   const [status,setStatus] = useState("");
   const [adding, setAdding] = useState(false);
@@ -173,7 +185,7 @@ const AddCard = ({ column, setCards, success,failure, members}) => {
     <>
       {adding ? (
         <NewTask invertTask={setAdding} taskStatus={adding} taskSuccess={success} taskFail={failure} members={members} 
-          setCards={setCards} column = {column} 
+          setCards={setCards} column = {column} creator={creator}
         /> /* Satan*/
       ) : (
         <button
