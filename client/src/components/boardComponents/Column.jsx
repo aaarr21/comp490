@@ -71,6 +71,17 @@ const Column = ({ title, column, headingColor, creator, cards, setCards, activeC
     clearHighlight();
   };
 
+  const handleColumnChange = async (cardId, columnId) =>{
+       try{
+         const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/swap-columns`,
+          {cardId, columnId},
+          {credentials: 'include'}
+         )
+       } catch (error){
+              fail("Internal Server Error: Code " + error.response.status);
+       }
+  }
+
   const handleDragEnd = (e) => { //Handle end of the drag event
     const cardId = e.dataTransfer.getData("cardId"); //get the card 
     
@@ -91,6 +102,8 @@ const Column = ({ title, column, headingColor, creator, cards, setCards, activeC
             return;
       let columnId = column;
       cardToMove = { ...cardToMove, columnId };
+      handleColumnChange(parseInt(cardId),columnId);
+
       copy = copy.filter((c) => c.id !== parseInt(cardId) );
 
       const moveBack = parseInt(before) === -1;
@@ -108,8 +121,21 @@ const Column = ({ title, column, headingColor, creator, cards, setCards, activeC
     }
   };
 
+  const updateTitle = async (cardId, newTitle) =>  {
+    try{
+     const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/update-title`,
+       {cardId, newTitle},
+       {credentials: 'include'}
+      );
+      console.log(response);
+    }catch(error){
+       fail("Internal Server Error: " + error.response.status);
+    }
+ }
+
   const handleEditCard = (cardId, newTitle) => {
     if (newTitle) {
+      updateTitle(cardId,newTitle);
       setCards((prevCards) =>
         prevCards.map((card) =>
           card.id === cardId ? { ...card, title: newTitle } : card
@@ -118,8 +144,22 @@ const Column = ({ title, column, headingColor, creator, cards, setCards, activeC
     }
   };
 
+  const updateStatus = async (cardId, newStatus) =>  {
+       try{
+        const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/update-status`,
+          {cardId, newStatus},
+          {credentials: 'include'}
+         );
+         console.log(response);
+       }catch(error){
+          fail("Internal Server Error: " + error.response.status);
+       }
+    }
+
   const handleEditStatus = (cardId, newStatus) =>{
-    if(newStatus) {
+  
+    if(newStatus) {    
+      updateStatus(cardId,newStatus);
       setCards((prevCards)=> prevCards.map((card)=>
         card.id === cardId ? {...card,status: newStatus} : card
       ));
@@ -166,7 +206,7 @@ const Column = ({ title, column, headingColor, creator, cards, setCards, activeC
         onDragLeave={handleDragLeave}
         onDrop={handleDragEnd}
         className={`h-full w-full transition-colors flex flex-col overflow-y-auto ${
-          active ? "bg-neutral-800/50" : "bg-neutral-800/0"
+          active ? "bg-neutral-800/50" : "bg-neutral-800/0 "
         } `}
       >
          

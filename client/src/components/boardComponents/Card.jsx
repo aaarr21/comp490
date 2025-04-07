@@ -11,11 +11,22 @@ const Card = ({ title,creator, id, status,file, assigned,date, columnId, handleD
   const [editTitle, setEditTitle] = useState(title);
   const [editStatus, setEditStatus] = useState(status);
   const [attachment,setAttachment] = useState(file); // Attached file
+  const [dueColor,setDueColor] = useState("");
+
+
 
   const menuRef = useRef(null);
 
+   const taskDate = new Date(date);
+    
+   const currDate = new Date(); // Get current Date.
 
-  
+ 
+  const formattedDate = taskDate.toLocaleDateString("en-US", { //Turn date into a date object for better rending.
+     year: "numeric",
+     month: "long",
+     day: "numeric",
+  });
 
 
   const handleClickOutside = useCallback(
@@ -60,7 +71,7 @@ const Card = ({ title,creator, id, status,file, assigned,date, columnId, handleD
       layoutId={id}
       draggable="true"
       onDragStart={(e) => handleDragStart(e, { title, id, columnId })}
-      className="rounded-lg p-2 m-2 px-3 shadow-lg bg-white active:cursor_grabbing max-w-full shadow-lg min-h-24 relative"
+      className="rounded-lg p-2 m-2 px-3 flex-shrink-0 shadow-lg bg-white active:cursor_grabbing max-w-full shadow-lg min-h-24 relative"
     >
       {/* Horizontal three-dot menu button, adjusted for extra spacing */}
       <button
@@ -106,14 +117,17 @@ const Card = ({ title,creator, id, status,file, assigned,date, columnId, handleD
           autoFocus
           className="w-full bg-neutral-100 text-neutral-800 p-1 mt-5 rounded focus:outline-none focus:ring-2 focus:ring-red-500 "
         />
-         : (<div className="text-md flex gap-4 justify-between mt-5 py-1 text-grey-800"> 
-                <p>{status}</p> 
-               
+         : (<div className="text-md flex gap-4 flex-col mt-0 py-1 text-grey-800 overflow-hidden"> 
+               <div className="text-sm">
+                <p>For: {assigned}</p>
+                <p>Due: {formattedDate}</p>
+                <p className="font-extrabold">{status}</p> 
+               </div>
                { attachment !== undefined ? <a href={URL.createObjectURL(file)}  
                  download={file.name}> <FontAwesomeIcon icon={faPaperclip} 
                  className="scale-145 ml-[2.2em] mt-[1.0em] 
                     cursor-pointer transition: background-color 0.5s hover:text-red-500" 
-                    onClick={console.log(attachment)} /> </a> : <section></section> }
+                    onClick={console.log(attachment)} /> </a> : <section style={{display: "none"}}></section> }
           </div> )
       }
        

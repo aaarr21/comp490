@@ -26,7 +26,7 @@ class TaskRepository{
        try{
         const [result] = await db.query(
             "INSERT INTO tasks (creator, title, status, assigned, date, columnId) VALUES (?,?,?,?,?,?)",
-             [task.creator,task.title,task.status,task.assigned,task.date,task.column]
+             [task.creator,task.title,task.status,task.assigned,task.date,task.columnId]
          );
          return result.insertId;
        }catch(error){
@@ -34,6 +34,37 @@ class TaskRepository{
         throw error;
        }
      }
+
+     async updateStatus (cardId, newStatus) {
+        console.log("Updating status "+ cardId + " new status: " + newStatus );
+        try{
+            const [result] = await db.query("UPDATE tasks SET status = ? WHERE id = ?", [newStatus, cardId]);
+            console.log(result);
+        }catch(error){
+            console.error("Error updating task", error)
+        }
+     }
+
+     async updateTitle (cardId, newTitle) {
+        
+        try{
+            const [result] = await db.query("UPDATE tasks SET title = ? WHERE id = ?", [newTitle, cardId]);
+            console.log(result);
+        }catch(error){
+            console.error("Error updating task", error)
+        }
+     }
+
+     async swapColumns( cardId, columnId){
+        try{
+          const [result] = await db.query("UPDATE tasks SET columnId = ? WHERE id = ?", [columnId ,  cardId]);
+          console.log(result);
+          
+        }catch(error){
+            throw new Error("Task Not Found");
+        }
+     }
+    
 
      async findOrCreateTask (){
 
@@ -64,9 +95,6 @@ class TaskRepository{
      }
 
 
-     async updateStatus(taskTitle, oldStatus, newStatus) {
-
-     }
 
      async getAllTasks(){
         try{

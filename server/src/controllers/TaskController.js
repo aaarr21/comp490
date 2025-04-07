@@ -24,9 +24,46 @@ const createNewTask = async (req,res) => {
       
 };
 
+const dealWTaskDrag = async (req,res) =>{
+   const {cardId, columnId} = req.body;
+   console.log(cardId + "     " + columnId);
+   if(!cardId || !columnId)
+     return res.status(401).json({error: "missing id"});
+    try{
+        await taskService.dragTaskEvent(cardId,columnId);
+        return res.status(201).json({msg: "Switched task to new goal!"});
+    }catch(error){
+    return res.status(500).json(error);
+    }
+
+
+}
+
+const updateStatus = async (req,res) => {
+   const{ cardId, newStatus} = req.body;
+   console.log(cardId + " " + newStatus);
+   try{
+      await taskService.updateTaskStatus(cardId, newStatus);
+      res.status(201).json({msg: "Updated Status!"});
+   }catch(error){
+     return res.status(500).json(error);
+   }
+}
+
+const updateTitle = async (req,res) => {
+  const{ cardId, newTitle} = req.body;
+  console.log(cardId + " " + newTitle);
+  try{
+     await taskService.updateTaskStatus(cardId, newTitle);
+     res.status(201).json({msg: "Updated Title!"});
+  }catch(error){
+    return res.status(500).json(error);
+  }
+}
+
 const createGoal = async (req,res) => {
     const {columnName, column, color, loggedInUser } = req.body;
-     console.log(column);
+     
      if(!column || !columnName || !color || !loggedInUser)
         return res.status(401).json({error: "At least one field is missing"});
 
@@ -76,5 +113,8 @@ module.exports = {
     createGoal,
     getAllGoals,
     getAllTasks,
-    deleteTask
+    deleteTask,
+    dealWTaskDrag,
+    updateStatus,
+    updateTitle
 };

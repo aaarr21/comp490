@@ -1,10 +1,10 @@
 import { useState,useEffect,useRef } from 'react';
 import axios from 'axios';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import { faCircleXmark, faXmark,faPaperclip, faFaceSmile,faCalendar, faUserPlus, faA } from '@fortawesome/free-solid-svg-icons';
+import {  faXmark,faPaperclip, faFaceSmile,faCalendar, faUserPlus,  } from '@fortawesome/free-solid-svg-icons';
 import Picker from 'emoji-picker-react'; // for the emoji section
 import DatePicker from 'react-date-picker';
-import { text } from '@fortawesome/fontawesome-svg-core';
+
 import { Toaster, toast } from 'sonner';
 import 'react-date-picker/dist/DatePicker.css';
 import 'react-calendar/dist/Calendar.css';
@@ -121,27 +121,23 @@ const NewTask = ({invertTask, taskStatus, taskSuccess, taskFail,members, setCard
           taskData.append('creator', creator)
           files.map((file) => taskData.append("attachment", file, file.name));
                    
-          
-          
-          
-         const response = await axios.post('http://localhost:5000/auth/create-new-task', taskData, {
-            'Content-Type': 'multipart/form-data',
-              withCredentials: true });  
-             
-            toast.promise(response, {
+      
+            
+            toast.promise(axios.post('http://localhost:5000/auth/create-new-task', taskData, {
+              'Content-Type': 'multipart/form-data',
+                withCredentials: true }) , {
                 loading: 'sending task to server...',
-                success: (data) =>{
+                success: (response) =>{
+                    console.log(response.data);
+                    invertTask(!taskStatus);                         
+                   setCards((prev) => [...prev, response.data]); //Something screwy is going on here.
                   
-                    invertTask(!taskStatus);
-                           
-                   setCards((prev) => [...prev, response.data.newTask]); //Something screwy is going on here.
-                   console.log()
                    setText(""); // Clear input field
                     return 'Task created Successfully';
                 },
-                error: "Error Occured",
-            });
-
+                error: "Error occured during task creation.",
+            }); 
+          
      }
 
      //Helper function to the file component to delete from files array once user clicks on the x mark.

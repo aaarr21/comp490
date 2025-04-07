@@ -21,7 +21,7 @@ class Task {
          this.assigned = assigned;
          
          this.status = "STARTED"; // 1, as task was just created, 2 should designate as completed, and 0 as overdue
-         this.column = column;
+         this.columnId = column;
          this.creator = creator;
       }
       

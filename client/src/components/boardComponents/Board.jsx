@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { Toaster, toast } from 'sonner';
 import Column from './Column';
 
 const Board = ({success,fail,members, columns,setColumns, loggedUser}) => {
@@ -22,16 +23,16 @@ const Board = ({success,fail,members, columns,setColumns, loggedUser}) => {
   */
 useEffect(()=> {
   const getTasks = async () => {
-    const response = await axios.get(`${process.env.REACT_APP_API_URL}/auth/get-all-tasks`, //get tasks from database
-        {credentials: 'include'},
-       )
-         if(response.status === 500)
-            fail(response.error);
-        else{
-           
-             setCards(response.data);
-           // setColumns(response.data); //store column state
-        }
+       toast.promise(axios.get(`${process.env.REACT_APP_API_URL}/auth/get-all-tasks`, 
+                    {credentials : 'include'} ) , {
+                     loading: 'Retriving Data...',
+                     success: (response) =>{
+                      setCards(response.data);
+                         return "Retrived Goals!";
+                     },
+                     error: "Error occured during retrival.",
+                 }); 
+  
 }
           getTasks();
 },[])
