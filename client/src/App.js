@@ -3,6 +3,7 @@ import Navibar from './components/NaviBar';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import WorkBoard from './pages/WorkFlowBoard';
+import Settings from './pages/Settings'
 import ForgotPassword from './pages/ForgotPassword';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -36,6 +37,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
      
+     
         {/* Protected Route for /workBoard */}
         <Route
           path="/workBoard"
@@ -53,7 +55,17 @@ function App() {
             </ProtectedRoute>
         }
         />
+        <Route 
+      path="/settings"
+      element={
+        <ProtectedRoute>
+          <Settings />
+        </ProtectedRoute>
+        
+      }
+      />
       </Routes>
+      
     </div>
   );
 }

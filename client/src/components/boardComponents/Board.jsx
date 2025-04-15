@@ -41,7 +41,7 @@ useEffect(()=> {
 
   return (
    <div>
-    <div className="flex h-full w-full gap-4  p-12">
+    <div className="flex h-full w-full gap-4  overflow-x-auto p-12">
       {columns.map((column) => <Column
          
          title={column.title}
