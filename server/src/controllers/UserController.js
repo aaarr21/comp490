@@ -74,12 +74,29 @@ const getUserProfile = async (req, res) => {
     }
 };
 
+const updateUserName = async (req, res) => {
+    // const userId = req.session.passport.user;
+      const {userId, nextUser} = req.body;
+      console.log(userId + "  " + nextUser);
+      try{
+        const updatedUser = await userService.updateUserName(userId, nextUser);
+      }catch(error) {
+        res.status(500).json({error:  error.message});
+      }
+      res.status(200).json({ success: true, message: 'Reset code sent successfully.' });
+ };
+ 
+
 // Route handler for updating user profile
 const updateUserProfile = async (req, res) => {
-    const userId = req.params.id;
-    const { username, email, name, role } = req.body;
+    const paramsId = req.params.id;
+    userId = paramsId.slice(1);
+    console.log(userId);
+    const {username, email, role } = req.body;
+    
     try {
-        const updatedUser = await userService.updateUserProfile(userId, { username, email, name, role });
+        const updatedUser = await userService.updateUserProfile(userId, { username, email, role });
+        console.log(updatedUser);
         if (!updatedUser) {
             return res.status(404).json({ message: 'User not found' });
         }
@@ -222,6 +239,7 @@ module.exports = {
     registerUser,
     loginUser,
     getUserProfile,
+    updateUserName,
     updateUserProfile,
     deleteUser,
     getAllUsers,

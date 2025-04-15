@@ -307,6 +307,27 @@ class UserRepository {
             throw error;
         }
     }
+
+    async updateUserProfile(userId, updatedData){
+        console.log(userId +"   " + updatedData.username + " " +  updatedData.email);
+        try{
+            if(typeof userId !== "number"){
+                parseInt(userId, 10);
+            }
+            console.log("Executing query to update user.")
+            const [result] = await db.query("UPDATE users set username = ?, email = ?, role = ? WHERE id = ?",
+                [updatedData.username,updatedData.email,updatedData.role, userId]
+            );
+            console.log("Updated user:" + result);
+            
+            if(result.affectedRows === 0){
+                throw new Error("no user was found matching the parameters")
+            }       
+            return result;
+        } catch(error){
+             throw error;
+        }
+    }
     async updateResetCodeLastSent(email) {
         const query = `
             UPDATE users

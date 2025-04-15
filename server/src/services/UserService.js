@@ -95,6 +95,7 @@ class UserService {
 
     // Method to update user profile
     async updateUserProfile(userId, updatedData) {
+        
         return await this.userRepository.updateUserProfile(userId, updatedData);
     }
 
