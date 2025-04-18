@@ -1,8 +1,22 @@
 const Task = require('../models/Task');
 const Column = require('../models/Column');
 const db = require('../config/db');
+const { S3Client, GetObjectCommand } = require("@aws-sdk/client-s3");
+const {getSignedUrl} = require("@aws-sdk/s3-request-presigner");
+
+
+const s3 = new S3Client({
+    region: process.env.AWS_REGION,
+    credentials: {
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_KEY,
+    },
+});
 
 class TaskRepository{
+
+
+     
 
 
     async findTask() {
@@ -99,8 +113,26 @@ class TaskRepository{
 
      async getAllTasks(){
         try{
-            const [rows] = await db.query("SELECT id, title, creator, assigned, columnId, status, date FROM tasks"); // Get all of the board columns.
-            return rows;
+            const [rows] = await db.query("SELECT id, title, creator, assigned, attachment, columnId, status, date FROM tasks"); // Get all of the board columns.
+            
+           //Promise.all to handle async operations, just to deal with generated signed urls.
+            const generatedRows = await Promise.all(
+                rows.map( async (row)=>{
+                    if(row.attachment !== null){
+                        
+                           const command = new GetObjectCommand({
+                              Bucket: process.env.S3_BUCKET_NAME,
+                              Key: row.attachment
+                           })
+                       const generatedURL = await getSignedUrl(s3, command, 
+                        {expiresIn: (3600 * 10)});
+                        row.attachment = generatedURL;
+                    }
+                    return row;
+               })
+            )
+           
+            return generatedRows;
          }catch(error){
             throw error;
          }

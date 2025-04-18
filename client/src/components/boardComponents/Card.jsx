@@ -4,13 +4,13 @@ import { faPaperclip } from "@fortawesome/free-solid-svg-icons";
 import DropIndicator from "./DropIndicator";
 import {motion} from "framer-motion"
 
-const Card = ({ title,creator, id, status,file, assigned,date, columnId, handleDragStart, onEdit, onDelete,onEditStatus }) => {
+const Card = ({ title,creator, id, status,attachment,assigned,date, columnId, handleDragStart, onEdit, onDelete,onEditStatus }) => {
   const [menuVisible, setMenuVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isEditingStatus,setIsEditingStatus] = useState(false)
   const [editTitle, setEditTitle] = useState(title);
   const [editStatus, setEditStatus] = useState(status);
-  const [attachment,setAttachment] = useState(file); // Attached file
+  const [attachedFile,setAttachedFile] = useState(attachment); // Attached file
   const [dueColor,setDueColor] = useState("");
 
 
@@ -121,13 +121,16 @@ const Card = ({ title,creator, id, status,file, assigned,date, columnId, handleD
                <div className="text-sm">
                 <p>For: {assigned}</p>
                 <p>Due: {formattedDate}</p>
-                <p className="font-extrabold">{status}</p> 
+               
                </div>
-               { attachment !== undefined ? <a href={URL.createObjectURL(file)}  
-                 download={file.name}> <FontAwesomeIcon icon={faPaperclip} 
-                 className="scale-145 ml-[2.2em] mt-[1.0em] 
+               <div className="flex justify-between m-0">
+               <p className="font-extrabold">{status}</p> 
+               { attachedFile !== null ? <a href={attachedFile} target="_blank"
+                 > <FontAwesomeIcon icon={faPaperclip} 
+                 className="scale-100 ml-[2.2em] mt-[1.0em] 
                     cursor-pointer transition: background-color 0.5s hover:text-red-500" 
-                    onClick={console.log(attachment)} /> </a> : <section style={{display: "none"}}></section> }
+                    onClick={() => {console.log("TBD")}} /> </a> : <section style={{display: "none"}}></section> }
+                    </div>
           </div> )
       }
        
