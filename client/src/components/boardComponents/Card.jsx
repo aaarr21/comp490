@@ -71,7 +71,7 @@ const Card = ({ title,creator, id, status,attachment,assigned,date, columnId, ha
       layoutId={id}
       draggable="true"
       onDragStart={(e) => handleDragStart(e, { title, id, columnId })}
-      className="rounded-lg p-2 m-2 px-3 flex-shrink-0 shadow-lg bg-white active:cursor_grabbing max-w-full shadow-lg min-h-24 relative"
+      className="rounded-lg p-2 m-2 px-3 flex-shrink-0 shadow-lg bg-white active:cursor_grabbing max-w-full max-h-[137.6px] shadow-lg min-h-24 relative"
     >
       {/* Horizontal three-dot menu button, adjusted for extra spacing */}
       <button
@@ -115,21 +115,21 @@ const Card = ({ title,creator, id, status,attachment,assigned,date, columnId, ha
             }
           }}
           autoFocus
-          className="w-full bg-neutral-100 text-neutral-800 p-1 mt-5 rounded focus:outline-none focus:ring-2 focus:ring-red-500 "
+          className="w-full bg-neutral-100 text-neutral-800 p-1  rounded focus:outline-none focus:ring-2 focus:ring-red-500 "
         />
-         : (<div className="text-md flex gap-4 flex-col mt-0 py-1 text-grey-800 overflow-hidden"> 
+         : (<div className="text-md flex gap-4 flex-col mt-0 py-1 text-grey-800 overflow-hidden w-[167.2px]"> 
                <div className="text-sm">
                 <p>For: {assigned}</p>
                 <p>Due: {formattedDate}</p>
                
                </div>
-               <div className="flex justify-between m-0">
+               <div className="flex justify-between m-0 h-[20px] mb-2">
                <p className="font-extrabold">{status}</p> 
-               { attachedFile !== null ? <a href={attachedFile} target="_blank"
+               { attachedFile !== null ? <a href={attachedFile}  id="fileAttached" target="_blank"
                  > <FontAwesomeIcon icon={faPaperclip} 
-                 className="scale-100 ml-[2.2em] mt-[1.0em] 
+                 className="text-sm 
                     cursor-pointer transition: background-color 0.5s hover:text-red-500" 
-                    onClick={() => {console.log("TBD")}} /> </a> : <section style={{display: "none"}}></section> }
+                     /> </a> : <section style={{display: "none"}}></section> }
                     </div>
           </div> )
       }
