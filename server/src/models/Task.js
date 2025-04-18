@@ -15,10 +15,11 @@
 
 
 class Task {
-      constructor(title,date,assigned, column, creator){
+      constructor(title,date,assigned,attachment, column, creator){
          this.title = title;
          this.date = date;
          this.assigned = assigned;
+         this.attachment = attachment;
          
          this.status = "STARTED"; // 1, as task was just created, 2 should designate as completed, and 0 as overdue
          this.columnId = column;

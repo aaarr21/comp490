@@ -6,19 +6,44 @@ const router = express.Router();
 const FRONTEND_URL = "http://localhost:3000/workBoard";
 const nodemailer = require("nodemailer");
 const multer = require('multer');
+const multers3 = require('multer-s3');
+const { S3Client } = require("@aws-sdk/client-s3");
+
+
+const s3 = new S3Client({
+    region: process.env.AWS_REGION,
+    credentials: {
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_KEY,
+    },
+});
 
 
 //multer storage set up, using memoryStorage because I don't want this to be in our server.
-const storage = multer.memoryStorage({
+/* const storage = multer.memoryStorage({
   destination: "src/tasks/",
   filename: function(req, file, cb) {
     // null as first argument means no error
     cb(null, file.originalname);
   },
-});
+}); */
 
-const upload = multer({storage: storage,
-                       limits: {fileSize : 10000000000}
+const upload = multer({
+  storage: multers3({
+    s3,
+    bucket: process.env.S3_BUCKET_NAME,
+    acl: 'private',
+    contentType: multers3.AUTO_CONTENT_TYPE,
+    metadata: (req,file,cb) => {
+      cb(null,{fieldName: file.fieldname});
+    } ,
+    key: (req,file,cb) => {
+      const fileKey = `${Date.now()}-${file.originalname}`;
+      cb(null,fileKey);
+    }
+
+  }),
+  limits: {fileSize : 10000000000}
 });
 
 // --- User Management Routes ---

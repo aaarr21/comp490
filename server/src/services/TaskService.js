@@ -21,8 +21,8 @@ class TaskService {
            return newColumn;
      }
 
-     async registerTask(textPart, date, assigned, column, creator){
-       const newTask = new Task(textPart, date,assigned,column,creator);
+     async registerTask(textPart, date, assigned, attachment, column, creator){
+       const newTask = new Task(textPart, date,assigned,attachment, column,creator);
         
         const id = await this.taskRepository.createTask(newTask);
         

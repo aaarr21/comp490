@@ -25,9 +25,10 @@ class TaskRepository{
      async createTask (task) {
        try{
         const [result] = await db.query(
-            "INSERT INTO tasks (creator, title, status, assigned, date, columnId) VALUES (?,?,?,?,?,?)",
-             [task.creator,task.title,task.status,task.assigned,task.date,task.columnId]
+            "INSERT INTO tasks (creator, title, status, assigned, date,attachment, columnId) VALUES (?,?,?,?,?,?,?)",
+             [task.creator,task.title,task.status,task.assigned,task.date,task.attachment,task.columnId]
          );
+         console.log("Task Creation details:" + result);
          return result.insertId;
        }catch(error){
         console.error("Error adding new task", error);

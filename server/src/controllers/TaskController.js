@@ -8,12 +8,16 @@ const taskService = new TaskService();
 const createNewTask = async (req,res) => {
      
   const {textPart, date, assigned, column, creator} = req.body;
+  let fileKey;
+  req.file === undefined ? fileKey = null : fileKey = req.file.key;
+  console.log(fileKey);
   if(!textPart || !date || !assigned || !column || !creator)
       return res.status(500).json({error: "Missing task field."})
+  
 
 
     try{
-        const newTask = await taskService.registerTask( textPart, date, assigned, column, creator);
+        const newTask = await taskService.registerTask( textPart, date, assigned, fileKey, column, creator);
         res.status(201).json({newTask});
          //let attachment = req.file;
          
