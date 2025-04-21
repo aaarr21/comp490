@@ -1,325 +1,507 @@
-import { useState,useEffect,useRef } from 'react';
-import axios from 'axios';
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {  faXmark,faPaperclip, faFaceSmile,faCalendar, faUserPlus,  } from '@fortawesome/free-solid-svg-icons';
-import Picker from 'emoji-picker-react'; // for the emoji section
-import DatePicker from 'react-date-picker';
+import { useState, useEffect, useRef } from "react";
+import axios from "axios";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faCircleXmark,
+  faXmark,
+  faPaperclip,
+  faFaceSmile,
+  faCalendar,
+  faUserPlus,
+  faA,
+} from "@fortawesome/free-solid-svg-icons";
+import Picker from "emoji-picker-react";
+import DatePicker from "react-date-picker";
+import { Toaster, toast } from "sonner";
+import "react-date-picker/dist/DatePicker.css";
+import "react-calendar/dist/Calendar.css";
+import { useRBAC } from "../../utils/rbacUtils";
 
-import { Toaster, toast } from 'sonner';
-import 'react-date-picker/dist/DatePicker.css';
-import 'react-calendar/dist/Calendar.css';
+const NewTask = ({
+  invertTask,
+  taskStatus,
+  taskSuccess,
+  taskFail,
+  members,
+  setCards,
+  column,
+}) => {
+  const { user } = useRBAC();
 
+  useEffect(() => {
+    console.log("Task members prop:", members);
+  }, [members]);
 
+  const closeTask = () => {
+    invertTask(!taskStatus);
+  };
 
-const NewTask = ({invertTask, taskStatus, taskSuccess, taskFail,members, setCards, column, creator}) => {
-    // Determine if this should get any passed in props to determine owner, 
-    //should talk to see if we should get a custom object to represent the task and the various attributes.
-     const closeTask = () =>{ //close task, this deletes all of the contents of the task and when clicked again renders a new task.
-        invertTask(!taskStatus);
-        
-     }
+  const [files, setFiles] = useState([]);
+  const [text, setText] = useState("");
+  const formRef = useRef(null);
+  const membersRef = useRef(null);
+  const [chosenMembers, setChosenMembers] = useState([]);
+  const [displayfile, setDisplayFile] = useState(false);
+  const [displayEmoji, setEmoji] = useState(false);
+  const [displayMembers, setDisplayMembers] = useState(false);
+  const [displayChosen, setDisplayChosen] = useState(false);
+  const [displayDate, setDisplayDate] = useState(false);
+  const [taskDate, setTaskDate] = useState(null);
+  const textRef = useRef(null);
 
-     /* 
-        Note: The list below exist for me to first implement the select options and see if I can grab and use the options 
-        for the Task object tbd. The actual iteartion will include an api call to the mysql database to create 
-        an array for the departments(probably in some table for departments), and then a created array
-         for the people within that department, another api call.
-     */
-
-     const [files,setFiles] = useState([]); //Handle the files
-     
-     const [text,setText] = useState("");
-     const formRef = useRef(null)
-     const [chosenMembers,setchosenMembers] = useState(null);
-
-     const[displayfile,setDisplayFile] = useState(false); //Display the attachments when they exist in context.
-
-     const[displayEmoji,setEmoji] = useState(false); // for emoji picker render
-
-     const [displayMembers,setDisplayMembers] = useState(false); // Boolean logic to render Display Members component
-
-     const [displayChosen, setdisplayChosen] = useState(false); // Boolean logic to render the chosen members
-
-     const[displayDate,setDisplayDate] = useState(false); // to render date picker
-     
-     const[taskDate,settaskDate] = useState(null); // State for the chosen date
-
-   
-  
-        //Handle file upload from user by concating to current file array.
-     const handleFileChange = (event) => {
-        if(event.target.files){ //Ensure that user did upload a pdf.          
-            try {
-                   if(event.target.files[0].size  <= 104857600 ) {
-                    setFiles(Array.from(event.target.files));
-                    setDisplayFile(true);                   
-                   }
-                   else{
-                     taskFail("File size exceeds limit.")
-                   }
-                    //const yoinkedFiles = Array.from(event.target.files); //use from to convert from FilesList to Array. 
-                                                                         // I need to do this so I can use the map array function.
-                  
-                 //  let combinedList = [...files,...yoinkedFiles]; //Use spread operator to create a final list of all file elements
-                  
-                     
-                   // setFiles(combinedList); //Set to final array                   
-            } catch (error) {
-             
-            }            
+  const handleFileChange = (event) => {
+    if (event.target.files) {
+      try {
+        if (event.target.files[0].size <= 104857600) {
+          setFiles(Array.from(event.target.files));
+          setDisplayFile(true);
+        } else {
+          taskFail("File size exceeds limit.");
         }
-     }
-     
-     const renderEmoji = (event) =>{
-       
-         event.preventDefault();
-         
-         setEmoji(!displayEmoji);
-     }
-      //starter to render date picker
-     const renderDate = (event) =>{
-         event.preventDefault();
-         setDisplayDate(!displayDate);
-     }
-     // take a passed in emojiObject from the EmojiPicker and append it to our task text area
-     const appendEmoji = (emojiObject) =>{
-        
-        setText((prevText) => prevText + emojiObject.emoji);
-        setEmoji(!displayEmoji);
-     }
+      } catch (error) {}
+    }
+  };
 
-     // Take chosen date and set it to our task date.
-     const appendDate = (date) =>{
-       
-        settaskDate(date);
-        taskSuccess(("Date Chosen: " + date))
-        setDisplayDate(false);
-     }
+  const renderEmoji = (event) => {
+    event.preventDefault();
+    setEmoji(!displayEmoji);
+  };
 
-     // Render the members list component.
-     const renderMembers = () =>{
-       
-    
-        setDisplayMembers(!displayMembers);
-      
-     }
+  const renderDate = (event) => {
+    event.preventDefault();
+    setDisplayDate(!displayDate);
+  };
 
-    
-      //create new instance of task object and store it within our seleted users.
-     const handleTaskupload = async (e) =>{
-          e.preventDefault();
-          const TaskForm = e.target;
-          if(taskDate == null || chosenMembers == null){
-            //Use toastify here to create a reponsive error message
-            taskFail("One or More empty fields for task, please fix them.")
-            return;
-          }
-          const taskData = new FormData(TaskForm);
-          taskData.append("date", taskDate.toISOString().slice(0,19).replace('T',' '));
-          taskData.append("assigned", chosenMembers)
-          taskData.append('column', column)
-          taskData.append('creator', creator)
-          files.map((file) => taskData.append("attachment", file, file.name));
-                   
-      
-            
-            toast.promise(axios.post('http://localhost:5000/auth/create-new-task', taskData, {
-              'Content-Type': 'multipart/form-data',
-                withCredentials: true }) , {
-                loading: 'sending task to server...',
-                success: (response) =>{
-                    console.log(response.data);
-                    invertTask(!taskStatus);                         
-                   setCards((prev) => [...prev, response.data]); //Something screwy is going on here.
-                  
-                   setText(""); // Clear input field
-                    return 'Task created Successfully';
-                },
-                error: "Error occured during task creation.",
-            }); 
-          
-     }
+  const appendEmoji = (emojiObject) => {
+    textRef.current.value += emojiObject.emoji;
+    setEmoji(!displayEmoji);
+  };
 
-     //Helper function to the file component to delete from files array once user clicks on the x mark.
-     const deleteAttachment = (fileId) => {
-      
-        
-        let tempArr = files.filter((file, index) => fileId !== index); //Temp array for the filtered array      
-         setFiles(tempArr); //set files state to that temporary array
-     } 
+  const appendDate = (date) => {
+    // Format the date as YYYY-MM-DD, adjust if needed
+    const formattedDate = new Date(date).toISOString().split("T")[0];
+    setTaskDate(formattedDate);
+    taskSuccess("Date Chosen: " + formattedDate);
+    setDisplayDate(false);
+  };
 
-     const deletePeople = (memberId) => {
-     
-       
-       let tempArr = chosenMembers.filter((member, index) => memberId !== index); //Temp array for the filtered array      
-        setchosenMembers(tempArr); //set chosenMembers state to that temporary array
-    } 
+  const renderMembers = (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    console.log("Available members:", members);
+    setDisplayMembers(!displayMembers);
+  };
 
+  const handleClickOutside = (e) => {
+    if (
+      formRef.current &&
+      !formRef.current.contains(e.target) &&
+      !(membersRef.current && membersRef.current.contains(e.target))
+    ) {
+      invertTask(!taskStatus);
+    }
+  };
 
-    return (
-        
-        <div className="fixed flex w-[450px] h-[525px] max-h-[525px] flex-col ml-[0.5em] border font-inter 
-        rounded-md inset-y-0 left-0 text-[18px] bg-white m-auto left-1/3 right-1/3 z-50">   
-           
-            <div className="w-full text-[24px] font-bold h-[15%] flex flex-row"><h2 className="w-[50%] ml-[0.5em] mt-[0.5em]">Create New Task</h2> 
-            <button className="float-right mb-[5%] ml-[40%] hover:scale-115" onClick={closeTask}><FontAwesomeIcon icon={faXmark} 
-            className="scale-100 text-grey-500 hover:text-red-700" 
-            /></button>
-            </div>
+  useEffect(() => {
+    if (taskStatus) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [taskStatus]);
 
-            <div className="w-full h-[10%] flex flex-row text-[18ox] ml-[1.0em]; mb-2">
-            
-                     <label className='ml-2'>For:</label> <span id="attach">{ displayChosen && chosenMembers.map( (member,index) =>(
-                        <MemberInfo memberId = {index} memberName={member} deletePeople={deletePeople}/>
-                     ))}</span>
-                    
-             </div>
-            <form className="h-[80%] w-full flex flex-col justify-center ml-[0em] mt-[3.5em]" ref={formRef} onSubmit={handleTaskupload} enctype="multipart/form-data" >            
-                <textarea
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                autoFocus
-                className='scale-100 w-[95%]  h-[40%] ml-[0.68em] border-solid border-3 border-cyan-600 rounded-md mt-[-9.0] p-0'
-                placeholder="Give the task a name!" id="textArea"  required name="textPart"/>
+  const handleTaskupload = async (e) => {
+    e.preventDefault();
+    if (taskDate == null || chosenMembers.length === 0) {
+      taskFail("One or more empty fields for task, please fix them.");
+      return;
+    }
 
-                <div className="w-full h-[20%] flex flex-row items-center">
-                   
+    const TaskForm = e.target;
+    const taskData = new FormData(TaskForm);
 
-                  <button type="button"  onClick={renderEmoji} id="emoji-picker" style = {{display: 'none'}}>   </button>         
-                    <div className="absolute top-1 left-1 z-[1000]">   { displayEmoji && <Picker onEmojiClick={appendEmoji} />  }  
-                    </div>
-                   <label htmlFor="emoji-picker" className="cursor-pointer  transition: background-color 0.5s hover:text-red-500  ml-[2.2em]"> 
-                    <FontAwesomeIcon icon={faFaceSmile} 
-                    className="scale-145  mt-[0.5em] " /> {/*auxillery-icon */}
-                     </label>
-                   <input type="file" style = {{display: 'none'}} onChange={handleFileChange} id="attachment-upload"
-                    accept=".pdf,.xml,.docx" />
-                   <label htmlFor="attachment-upload"  className="cursor-pointer  transition: background-color 0.5s hover:text-red-500  ml-[2.2em]">
-                    <FontAwesomeIcon icon={faPaperclip} className="scale-145  mt-[0.5em] "/> {/*auxillery-icon */}
-                    </label>
+    // Append task data
+    taskData.append("date", taskDate);
+    // "assigned" field is now a comma-separated string
+    taskData.append("assigned", chosenMembers.join(","));
+    taskData.append("column", column);
+    // Explicitly set the status to "IN PROGRESS"
+    taskData.append("status", "IN PROGRESS");
+    taskData.append("creator", user?.id || user?.username);
 
-                    <button type="button"  onClick={renderDate} id="date-picker" style = {{display: 'none'}}>   </button>
-                   <label htmlFor="date-picker"  className="cursor-pointer  transition: background-color 0.5s hover:text-red-500 ml-[2.2em]" >  
-                     <FontAwesomeIcon icon={faCalendar} 
-                    className="scale-145  mt-[0.5em]  "/> </label>
-                   <div className="absolute left-[150px] bottom-[220px] bg-white rounded-md z-[1000]" >  {/* .date-position*/}
-                     { displayDate && <DatePicker  selected={taskDate} onChange={appendDate} /> }  </div>
-                    
-                    {taskDate && (
-                       <p className="ml-[2.2em] text-sm text-gray-700 font-inter">
-                          Selected Date: {taskDate.toLocaleDateString()}
-                       </p>
-                    )}
+    files.forEach((file) => taskData.append("attachment", file, file.name));
 
-                     <button type="button"  onClick={renderMembers} id="member-picker"style = {{display: 'none'}}>   </button>
-                  <label htmlFor="member-picker"  className="cursor-pointer  transition: background-color 0.5s hover:text-red-500 left-[400px] absolute"  > 
-                     <FontAwesomeIcon icon={faUserPlus} 
-                  className = "scale-145 text-grey-400 cursor-pointer mt-[0.7em]" /></label> {/*person-share*/}
-                     
-                </div>
-                
-                <div className="flex h-[40px]">
-                    <div className="w-full  h-[15%] text-[12px] flex  flex-wrap m-0 "> {/*.attachments-section*/} 
-                     <label className="ml-2" >Attachments:</label> <span id="attach">{ displayfile && files.map( (file,index) =>(
-                        <FileInfo id = {index} fileName={file.name} deleteAttachment={deleteAttachment}/>
-                     ))}</span>
-                    </div>
-                </div>
-                <div className="flex justify-center"> {/*new-task-submit */}
-                      <button  type="submit"className="w-[75%] mt-[1.0em] h-full font-bold mt-[2.5em] bg-cyan-500 
-                         text-center text-[18px]
-                         text-white rounded-md transition delay-150 hover:bg-indigo-500 
-                      "> Create Task</button>  {/*task-submit-button*/}
-                </div>
-              
-            </form>
-            <div className="absolute z-[1000] left-[500px] bottom-[100px]">{displayMembers && < MemberChecklist deptMemberList={members} 
-                 close={renderMembers} setChosenMembers={setchosenMembers} chosen ={chosenMembers} 
-                 displayChosen={setdisplayChosen}/>}</div>
-           
-            
+    try {
+      taskSuccess("Creating task...");
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/auth/create-new-task`,
+        taskData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+          withCredentials: true,
+        }
+      );
+      console.log("Response data:", response.data);
+      const { newTask } = response.data;
+      if (newTask && newTask.id) {
+        setCards((prev) => [...prev, { ...newTask, columnId: column }]);
+        invertTask(false);
+        taskSuccess("Task created successfully");
+      } else {
+        const newTaskId = Math.random().toString();
+        const newTaskObj = {
+          id: newTaskId,
+          title: text,
+          status: "IN PROGRESS",
+          assigned: chosenMembers.join(", "),
+          date: taskDate,
+          columnId: column,
+          creator: user?.id || user?.username,
+        };
+        setCards((prev) => [...prev, newTaskObj]);
+        invertTask(false);
+        taskSuccess("Task created successfully");
+      }
+    } catch (error) {
+      console.error("Error creating task:", error.response?.data || error);
+      taskFail(error.response?.data?.message || "Failed to create task");
+    }
+  };
+
+  const deleteAttachment = (fileId) => {
+    setFiles((prev) => prev.filter((file, index) => index !== fileId));
+  };
+
+  const deletePeople = (memberId) => {
+    setChosenMembers((prev) => prev.filter((_, index) => index !== memberId));
+  };
+
+  return (
+    <div className="absolute flex w-[450px] h-[525px] max-h-[525px] flex-col ml-[0.5em] border font-inter rounded-md inset-y-0 left-0 text-[18px] bg-white m-auto left-1/3 right-1/3 z-[9999]">
+      <div className="w-full text-[24px] font-bold h-[15%] flex flex-row">
+        <h2 className="w-[50%] ml-[0.5em] mt-[0.5em]">Create New Task</h2>
+        <button
+          className="float-right mb-[5%] ml-[40%] hover:scale-115"
+          onClick={closeTask}
+        >
+          <FontAwesomeIcon
+            icon={faXmark}
+            className="scale-100 text-grey-500 hover:text-red-700"
+          />
+        </button>
+      </div>
+      <div className="w-full h-[10%] flex flex-row text-[18ox] ml-[1.0em]">
+        <label>For:</label>{" "}
+        <span id="attach">
+          {displayChosen &&
+            chosenMembers.map((member, index) => (
+              <MemberInfo
+                key={index}
+                memberId={index}
+                memberName={member}
+                deletePeople={deletePeople}
+              />
+            ))}
+        </span>
+      </div>
+      <form
+        className="h-[80%] w-full flex flex-col justify-center ml-[0em] mt-[3.5em]"
+        ref={formRef}
+        onSubmit={handleTaskupload}
+        encType="multipart/form-data"
+      >
+        <textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          autoFocus
+          className="scale-100 w-[95%] h-[40%] ml-[0.68em] border-solid border-3 border-cyan-600 rounded-md mt-[-9.0] p-0"
+          placeholder="Give the task a name!"
+          id="textArea"
+          ref={textRef}
+          required
+          name="textPart"
+        />
+        <div className="w-full h-[20%] flex flex-row">
+          <button
+            type="button"
+            onClick={renderEmoji}
+            id="emoji-picker"
+            style={{ display: "none" }}
+          >
+            {" "}
+          </button>
+          <div className="absolute top-1 left-1 z-[1000]">
+            {displayEmoji && <Picker onEmojiClick={appendEmoji} />}
+          </div>
+          <label htmlFor="emoji-picker">
+            <FontAwesomeIcon
+              icon={faFaceSmile}
+              className="scale-145 ml-[2.2em] mt-[1.0em] cursor-pointer transition: background-color 0.5s hover:text-red-500"
+            />
+          </label>
+          <input
+            type="file"
+            style={{ display: "none" }}
+            onChange={handleFileChange}
+            id="attachment-upload"
+            accept=".pdf,.xml,.docx"
+          />
+          <label htmlFor="attachment-upload">
+            <FontAwesomeIcon
+              icon={faPaperclip}
+              className="scale-145 ml-[2.2em] mt-[1.0em] cursor-pointer transition: background-color 0.5s hover:text-red-500"
+            />
+          </label>
+          <button
+            type="button"
+            onClick={renderDate}
+            id="date-picker"
+            style={{ display: "none" }}
+          >
+            {" "}
+          </button>
+          <label htmlFor="date-picker">
+            <FontAwesomeIcon
+              icon={faCalendar}
+              className="scale-145 ml-[2.2em] mt-[1.0em] cursor-pointer transition: background-color 0.5s hover:text-red-500"
+            />
+          </label>
+          <div className="absolute left-[325px] bottom-[240px] bg-white rounded-md z-[1000]">
+            {displayDate && (
+              <DatePicker selected={taskDate} onChange={appendDate} />
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={renderMembers}
+            id="member-picker"
+            style={{ display: "none" }}
+          >
+            {" "}
+          </button>
+          <label htmlFor="member-picker" className="ml-[50%]">
+            <FontAwesomeIcon
+              icon={faUserPlus}
+              className="scale-145 text-grey-400 cursor-pointer mt-[0.7em]"
+            />
+          </label>
         </div>
-    )
+        <div>
+          <div className="w-full h-[15%] text-[12px] flex m-0 flex-row">
+            <label>Attachments:</label>{" "}
+            <span id="attach">
+              {displayfile &&
+                files.map((file, index) => (
+                  <FileInfo
+                    key={index}
+                    id={index}
+                    fileName={file.name}
+                    deleteAttachment={deleteAttachment}
+                  />
+                ))}
+            </span>
+          </div>
+        </div>
+        <div className="w-full h-[50px] flex justify-center">
+          <button
+            type="submit"
+            className="w-[75%] mt-[1.0em] h-full font-bold mt-[2.5em] bg-cyan-500 text-center text-[18px] text-white rounded-md transition delay-150 hover:bg-indigo-500"
+          >
+            Create Task
+          </button>
+        </div>
+      </form>
+      <div
+        ref={membersRef}
+        className="absolute z-[10000] left-[500px] bottom-[100px]"
+      >
+        {displayMembers && (
+          <MemberChecklist
+            deptMemberList={members || []}
+            close={renderMembers}
+            setChosenMembers={setChosenMembers}
+            chosen={chosenMembers}
+            displayChosen={setDisplayChosen}
+          />
+        )}
+      </div>
+    </div>
+  );
 };
 
-
-
-
-
-
-const FileInfo = ({id,fileName, deleteAttachment}) => {
-      let fileID = id;
-   
-    return (
-        <div className="h-[40px] text-[12px] font-bold ml-[2.0em] bg-red-700 text-white rounded-md justify-center
-        inline-block p-[12px] min-w-[25%] min-h-[50%] m-0 p-0 "> {/*file-card*/}
-            {fileName} <button  onClick={()=> {deleteAttachment(fileID)}} type="button"><FontAwesomeIcon icon={faXmark} 
-            className="close"/> </button>
-        </div>
-    )
-}
-
-//Same as FileInfo, but for members
-const MemberInfo = ({memberId,memberName, deletePeople}) => {
-  let memberID = memberId;
-      
-return (
-    <div className="h-[40px] text-[12px] ml-[2.0em] bg-red-700 justify-center rounded-md inline-block p-[12px] text-white"> {/*   */}
-        {memberName} <button  onClick={()=> {deletePeople(memberID)}} type="button"><FontAwesomeIcon icon={faXmark} 
-        className="close"/> </button>
+const FileInfo = ({ id, fileName, deleteAttachment }) => {
+  return (
+    <div className="h-full text-[8px] font-bold ml-[2.0em] bg-red-700 text-white rounded-md justify-center inline-block p-[12px] min-w-[25%] min-h-[50%] m-0 p-0">
+      {fileName}{" "}
+      <button onClick={() => deleteAttachment(id)} type="button">
+        <FontAwesomeIcon icon={faXmark} className="close" />
+      </button>
     </div>
-)
-}
+  );
+};
 
-const MemberChecklist = ({ deptMemberList, close, setChosenMembers, displayChosen, chosen  }) => {
-  const handleMemberSelection = (e) => {
-       e.preventDefault();
-    
-    const memberData = e.target;
-     const formData = new FormData(memberData);
-     const chosenList = [];
-     for (let [key, value] of formData.entries()) {
-       chosenList.push(value);
-     }
-       if(chosen !== null){
-       let combinedList = [...chosen,...chosenList];
-       setChosenMembers(combinedList);
-       }
-       else{
-           setChosenMembers(chosenList);
-       }
-     displayChosen(true);
-    close();  
-  };
-    return (
-      <div className="border-solid border-3 border-cyan-600 rounded-md w-[300px] max-h-[250px] flex flex-col bg-white"> {/*check-list-container */}
-        <form className="overflow-hidden overflow-y-scroll" onSubmit={handleMemberSelection}> {/*check-list */}
-          <ul>
-            {deptMemberList.map((member) => (
-              <li className="border-b-2 border-black" key={member.username}> {/*check-list-option */}
-                <input
-                  type="checkbox"
-                  id={member.username}
-                  name="members"
-                  value={member.username}
-                />
-                <label htmlFor={member.username}>{member.username}</label>
-              </li>
-            ))}
-          </ul>
-  
-          <div className="adjacent-check-list">
-            <button type="button" className="w-[50%] bg-red-800 transition delay-150 hover:bg-red-500" onClick={close}> {/*check-list-close */}
-              Close
-            </button>
-            <button  type="submit" className="w-[45%] transition delay-150 bg-green-800 hover:bg-indigo-500"> {/* check-list-accept*/}
-              Accept
-            </button>
-          </div>
-        </form>
-      </div>
+const MemberInfo = ({ memberId, memberName, deletePeople }) => {
+  return (
+    <div className="h-full text-[12px] ml-[2.0em] bg-red-700 justify-center inline-block p-[12px] text-white">
+      {memberName}{" "}
+      <button onClick={() => deletePeople(memberId)} type="button">
+        <FontAwesomeIcon icon={faXmark} className="close" />
+      </button>
+    </div>
+  );
+};
+
+const MemberChecklist = ({
+  deptMemberList = [],
+  close,
+  setChosenMembers,
+  displayChosen,
+  chosen,
+}) => {
+  const [search, setSearch] = useState("");
+  const [selectedItems, setSelectedItems] = useState([]);
+  const searchInputRef = useRef(null);
+
+  useEffect(() => {
+    if (searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+    console.log("Department Members List:", deptMemberList);
+  }, [deptMemberList]);
+
+  const handleCheckboxChange = (e) => {
+    const { value, checked } = e.target;
+    setSelectedItems((prev) =>
+      checked ? [...prev, value] : prev.filter((item) => item !== value)
     );
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log("Selected members:", selectedItems);
+    if (Array.isArray(chosen) && chosen.length > 0) {
+      const combinedList = [...chosen, ...selectedItems];
+      setChosenMembers([...new Set(combinedList)]);
+    } else {
+      setChosenMembers(selectedItems);
+    }
+    displayChosen(true);
+    close();
+  };
 
-  export default NewTask;
+  const defaultMembers = [
+    { id: 1, username: "admin" },
+    { id: 2, username: "user1" },
+    { id: 3, username: "user2" },
+  ];
+
+  const membersToDisplay =
+    Array.isArray(deptMemberList) && deptMemberList.length > 0
+      ? deptMemberList
+      : defaultMembers;
+  const filteredMembers = membersToDisplay.filter((member) => {
+    const username = member.username || "";
+    const email = member.email || "";
+    return (
+      username.toLowerCase().includes(search.toLowerCase()) ||
+      email.toLowerCase().includes(search.toLowerCase())
+    );
+  });
+
+  return (
+    <div
+      className="border-solid border-2 border-gray-300 rounded-md w-[300px] max-h-[350px] flex flex-col bg-white shadow-lg z-[10000]"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div className="p-2 border-b border-gray-200 bg-gray-50">
+        <input
+          type="text"
+          placeholder="Search users..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full p-2 border rounded"
+          ref={searchInputRef}
+          onClick={(e) => e.stopPropagation()}
+        />
+      </div>
+      <form className="overflow-auto flex-grow" onSubmit={handleSubmit}>
+        {filteredMembers.length > 0 ? (
+          <ul className="divide-y divide-gray-200">
+            {filteredMembers.map((member, index) => {
+              const value = member.username || member.email || `user${index}`;
+              return (
+                <li
+                  className="py-2 px-3 hover:bg-gray-100"
+                  key={index}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id={`member-${index}`}
+                      name="members"
+                      value={value}
+                      className="h-4 w-4 mr-2"
+                      onChange={handleCheckboxChange}
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                    <label
+                      htmlFor={`member-${index}`}
+                      className="ml-2 text-sm font-medium text-gray-700 cursor-pointer"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const checkbox = document.getElementById(
+                          `member-${index}`
+                        );
+                        if (checkbox) {
+                          checkbox.checked = !checkbox.checked;
+                          checkbox.dispatchEvent(
+                            new Event("change", { bubbles: true })
+                          );
+                        }
+                      }}
+                    >
+                      {value}
+                    </label>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        ) : (
+          <div className="p-4 text-center text-gray-500">
+            {search ? "No users match your search" : "No users available"}
+          </div>
+        )}
+        <div className="flex border-t border-gray-200">
+          <button
+            type="button"
+            className="w-1/2 py-2 bg-red-600 hover:bg-red-700 text-white font-medium"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              close();
+            }}
+          >
+            Close
+          </button>
+          <button
+            type="submit"
+            className="w-1/2 py-2 bg-green-600 hover:bg-green-700 text-white font-medium"
+            onClick={(e) => e.stopPropagation()}
+          >
+            Accept
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+export default NewTask;

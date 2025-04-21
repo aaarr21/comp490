@@ -1,32 +1,33 @@
 {
-    "sqltools.connections": [
-        {
-            "mysqlOptions": {
-                "authProtocol": "default",
-                "enableSsl": "Disabled"
-            },
-            "previewLimit": 50,
-            "server": "130.166.163.255",
-            "port": 3306,
-            "driver": "MySQL",
-            "name": "WorkFlow Connection",
-            "database": "WorkFlowBan",
-            "username": "root"
-        },
-        {
-            "mysqlOptions": {
-                "authProtocol": "default",
-                "enableSsl": "Disabled"
-            },
-            "previewLimit": 50,
-            "server": "130.166.160.32",
-            "port": 3306,
-            "driver": "MySQL",
-            "name": "WorkFlow Connection",
-            "database": "WorkFlowBan",
-            "username": "teamuser",
-            "askForPassword": true
-        }
-    ],
-    "git.ignoreLimitWarning": true
+  "sqltools.connections": [
+    {
+      "mysqlOptions": {
+        "authProtocol": "default",
+        "enableSsl": "Disabled"
+      },
+      "previewLimit": 50,
+      "server": "130.166.163.255",
+      "port": 3306,
+      "driver": "MySQL",
+      "name": "WorkFlow Connection",
+      "database": "WorkFlowBan",
+      "username": "root"
+    },
+    {
+      "mysqlOptions": {
+        "authProtocol": "default",
+        "enableSsl": "Disabled"
+      },
+      "previewLimit": 50,
+      "server": "130.166.160.32",
+      "port": 3306,
+      "driver": "MySQL",
+      "name": "WorkFlow Connection",
+      "database": "WorkFlowBan",
+      "username": "teamuser",
+      "askForPassword": true
+    }
+  ],
+  "git.ignoreLimitWarning": true,
+  "CodeGPT.apiKey": "CodeGPT Plus Beta"
 }

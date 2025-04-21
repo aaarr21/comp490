@@ -1,153 +1,215 @@
-const Task = require('../models/Task');
-const Column = require('../models/Column');
-const db = require('../config/db');
-const { S3Client, GetObjectCommand } = require("@aws-sdk/client-s3");
-const {getSignedUrl} = require("@aws-sdk/s3-request-presigner");
+const db = require("../config/db");
 
+class TaskRepository {
+  async createColumn(column) {
+    try {
+      console.log("Creating column with values:", {
+        title: column.title,
+        columnAsg: column.columnAsg,
+        color: column.color,
+        creator: column.creator,
+      });
 
-const s3 = new S3Client({
-    region: process.env.AWS_REGION,
-    credentials: {
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.AWS_SECRET_KEY,
-    },
-});
+      // Optionally, you can check for duplicate columnAsg here:
+      const [existing] = await db.query(
+        "SELECT * FROM columns WHERE columnAsg = ?",
+        [column.columnAsg]
+      );
+      if (existing.length > 0) {
+        throw new Error("A column with this slug already exists.");
+      }
 
-class TaskRepository{
+      const [result] = await db.query(
+        "INSERT INTO columns (title, columnAsg, color, creator) VALUES (?, ?, ?, ?)",
+        [column.title, column.columnAsg, column.color, column.creator]
+      );
+      console.log("Column created, insertId:", result.insertId);
+      return result.insertId;
+    } catch (error) {
+      console.error("Error adding new column:", error);
+      throw new Error("Column creation failed: " + error.message);
+    }
+  }
 
+  async createTask(task) {
+    try {
+      const [result] = await db.query(
+        "INSERT INTO tasks (creator, title, status, assigned, date, columnId) VALUES (?,?,?,?,?,?)",
+        [
+          task.creator,
+          task.title,
+          task.status,
+          task.assigned,
+          task.date,
+          task.columnId,
+        ]
+      );
+      return result.insertId;
+    } catch (error) {
+      console.error("Error adding new task", error);
+      throw error;
+    }
+  }
 
-     
+  async updateStatus(cardId, newStatus) {
+    console.log("Updating status " + cardId + " new status: " + newStatus);
+    try {
+      const [result] = await db.query(
+        "UPDATE tasks SET status = ? WHERE id = ?",
+        [newStatus, cardId]
+      );
+      console.log(result);
+      return result;
+    } catch (error) {
+      console.error("Error updating task status", error);
+      throw error;
+    }
+  }
 
+  async updateTitle(cardId, newTitle) {
+    try {
+      const [result] = await db.query(
+        "UPDATE tasks SET title = ? WHERE id = ?",
+        [newTitle, cardId]
+      );
+      console.log(result);
+      return result;
+    } catch (error) {
+      console.error("Error updating task title", error);
+      throw error;
+    }
+  }
 
-    async findTask() {
+  async swapColumns(cardId, columnId) {
+    try {
+      const [result] = await db.query(
+        "UPDATE tasks SET columnId = ? WHERE id = ?",
+        [columnId, cardId]
+      );
+      console.log(result);
+      return result;
+    } catch (error) {
+      console.error("Error swapping columns", error);
+      throw new Error("Task Not Found");
+    }
+  }
 
+  async deleteTask(cardId) {
+    const [rows] = await db.query("SELECT * FROM tasks WHERE id = ?", [cardId]);
+    if (rows.length === 0) {
+      throw new Error("Task Not Found");
     }
 
-     async createColumn (column){
-         try {
-                     const [result] = await db.query(
-                         "INSERT INTO columns ( title, columnAsg, color, creator ) VALUES (?, ?, ?, ?)", 
-                         [column.columnTitle, column.column,column.color,column.creator]
-                     );
-                     return result.insertId;
-                 } catch (error) {
-                     console.error("Error adding new column:", error);
-                     throw error;
-                 }
-     }
+    try {
+      const [result] = await db.query("DELETE FROM tasks WHERE id = ?", [
+        cardId,
+      ]);
+      console.log(result);
+      return result;
+    } catch (error) {
+      console.error("Error deleting task", error);
+      throw new Error("Unable to delete Task");
+    }
+  }
 
-     async createTask (task) {
-       try{
-        const [result] = await db.query(
-            "INSERT INTO tasks (creator, title, status, assigned, date,attachment, columnId) VALUES (?,?,?,?,?,?,?)",
-             [task.creator,task.title,task.status,task.assigned,task.date,task.attachment,task.columnId]
-         );
-         console.log("Task Creation details:" + result);
-         return result.insertId;
-       }catch(error){
-        console.error("Error adding new task", error);
-        throw error;
-       }
-     }
+  async deleteColumn(columnId, creator) {
+    try {
+      // First check if column exists
+      const [columnRows] = await db.query(
+        "SELECT creator FROM columns WHERE columnAsg = ?",
+        [columnId]
+      );
 
-     async updateStatus (cardId, newStatus) {
-        console.log("Updating status "+ cardId + " new status: " + newStatus );
-        try{
-            const [result] = await db.query("UPDATE tasks SET status = ? WHERE id = ?", [newStatus, cardId]);
-            console.log(result);
-        }catch(error){
-            console.error("Error updating task", error)
-        }
-     }
+      if (columnRows.length === 0) {
+        throw new Error("Column not found");
+      }
 
-     async updateTitle (cardId, newTitle) {
-        
-        try{
-            const [result] = await db.query("UPDATE tasks SET title = ? WHERE id = ?", [newTitle, cardId]);
-            console.log(result);
-        }catch(error){
-            console.error("Error updating task", error)
-        }
-     }
+      // Check if column has any incomplete tasks (compare status case-insensitively)
+      const [taskRows] = await db.query(
+        "SELECT COUNT(*) as taskCount FROM tasks WHERE columnId = ? AND UPPER(status) != 'COMPLETED'",
+        [columnId]
+      );
 
-     async swapColumns( cardId, columnId){
-        try{
-          const [result] = await db.query("UPDATE tasks SET columnId = ? WHERE id = ?", [columnId ,  cardId]);
-          console.log(result);
-          
-        }catch(error){
-            throw new Error("Task Not Found");
-        }
-     }
-    
+      if (taskRows[0].taskCount > 0) {
+        throw new Error("Cannot delete column with incomplete tasks");
+      }
 
-     async findOrCreateTask (){
+      // Delete the column
+      const [result] = await db.query(
+        "DELETE FROM columns WHERE columnAsg = ?",
+        [columnId]
+      );
 
-     }
+      return result;
+    } catch (error) {
+      console.error("Error deleting column", error);
+      throw error;
+    }
+  }
 
-     async updateDate (){
+  /**
+   * Get all tasks
+   * @returns {Promise<Array>} Array of task objects
+   */
+  async getAllTasks() {
+    try {
+      const [rows] = await db.query(
+        "SELECT id, title, creator, assigned, columnId, status, date FROM tasks"
+      );
+      return rows;
+    } catch (error) {
+      console.error("Error getting all tasks", error);
+      throw error;
+    }
+  }
 
-     }
+  /**
+   * Get tasks created by or assigned to a specific user
+   * @param {number|string} userId - User ID or username
+   * @returns {Promise<Array>} Array of task objects
+   */
+  async getTasksByUser(userId) {
+    try {
+      const [rows] = await db.query(
+        "SELECT id, title, creator, assigned, columnId, status, date FROM tasks WHERE creator = ? OR assigned LIKE ?",
+        [userId, `%${userId}%`]
+      );
+      return rows;
+    } catch (error) {
+      console.error(`Error getting tasks for user ${userId}`, error);
+      throw error;
+    }
+  }
 
-     async deleteTask (cardId) {
-        
-        const [rows] = await db.query(`SELECT * FROM tasks where id =  ?`,[cardId]); // is it this?
-        console.log(rows);
-        if(rows.length === 0)
-            throw new Error("Task Not Found");
+  /**
+   * Get tasks assigned to a specific user
+   * @param {string} username - Username
+   * @returns {Promise<Array>} Array of task objects
+   */
+  async getTasksByAssigned(username) {
+    try {
+      const [rows] = await db.query(
+        "SELECT id, title, creator, assigned, columnId, status, date FROM tasks WHERE assigned LIKE ?",
+        [`%${username}%`]
+      );
+      return rows;
+    } catch (error) {
+      console.error(`Error getting tasks for assigned user ${username}`, error);
+      throw error;
+    }
+  }
 
-        try {
-            const [result] = await db.query(`DELETE FROM tasks WHERE id = ?`,[cardId]);
-            console.log(result);
-            return result;
-        }catch(error){
-             throw new Error("Unable to delete Task");
-        }
-     }
-
-     async deleteColumn () {
-        
-     }
-
-
-
-     async getAllTasks(){
-        try{
-            const [rows] = await db.query("SELECT id, title, creator, assigned, attachment, columnId, status, date FROM tasks"); // Get all of the board columns.
-            
-           //Promise.all to handle async operations, just to deal with generated signed urls.
-            const generatedRows = await Promise.all(
-                rows.map( async (row)=>{
-                    if(row.attachment !== null){
-                        
-                           const command = new GetObjectCommand({
-                              Bucket: process.env.S3_BUCKET_NAME,
-                              Key: row.attachment
-                           })
-                       const generatedURL = await getSignedUrl(s3, command, 
-                        {expiresIn: (3600 * 10)});
-                        row.attachment = generatedURL;
-                    }
-                    return row;
-               })
-            )
-           
-            return generatedRows;
-         }catch(error){
-            throw error;
-         }
-     }
-
-     async getAllGoals(){
-         try{
-            const [rows] = await db.query("SELECT title, columnAsg, color, creator FROM columns"); // Get all of the board columns.
-            return rows;
-         }catch(error){
-            throw error;
-         }
-     }
+  async getAllGoals() {
+    try {
+      const [rows] = await db.query(
+        "SELECT title, columnAsg, color, creator FROM columns"
+      );
+      return rows;
+    } catch (error) {
+      console.error("Error getting all goals/columns", error);
+      throw error;
+    }
+  }
 }
-
-
 
 module.exports = TaskRepository;
