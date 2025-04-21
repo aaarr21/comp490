@@ -40,13 +40,14 @@ body{
   margin-right: 40px;
   font-weight: 500;
   cursor: pointer;
-  background-color: black;
-  block-size: 50px;
-  
-  
+  background-color: white;
+  padding:15px;
+  max-height: 100px;
+  transition: background-color 0.5s;
+  border-radius:10px;
 }
 .listItem:hover{
-  background-color:brown;
+  background-color:whitesmoke;
 }
 
 .LogBox{
@@ -307,8 +308,10 @@ body{
 }
 
 
-.logo{
+.nav-logo{
+  display:block;
   font:bolder;
+  padding:50px;
 }
 
 .forgot{
