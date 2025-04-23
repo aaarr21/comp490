@@ -1,4 +1,14 @@
 const db = require("../config/db");
+const { S3Client, GetObjectCommand } = require("@aws-sdk/client-s3");
+const {getSignedUrl} = require("@aws-sdk/s3-request-presigner");
+
+const s3 = new S3Client({
+    region: process.env.AWS_REGION,
+    credentials: {
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_KEY,
+    },
+});
 
 class TaskRepository {
   async createColumn(column) {
@@ -34,12 +44,13 @@ class TaskRepository {
   async createTask(task) {
     try {
       const [result] = await db.query(
-        "INSERT INTO tasks (creator, title, status, assigned, date, columnId) VALUES (?,?,?,?,?,?)",
+        "INSERT INTO tasks (creator, title, status, assigned,attachment, date, columnId) VALUES (?,?,?,?,?,?,?)",
         [
           task.creator,
           task.title,
           task.status,
           task.assigned,
+          task.attachment,
           task.date,
           task.columnId,
         ]
@@ -154,9 +165,22 @@ class TaskRepository {
   async getAllTasks() {
     try {
       const [rows] = await db.query(
-        "SELECT id, title, creator, assigned, columnId, status, date FROM tasks"
+        "SELECT id, title, creator, assigned,attachment, columnId, status, date FROM tasks"
       );
-      return rows;
+      const generatedRows = await Promise.all(
+        rows.map(async (row)=> {
+          if(row.attachment !== null){
+            const command = new GetObjectCommand({
+              Bucket: process.env.S3_BUCKET_NAME,
+              Key: row.attachment
+            })
+            const generatedURL = await getSignedUrl(s3, command,{expiresIn: (3600 * 10)});
+            row.attachment = generatedURL;
+          }
+          return row;
+        })
+      )
+      return generatedRows;
     } catch (error) {
       console.error("Error getting all tasks", error);
       throw error;
@@ -171,10 +195,23 @@ class TaskRepository {
   async getTasksByUser(userId) {
     try {
       const [rows] = await db.query(
-        "SELECT id, title, creator, assigned, columnId, status, date FROM tasks WHERE creator = ? OR assigned LIKE ?",
+        "SELECT id, title, creator, assigned,attchment,columnId, status, date FROM tasks WHERE creator = ? OR assigned LIKE ?",
         [userId, `%${userId}%`]
       );
-      return rows;
+      const generatedRows = await Promise.all(
+        rows.map(async (row)=> {
+          if(row.attachment !== null){
+            const command = new GetObjectCommand({
+              Bucket: process.env.S3_BUCKET_NAME,
+              Key: row.attachment
+            })
+            const generatedURL = await getSignedUrl(s3, command,{expiresIn: (3600 * 10)});
+            row.attachment = generatedURL;
+          }
+          return row;
+        })
+      )
+      return generatedRows;
     } catch (error) {
       console.error(`Error getting tasks for user ${userId}`, error);
       throw error;
@@ -189,10 +226,23 @@ class TaskRepository {
   async getTasksByAssigned(username) {
     try {
       const [rows] = await db.query(
-        "SELECT id, title, creator, assigned, columnId, status, date FROM tasks WHERE assigned LIKE ?",
+        "SELECT id, title, creator, assigned,attachment,columnId, status, date FROM tasks WHERE assigned LIKE ?",
         [`%${username}%`]
       );
-      return rows;
+      const generatedRows = await Promise.all(
+        rows.map(async (row)=> {
+          if(row.attachment !== null){
+            const command = new GetObjectCommand({
+              Bucket: process.env.S3_BUCKET_NAME,
+              Key: row.attachment
+            })
+            const generatedURL = await getSignedUrl(s3, command,{expiresIn: (3600 * 10)});
+            row.attachment = generatedURL;
+          }
+          return row;
+        })
+      )
+      return generatedRows;
     } catch (error) {
       console.error(`Error getting tasks for assigned user ${username}`, error);
       throw error;

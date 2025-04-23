@@ -9,7 +9,8 @@ const db = require("../config/db");
 
 const createNewTask = async (req, res) => {
   const { textPart, date, assigned, column, creator } = req.body;
-
+   let fileKey;
+   req.file === undefined ? fileKey = null : fileKey = req.file.key;
   if (!textPart || !date || !assigned || !column || !creator) {
     return res.status(400).json({ error: "Missing task field." });
   }
@@ -19,6 +20,7 @@ const createNewTask = async (req, res) => {
       textPart,
       date,
       assigned,
+      fileKey,
       column,
       creator
     );

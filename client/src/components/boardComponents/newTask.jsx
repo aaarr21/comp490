@@ -73,7 +73,7 @@ const NewTask = ({
   };
 
   const appendEmoji = (emojiObject) => {
-    textRef.current.value += emojiObject.emoji;
+    setText((prevText) => prevText + emojiObject.emoji);
     setEmoji(!displayEmoji);
   };
 
@@ -151,7 +151,6 @@ const NewTask = ({
       if (newTask && newTask.id) {
         setCards((prev) => [...prev, { ...newTask, columnId: column }]);
         invertTask(false);
-        taskSuccess("Task created successfully");
       } else {
         const newTaskId = Math.random().toString();
         const newTaskObj = {
@@ -182,7 +181,8 @@ const NewTask = ({
   };
 
   return (
-    <div className="absolute flex w-[450px] h-[525px] max-h-[525px] flex-col ml-[0.5em] border font-inter rounded-md inset-y-0 left-0 text-[18px] bg-white m-auto left-1/3 right-1/3 z-[9999]">
+    <div className="fixed flex w-[450px] h-[525px] max-h-[525px] flex-col ml-[0.5em] border 
+    font-inter rounded-md inset-y-0 left-0 text-[18px] bg-white m-auto left-1/3 right-1/3 z-[9999]">
       <div className="w-full text-[24px] font-bold h-[15%] flex flex-row">
         <h2 className="w-[50%] ml-[0.5em] mt-[0.5em]">Create New Task</h2>
         <button
@@ -226,7 +226,7 @@ const NewTask = ({
           required
           name="textPart"
         />
-        <div className="w-full h-[20%] flex flex-row">
+        <div className="w-full h-[20%] flex flex-row items-center">
           <button
             type="button"
             onClick={renderEmoji}
@@ -238,10 +238,10 @@ const NewTask = ({
           <div className="absolute top-1 left-1 z-[1000]">
             {displayEmoji && <Picker onEmojiClick={appendEmoji} />}
           </div>
-          <label htmlFor="emoji-picker">
+          <label htmlFor="emoji-picker" className="ml-[2.2em] cursor-pointer transition: background-color 0.5s hover:text-red-500">
             <FontAwesomeIcon
               icon={faFaceSmile}
-              className="scale-145 ml-[2.2em] mt-[1.0em] cursor-pointer transition: background-color 0.5s hover:text-red-500"
+              className="scale-145  mt-[0.5em] "
             />
           </label>
           <input
@@ -251,10 +251,10 @@ const NewTask = ({
             id="attachment-upload"
             accept=".pdf,.xml,.docx"
           />
-          <label htmlFor="attachment-upload">
+          <label htmlFor="attachment-upload" className="ml-[2.2em]  cursor-pointer transition: background-color 0.5s hover:text-red-500">
             <FontAwesomeIcon
               icon={faPaperclip}
-              className="scale-145 ml-[2.2em] mt-[1.0em] cursor-pointer transition: background-color 0.5s hover:text-red-500"
+              className="scale-145 mt-[0.5em]"
             />
           </label>
           <button
@@ -265,10 +265,10 @@ const NewTask = ({
           >
             {" "}
           </button>
-          <label htmlFor="date-picker">
+          <label htmlFor="date-picker" className="ml-[2.2em]  cursor-pointer transition: background-color 0.5s hover:text-red-500">
             <FontAwesomeIcon
               icon={faCalendar}
-              className="scale-145 ml-[2.2em] mt-[1.0em] cursor-pointer transition: background-color 0.5s hover:text-red-500"
+              className="scale-145 mt-[0.5em]"
             />
           </label>
           <div className="absolute left-[325px] bottom-[240px] bg-white rounded-md z-[1000]">
@@ -284,15 +284,16 @@ const NewTask = ({
           >
             {" "}
           </button>
-          <label htmlFor="member-picker" className="ml-[50%]">
+          <label htmlFor="member-picker" className="ml-[2.5%] cursor-pointer  transition: background-color 
+          0.5s hover:text-red-500 left-[400px] absolute">
             <FontAwesomeIcon
               icon={faUserPlus}
-              className="scale-145 text-grey-400 cursor-pointer mt-[0.7em]"
+              className="scale-145 text-grey-400  mt-[0.7em]"
             />
           </label>
         </div>
         <div>
-          <div className="w-full h-[15%] text-[12px] flex m-0 flex-row">
+          <div className="w-full h-[15%] text-[12px] flex m-0 flex-wrap">
             <label>Attachments:</label>{" "}
             <span id="attach">
               {displayfile &&
@@ -307,7 +308,7 @@ const NewTask = ({
             </span>
           </div>
         </div>
-        <div className="w-full h-[50px] flex justify-center">
+        <div className=" flex justify-center">
           <button
             type="submit"
             className="w-[75%] mt-[1.0em] h-full font-bold mt-[2.5em] bg-cyan-500 text-center text-[18px] text-white rounded-md transition delay-150 hover:bg-indigo-500"
@@ -336,7 +337,8 @@ const NewTask = ({
 
 const FileInfo = ({ id, fileName, deleteAttachment }) => {
   return (
-    <div className="h-full text-[8px] font-bold ml-[2.0em] bg-red-700 text-white rounded-md justify-center inline-block p-[12px] min-w-[25%] min-h-[50%] m-0 p-0">
+    <div className="h-[40px] text-[12px] font-bold ml-[2.0em] 
+    bg-red-700 text-white rounded-md justify-center inline-block p-[12px] min-w-[25%] min-h-[50%] m-0 p-0">
       {fileName}{" "}
       <button onClick={() => deleteAttachment(id)} type="button">
         <FontAwesomeIcon icon={faXmark} className="close" />

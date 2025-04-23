@@ -59,7 +59,6 @@ router.delete('/:id', userController.deleteUser);  // Route to delete a user
 router.post('/reset-password', userController.resetPassword);  // Route to reset the password
 router.post('/swap-columns',taskController.dealWTaskDrag); //route to deal with swapping columns
 router.post('/update-status', taskController.updateStatus);
-
 router.post('/update-title',taskController.updateTitle);
 router.post('/create-new-task', upload.single('attachment'), taskController.createNewTask); // Route to create a new task 
 router.post('/create-new-goal', taskController.createGoal);

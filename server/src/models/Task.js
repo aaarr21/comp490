@@ -2,10 +2,11 @@
 const db = require("../config/db");
 
 class Task {
-  constructor(title, date, assigned, column, creator) {
+  constructor(title, date, assigned, attachment, column, creator) {
     this.title = title;
     this.date = date;
     this.assigned = assigned;
+    this.attachment = attachment;
     this.status = "STARTED"; // Default status for new tasks
     this.columnId = column;
     this.creator = creator;

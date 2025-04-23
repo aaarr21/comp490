@@ -18,6 +18,7 @@ const Card = ({
   columnId,
   creator,
   assigned,
+  attachment,
   date,
   handleDragStart,
   onEdit,
@@ -38,6 +39,8 @@ const Card = ({
   const canDeleteTask = hasPermission("task.delete");
   const canDeleteAnyTask = hasPermission("task.delete.any");
   const isAdmin = hasRole("admin");
+
+ 
 
   // Compare creator and user.id as strings
   const isCreator =
