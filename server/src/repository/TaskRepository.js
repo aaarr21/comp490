@@ -1,5 +1,5 @@
 const db = require("../config/db");
-const { S3Client, GetObjectCommand } = require("@aws-sdk/client-s3");
+const { S3Client, GetObjectCommand, DeleteObjectCommand } = require("@aws-sdk/client-s3");
 const {getSignedUrl} = require("@aws-sdk/s3-request-presigner");
 
 const s3 = new S3Client({
@@ -66,6 +66,8 @@ class TaskRepository {
   async updateStatus(cardId, newStatus) {
     console.log("Updating status " + cardId + " new status: " + newStatus);
     try {
+      
+      
       const [result] = await db.query(
         "UPDATE tasks SET status = ? WHERE id = ?",
         [newStatus, cardId]
@@ -81,12 +83,32 @@ class TaskRepository {
   async attachFile(cardId, fileKey){
     console.log("Attaching file:" + cardId + " file: " + fileKey);
     try{
+      const [rows] = await db.query("SELECT * FROM tasks WHERE id = ?",[cardId]);
+        if(rows[0].attachment !== null){
+          //do deleting things here.
+          this.removeFile(rows[0].attachment);
+         
+        }
         const [result] = await db.query("UPDATE tasks SET attachment = ? WHERE id = ?",[fileKey,cardId]);
         console.log(result);
         return result;
     }catch (error){
       console.error("Error updating task")
     }
+  }
+
+  async removeFile(file){
+    const command = new DeleteObjectCommand({
+      Bucket: process.env.S3_BUCKET_NAME,
+      Key: file,
+    })
+    try{
+      const response = await s3.send(command);
+      console.log("Deleted object from bucket.");
+    }catch(error){
+      console.log("Failed to delete bucket: " + error);
+    }
+   
   }
 
   async updateTitle(cardId, newTitle) {

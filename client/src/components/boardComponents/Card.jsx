@@ -97,6 +97,7 @@ const Card = ({
         const data = new FormData();
         data.append("cardId", id);
         data.append("attachment", event.target.files[0]); 
+        
         console.log(data);
         try{
           toast.promise(await axios.post(

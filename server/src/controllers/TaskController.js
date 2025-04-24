@@ -146,7 +146,7 @@ const attachFile = async (req, res) => {
       "update"
     );
     console.log(
-      `User ${req.user.id} delete permission for card ${cardId}: ${hasPermission}`
+      `User ${req.user.id} update permission for card ${cardId}: ${hasPermission}`
     );
     if (!hasPermission) {
       return res.status(403).json({
@@ -155,7 +155,7 @@ const attachFile = async (req, res) => {
       });
     }
     const file = await taskService.attachFile(cardId, fileKey);
-    console.log(file);
+    
     res.status(200).json({
       success: true,
       message: "Succesfully attached a file!",
