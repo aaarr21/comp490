@@ -60,6 +60,7 @@ router.post('/reset-password', userController.resetPassword);  // Route to reset
 router.post('/swap-columns',taskController.dealWTaskDrag); //route to deal with swapping columns
 router.post('/update-status', taskController.updateStatus);
 router.post('/update-title',taskController.updateTitle);
+router.post('/attach-file', upload.single('attachment'), taskController.attachFile)
 router.post('/create-new-task', upload.single('attachment'), taskController.createNewTask); // Route to create a new task 
 router.post('/create-new-goal', taskController.createGoal);
 router.get('/get-all-members', userController.getAllUsers);

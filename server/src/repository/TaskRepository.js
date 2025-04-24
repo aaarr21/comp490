@@ -55,7 +55,7 @@ class TaskRepository {
           task.columnId,
         ]
       );
-      console.log(result);
+      
       return result.insertId;
     } catch (error) {
       console.error("Error adding new task", error);
@@ -75,6 +75,17 @@ class TaskRepository {
     } catch (error) {
       console.error("Error updating task status", error);
       throw error;
+    }
+  }
+
+  async attachFile(cardId, fileKey){
+    console.log("Attaching file:" + cardId + " file: " + fileKey);
+    try{
+        const [result] = await db.query("UPDATE tasks SET attachment = ? WHERE id = ?",[fileKey,cardId]);
+        console.log(result);
+        return result;
+    }catch (error){
+      console.error("Error updating task")
     }
   }
 

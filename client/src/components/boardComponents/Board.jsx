@@ -136,8 +136,9 @@ const Board = ({ success, fail }) => {
   */
 useEffect(()=> {
   const getTasks = async () => {
+    try{
        toast.promise(axios.get(`${process.env.REACT_APP_API_URL}/auth/get-all-tasks`, 
-                    {credentials : 'include'} ) , {
+                    {withCredentials: true,} ) , {
                      loading: 'Retriving Data...',
                      success: (response) =>{
                       setCards(response.data);
@@ -145,6 +146,9 @@ useEffect(()=> {
                      },
                      error: "Error occured during retrival.",
                  }); 
+                }catch(error){
+                  console.error(error); 
+                }
   
 }
           getTasks();

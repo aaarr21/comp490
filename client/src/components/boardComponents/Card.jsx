@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useRBAC } from "../../utils/rbacUtils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {motion} from 'framer-motion';
+import axios from 'axios';
 import {
   faCalendarAlt,
   faUser,
@@ -11,6 +12,7 @@ import {
   faArrowRight,
   faPaperclip,
 } from "@fortawesome/free-solid-svg-icons";
+import { toast } from "sonner";
 
 const Card = ({
   id,
@@ -28,6 +30,7 @@ const Card = ({
 }) => {
   const [menuVisible, setMenuVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [attached,setAttached] = useState(attachment);
   const [isEditingStatus, setIsEditingStatus] = useState(false);
   const [editTitle, setEditTitle] = useState(title);
   const [editStatus, setEditStatus] = useState(status);
@@ -87,6 +90,37 @@ const Card = ({
       setIsEditingStatus(false);
     }
   };
+
+  const handleFileUpload = async (event) => {
+    setMenuVisible(false);
+    if(canUpdateTask) {
+        const data = new FormData();
+        data.append("cardId", id);
+        data.append("attachment", event.target.files[0]); 
+        console.log(data);
+        try{
+          toast.promise(await axios.post(
+            `${process.env.REACT_APP_API_URL}/auth/attach-file`,
+            data,
+            {
+              headers: { "Content-Type": "multipart/form-data" },
+              withCredentials: true,
+            }
+          ), {
+            loading: "uploading file....",
+            success: (response) => {
+              
+              setAttached(response.data.file);   
+              return "Attached file to task!"
+            },
+            failure: "Error uploading file"
+          }    );
+
+        }catch(error){
+            console.error(error);
+        }
+    }
+  }
 
   // Format date for display
   const formattedDate = date ? new Date(date).toLocaleDateString() : null;
@@ -158,7 +192,7 @@ const Card = ({
         ) : (
           <div className="text-md flex gap-1 justify-between mt-5 py-1 text-grey-800">
             <p>{status}</p>
-           { attachment !== null ?( <a href={attachment} target="_blank"> <FontAwesomeIcon className="mr-[2.5%] cursor-pointer  transition: background-color 
+           { attached !== null ?( <a href={attached} target="_blank"> <FontAwesomeIcon className="mr-[2.5%] cursor-pointer  transition: background-color 
           0.5s hover:text-red-500" icon={faPaperclip}/></a>) :(<span></span>) }
           </div>
         )}
@@ -201,6 +235,13 @@ const Card = ({
                 >
                   Edit Status
                 </li>
+                <li 
+                
+                    className="cursor-pointer px-3 py-1 roudded hover:bg-amber-100 transition-colors"
+                     >
+                      <label className="cursor-pointer" htmlFor="file-upload">Attach File</label>
+                      <input type="file" id="file-upload" onChange={handleFileUpload} style={{display: "none"}}></input>
+                      </li>
               </>
             )}
 

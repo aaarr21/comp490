@@ -40,6 +40,13 @@ class TaskService {
     return taskWithId;
   }
 
+
+  async attachFile(cardId, fileKey) {
+     await this.taskRepository.attachFile(cardId,fileKey);
+     const key = await this.generateURL(fileKey);
+     return key;
+  }
+
   //Generate a signedURL for task creation
   // Done so the immediate created task actually has a link to access the file.
   async generateURL(attachment) { 

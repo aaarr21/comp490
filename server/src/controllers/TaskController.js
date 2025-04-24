@@ -130,6 +130,42 @@ const updateTitle = async (req, res) => {
   }
 };
 
+const attachFile = async (req, res) => {
+  const {cardId} = req.body;
+  console.log(cardId);
+  
+  let fileKey = req.file.key;
+  console.log(fileKey);
+  if(!cardId) {
+      return res.status(400).json({error: "Missing task ID"});
+  }  
+  try{
+    const hasPermission = await Task.checkPermission(
+      req.user.id,
+      cardId,
+      "update"
+    );
+    console.log(
+      `User ${req.user.id} delete permission for card ${cardId}: ${hasPermission}`
+    );
+    if (!hasPermission) {
+      return res.status(403).json({
+        success: false,
+        message: "You don't have permission to delete this task",
+      });
+    }
+    const file = await taskService.attachFile(cardId, fileKey);
+    console.log(file);
+    res.status(200).json({
+      success: true,
+      message: "Succesfully attached a file!",
+      file
+    })
+  }catch(error){
+
+  }
+}
+
 const deleteTask = async (req, res) => {
   const { cardId } = req.query;
   if (!cardId) {
@@ -305,4 +341,5 @@ module.exports = {
   updateStatus,
   updateTitle,
   deleteColumn,
+  attachFile,
 };
