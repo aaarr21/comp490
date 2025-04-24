@@ -55,6 +55,7 @@ class TaskRepository {
           task.columnId,
         ]
       );
+      console.log(result);
       return result.insertId;
     } catch (error) {
       console.error("Error adding new task", error);

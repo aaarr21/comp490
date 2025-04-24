@@ -7,6 +7,17 @@ const Task = require("../models/Task");
 const Column = require("../models/Column");
 const TaskRepository = require("../repository/TaskRepository");
 const rbacService = require("../services/RBACService");
+const { S3Client, GetObjectCommand } = require("@aws-sdk/client-s3");
+const {getSignedUrl} = require("@aws-sdk/s3-request-presigner");
+
+const s3 = new S3Client({
+    region: process.env.AWS_REGION,
+    credentials: {
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_KEY,
+    },
+});
+
 
 class TaskService {
   constructor() {
@@ -22,8 +33,22 @@ class TaskService {
   async registerTask(textPart, date, assigned,attachment,column, creator) {
     const newTask = new Task(textPart, date, assigned,attachment, column, creator);
     const id = await this.taskRepository.createTask(newTask);
+    if(attachment !== null){
+      newTask.attachment = await this.generateURL(attachment);
+    }
     const taskWithId = { ...newTask, id: id };
     return taskWithId;
+  }
+
+  //Generate a signedURL for task creation
+  // Done so the immediate created task actually has a link to access the file.
+  async generateURL(attachment) { 
+     const command = new GetObjectCommand({
+        Bucket: process.env.S3_BUCKET_NAME,
+        Key: attachment
+     })
+     const attached = await getSignedUrl(s3,command,{expiresIn: (3600 * 10)});
+     return attached;
   }
 
   async deleteTask(cardId) {

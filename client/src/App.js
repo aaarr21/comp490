@@ -28,7 +28,7 @@ function App() {
   return (
     // Wrap the entire application with RBACProvider
     <RBACProvider>
-      <div>
+      <div className="overflow-hidden">
         {shouldShowDashbar && <Dashbar />}
         {shouldShowNavibar && <Navibar />}
 

@@ -9,6 +9,7 @@ import {
   faEdit,
   faTrash,
   faArrowRight,
+  faPaperclip,
 } from "@fortawesome/free-solid-svg-icons";
 
 const Card = ({
@@ -30,6 +31,7 @@ const Card = ({
   const [isEditingStatus, setIsEditingStatus] = useState(false);
   const [editTitle, setEditTitle] = useState(title);
   const [editStatus, setEditStatus] = useState(status);
+  
   const menuRef = useRef(null);
   const { hasPermission, hasRole, user } = useRBAC();
 
@@ -154,8 +156,10 @@ const Card = ({
             disabled={!canEditThisTask}
           />
         ) : (
-          <div className="text-md flex gap-4 justify-between mt-5 py-1 text-grey-800">
+          <div className="text-md flex gap-1 justify-between mt-5 py-1 text-grey-800">
             <p>{status}</p>
+           { attachment !== null ?( <a href={attachment} target="_blank"> <FontAwesomeIcon className="mr-[2.5%] cursor-pointer  transition: background-color 
+          0.5s hover:text-red-500" icon={faPaperclip}/></a>) :(<span></span>) }
           </div>
         )}
 

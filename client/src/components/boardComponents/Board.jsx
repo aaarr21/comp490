@@ -153,7 +153,7 @@ useEffect(()=> {
 
 
   return (
-    <div className="p-12">
+    <div className="p-2">
       {/* Board container with horizontal scrolling */}
       <div className="flex gap-3 overflow-x-auto">
         {columns.map((column) => (
