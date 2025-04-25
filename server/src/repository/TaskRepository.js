@@ -97,6 +97,24 @@ class TaskRepository {
     }
   }
 
+  async deleteFile(cardId){
+    try{
+      const [rows] = await db.query("SELECT * FROM tasks WHERE id = ?",[cardId]);
+        if(rows[0].attachment !== null){
+          //do deleting things here.
+          this.removeFile(rows[0].attachment);
+          const erasure = null;
+          const [result] = await db.query("UPDATE tasks SET attachment = ? WHERE id = ?",[erasure,cardId]);
+        console.log(result);
+    
+        }
+
+       
+    }catch (error){
+      console.error("Error updating task")
+    }
+  }
+
   async removeFile(file){
     const command = new DeleteObjectCommand({
       Bucket: process.env.S3_BUCKET_NAME,

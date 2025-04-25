@@ -91,6 +91,31 @@ const Card = ({
     }
   };
 
+  const handleFileRemoval = async () =>{
+
+    if(canUpdateTask){
+      const cardId = id;
+      try{
+        toast.promise(await axios.post(
+          `${process.env.REACT_APP_API_URL}/auth/delete-file`,{cardId},
+          {withCredentials: true}
+        ), {
+          loading: "removing file....",
+          success: (response) => {
+            
+            setAttached(null);   
+            return "Removed file from task"
+          },
+          failure: "Error deleting file"
+        }    );
+
+      }catch(error){
+          console.error(error);
+      }
+    }
+     
+  }
+
   const handleFileUpload = async (event) => {
     setMenuVisible(false);
     if(canUpdateTask) {
@@ -243,6 +268,15 @@ const Card = ({
                       <label className="cursor-pointer" htmlFor="file-upload">Attach File</label>
                       <input type="file" id="file-upload" onChange={handleFileUpload} style={{display: "none"}}></input>
                       </li>
+               <li
+                  onClick={() =>{
+                    handleFileRemoval();
+                    setMenuVisible(false);
+                  }}
+                  className="cursor-pointer px-3 py-1 rounded hover:bg-red-100 transition-colors"
+               >
+                  Remove File
+               </li>
               </>
             )}
 
@@ -254,7 +288,7 @@ const Card = ({
                 }}
                 className="cursor-pointer px-3 py-1 rounded hover:bg-red-100 transition-colors"
               >
-                Delete
+                Delete Task
               </li>
             )}
           </ul>

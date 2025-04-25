@@ -47,6 +47,10 @@ class TaskService {
      return key;
   }
 
+  async deleteFile(cardId){
+    await this.taskRepository.deleteFile(cardId);
+  }
+
   //Generate a signedURL for task creation
   // Done so the immediate created task actually has a link to access the file.
   async generateURL(attachment) { 

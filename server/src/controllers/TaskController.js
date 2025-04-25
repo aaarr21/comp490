@@ -132,10 +132,10 @@ const updateTitle = async (req, res) => {
 
 const attachFile = async (req, res) => {
   const {cardId} = req.body;
-  console.log(cardId);
+  
   
   let fileKey = req.file.key;
-  console.log(fileKey);
+  
   if(!cardId) {
       return res.status(400).json({error: "Missing task ID"});
   }  
@@ -151,7 +151,7 @@ const attachFile = async (req, res) => {
     if (!hasPermission) {
       return res.status(403).json({
         success: false,
-        message: "You don't have permission to delete this task",
+        message: "You don't have permission to update this task",
       });
     }
     const file = await taskService.attachFile(cardId, fileKey);
@@ -162,8 +162,40 @@ const attachFile = async (req, res) => {
       file
     })
   }catch(error){
-
+     console.error("Failed to attach file:" + " " + error);
   }
+}
+
+const deleteFile = async(req,res) => {
+  const {cardId} = req.body;
+  if(!cardId) {
+    return res.status(400).json({error: "Missing task ID"});
+}  
+try{
+  const hasPermission = await Task.checkPermission(
+    req.user.id,
+    cardId,
+    "update"
+  );
+  console.log(
+    `User ${req.user.id} update permission for card ${cardId}: ${hasPermission}`
+  );
+  if (!hasPermission) {
+    return res.status(403).json({
+      success: false,
+      message: "You don't have permission to update this task",
+    });
+  }
+   await taskService.deleteFile(cardId);
+  
+  res.status(200).json({
+    success: true,
+    message: "Succesfully removed a file!",
+  
+  })
+}catch(error){
+   console.error("Failed to remove file:" + " " + error);
+}
 }
 
 const deleteTask = async (req, res) => {
@@ -342,4 +374,5 @@ module.exports = {
   updateTitle,
   deleteColumn,
   attachFile,
+  deleteFile,
 };
