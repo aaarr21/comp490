@@ -1,29 +1,31 @@
-Workflowban project
-file structure
+### WORKFLOWBAN
 
-/fullstack-app
-│
-├── /client              # Frontend (React, Vue, or any frontend framework)
-│   ├── /src
-│   │   ├── /components
-│   │   └── /pages
-│   └── /public
-│
-├── /server              # Backend (Node.js with Express)
-│   ├── /src
-│   │   ├── /config      #Configuration setting(e.g., db.js)
-│   │   ├── /controllers	#handles application logic and routes
-│   │   ├── /models				#database schema
-│   │   ├── /routes 			#API routes (e.g., user routes)
-│   │   └── /services			#business logic
-│   └── index.js
-│
-├── package.json         # Root package.json for managing scripts
-├── README.md            # Documentation
-└── .env                 # Environment variables
+A Trello-esque project management Webstie featuring a role-based permission system.
 
 
+### Features
 
-NOTE: 
-  
-   Please message me for the specifics of the .env file because you cannot push it to the remote without violating branch protection
+Create project goals and sub-tasks for each goal. Each sub task is given a name, status, whose is working on it, and an accompying attachment, if needed. 
+These sub tasks can be moved around different goals depending on client needs.
+
+Admins, such as faculty admins or Company managers are able to modify and create permissions for either roles or speciifc people. 
+
+These permissions include
+- Abilty to view certain goals or tasks
+- Creation of tasks
+- Modification, such as attachment upload, status or date change, and deletion.
+
+
+### Tools used
+
+This project was built using React and accompying packages for our frontend, and an Express-based server with middleware such as multer(file uploading) and passport to handle non-local authentication.
+
+A MySql database on a remote ubuntu server, provided by Professor John Wiegley, handled database interactions, and an AWS S3 instance to handle attached file uploading, viewing, and deletion.
+
+Group Members:
+
+Sebastian Sunga
+Bryan Abrego
+Alyssa Gomez 
+John Dong
+Bianca Loera
