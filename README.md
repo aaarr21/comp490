@@ -1,6 +1,6 @@
 ### WORKFLOWBAN
 
-A Trello-esque project management Webstie featuring a role-based permission system.
+A Trello-esque project management Website featuring a role-based permission system.
 
 
 ### Features
@@ -8,7 +8,7 @@ A Trello-esque project management Webstie featuring a role-based permission syst
 Create project goals and sub-tasks for each goal. Each sub task is given a name, status, whose is working on it, and an accompying attachment, if needed. 
 These sub tasks can be moved around different goals depending on client needs.
 
-Admins, such as faculty admins or Company managers are able to modify and create permissions for either roles or speciifc people. 
+Admins, such as faculty admins or Company managers, are able to modify and create permissions for either roles or speciifc people. 
 
 These permissions include
 - Abilty to view certain goals or tasks
